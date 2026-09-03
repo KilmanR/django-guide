@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Часть 5: Тестирование — django-guide</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav><a href="index.html">Разделы</a></nav>
+  </div>
+</header>
+<main class="wrap">
+<h1>Часть 5: Тестирование</h1>
+<p>Тесты защищают код: находим ошибки до пользователя.</p>
+<h2>Простой тест модели</h2>
+<p>В <code>polls/tests.py</code>:<br>```python<br>from django.test import TestCase<br>from .models import Question</p>
+<p>class QuestionModelTests(TestCase):<br>    def test_was_published_recently_with_future(self):<br>        # Вопрос из будущего не должен считаться недавним.<br>        import datetime<br>        from django.utils import timezone<br>        future_question = Question(pub_date=timezone.now() + datetime.timedelta(days=30))<br>        self.assertIs(future_question.was_published_recently(), False)<br>```</p>
+<h2>Тест view</h2>
+<pre>def test_no_questions(self):
+    response = self.client.get("/polls/")
+    self.assertContains(response, "Нет голосований.")</pre>
+<h2>Запуск</h2>
+<pre>python manage.py test polls</pre>
+<p>Каждый тест создаёт свою тестовую БД (не трогает рабочую).</p>
+<h2>Принцип</h2>
+<p>Тестируйте поведение, которое пользователь увидит: страницы возвращают 200,<br>содержат нужный текст, редиректы работают.</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
+</main>
+</body>
+</html>

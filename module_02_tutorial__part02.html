@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Часть 2: Модели и база данных — django-guide</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav><a href="index.html">Разделы</a></nav>
+  </div>
+</header>
+<main class="wrap">
+<h1>Часть 2: Модели и база данных</h1>
+<p>Модель = таблица в базе. Django хранит логику в ORM.</p>
+<h2>Модели Question и Choice</h2>
+<p>В <code>polls/models.py</code>:<br>```python<br>from django.db import models</p>
+<p>class Question(models.Model):<br>    question_text = models.CharField(max_length=200)<br>    pub_date = models.DateTimeField("date published")</p>
+<p>    def __str__(self):<br>        return self.question_text</p>
+<p>class Choice(models.Model):<br>    question = models.ForeignKey(Question, on_delete=models.CASCADE)<br>    choice_text = models.CharField(max_length=200)<br>    votes = models.IntegerField(default=0)</p>
+<p>    def __str__(self):<br>        return self.choice_text<br>```</p>
+<h2>Миграции</h2>
+<pre>python manage.py makemigrations polls   # создать миграции
+python manage.py sqlmigrate polls 0001  # увидеть SQL
+python manage.py migrate                # применить</pre>
+<h2>Регистрация в админке</h2>
+<p>В <code>polls/admin.py</code>:<br>```python<br>from django.contrib import admin<br>from .models import Question</p>
+<p>admin.site.register(Question)<br>```</p>
+<h2>Суперпользователь</h2>
+<pre>python manage.py createsuperuser</pre>
+<p>Админка: http://127.0.0.1:8000/admin/</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
+</main>
+</body>
+</html>

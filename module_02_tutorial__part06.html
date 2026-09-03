@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Часть 6: Статика (CSS, картинки, JS) — django-guide</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav><a href="index.html">Разделы</a></nav>
+  </div>
+</header>
+<main class="wrap">
+<h1>Часть 6: Статика (CSS, картинки, JS)</h1>
+<h2>Создаём CSS</h2>
+<p>Файл <code>polls/static/polls/style.css</code>:<br>``<code>css&lt;br&gt;body { background: white; color: #333; font-family: sans-serif; }&lt;br&gt;</code>``</p>
+<h2>Подключаем в шаблон</h2>
+<p>В начале <code>polls/templates/polls/index.html</code>:<br>``<code>html&lt;br&gt;{% load static %}&lt;br&gt;&lt;link rel="stylesheet" href="{% static 'polls/style.css' %}"&gt;&lt;br&gt;</code>``</p>
+<h2>Настройки (dev)</h2>
+<p>В <code>settings.py</code> уже есть <code>STATIC_URL = "static/"</code>. Это путь на сервере.<br>Django сам находит статику в <code>static/</code> внутри приложений.</p>
+<h2>В проде (collectstatic)</h2>
+<pre>python manage.py collectstatic</pre>
+<p>собирает всё из приложений в одну папку <code>STATIC_ROOT</code>.</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
+</main>
+</body>
+</html>

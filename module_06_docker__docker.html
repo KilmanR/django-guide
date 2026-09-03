@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docker для Django (основные понятия и команды) — django-guide</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav><a href="index.html">Разделы</a></nav>
+  </div>
+</header>
+<main class="wrap">
+<h1>Docker для Django (основные понятия и команды)</h1>
+<p>Docker обёртывает приложение в <strong>контейнер</strong> — изолированное окружение, где уже есть<br>Python, библиотеки и запуск команд. Так проект живёт одинаково на любом компьютере.</p>
+<h2>Ключевые понятия (коротко)</h2>
+<table><tr><th>Термин</th><th>Что это</th></tr><tr><td>--------</td><td>---------</td></tr><tr><td><strong>Образ (image)</strong></td><td>«чертёж»/пакет со всем нужным (Python + Django + код). Неизменяем.</td></tr><tr><td><strong>Контейнер (container)</strong></td><td>запущенный образ — живой процесс (сами запускаете/останавливаете).</td></tr><tr><td><strong>Dockerfile</strong></td><td>файл-инструкция, из которого строится образ.</td></tr><tr><td><strong>docker-compose</strong></td><td>много контейнеров сразу (у нас web + база postgres) одной командой.</td></tr><tr><td><strong>Docker Hub / registry</strong></td><td>онлайн-хранилище готовых образов (<code>postgres:16</code>, <code>python:3.12</code>).</td></tr></table>
+<h2>Dockerfile (как строится образ)</h2>
+<pre>FROM python:3.12-slim        # база-образ (свежий Python)
+WORKDIR /app                 # рабочая папка внутри контейнера
+COPY . /app                  # копируем код
+RUN pip install -r requirements.txt   # ставим зависимости
+CMD ["python", "manage.py", "runserver"]  # команда старта</pre>
+<h2>Основные команды Docker</h2>
+<pre>docker build -t myapp .       # собрать образ из Dockerfile
+docker images                 # список образов
+docker run -it myapp          # запустить контейнер в фореграунде
+
+docker ps                     # запущенные контейнеры
+docker ps -a                  # все (включая остановленные)
+
+docker stop &lt;id&gt;              # остановить
+docker rm &lt;id&gt;                # удалить контейнер
+docker exec -it &lt;id&gt; bash     # зайти внутрь запущенного контейнера
+docker logs &lt;id&gt;              # логи контейнера
+docker rmi &lt;образ&gt;            # удалить образ</pre>
+<h2>Docker Compose (наше: web + db)</h2>
+<p>Файл <code>docker-compose.yml</code> описывает все сервисы и связи одной командой.</p>
+<pre>services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: django
+      POSTGRES_PASSWORD: django
+      POSTGRES_DB: mydb
+  web:
+    build: .                 # собирается из Dockerfile
+    ports:
+      - "8000:8000"          # порт наружу : порт внутри
+    volumes:
+      - ./app:/app           # код с диска внутрь (правки сразу видны)
+    depends_on:
+      - db</pre>
+<pre>docker compose up -d        # запустить всё (в фоне)
+docker compose ps           # статус сервисов
+docker compose logs -f web  # смотреть логи (f = follow)
+docker compose down         # остановить и убрать контейнеры (данные в volume остаются)
+docker compose build        # пересобрать образ после изменений</pre>
+<h2>Важные детали для Django</h2>
+<ul><li><strong>Порты</strong>: <code>ПОРТ_СНАРУЖИ:ПОРТ_ВНУТРИ</code>. Внутри Django слушает <code>0.0.0.0:8000</code>,</li></ul>
+<p>  снаружи доступен на том же 8000. <code>0.0.0.0</code> = слушать для всех адресов.<br>- <strong>Volumes</strong>: синхронизируют папку с кодом между диском и контейнером. Изменили<br>  код → перезапустить runserver (или он сам рестартует с <code>--reload</code>).<br>- <strong>Переменные окружения</strong>: подключение к БД в контейнере передаётся env-переменными<br>  (хост БД = имя сервиса <code>db</code>, а не localhost!).<br>- <strong>База в контейнере</strong>: данные хранятся в volume <code>pgdata</code> — переживают <code>down</code>.<br>  Чтобы полностью сбросить БД: <code>docker compose down -v</code> (удалит данные!).</p>
+<h2>Типичный цикл работы (по шагам, как мы делали)</h2>
+<pre>docker compose up -d          # подняли Django + Postgres
+docker compose exec web python manage.py startapp polls   # добавили приложение
+# ... отредактировали код в ./app ...
+docker compose logs -f web    # смотрим ошибки запуска</pre>
+<h2>Где твой проект</h2>
+<p>У нас на сервере: <code>~/django-guide/compose/</code><br>``<code>bash&lt;br&gt;cd ~/django-guide/compose&lt;br&gt;docker compose up -d      # запустить&lt;br&gt;docker compose logs -f web&lt;br&gt;</code>``<br>Открыть в браузере: <strong>http://192.168.31.41:8000/</strong> (адрес-ноутса/localhost).<br>Контейнер = отличная «песочница»: редактируем код по шагам tutorial, ошибка — читаем<br>логи, экспериментируем сколько угодно, база изолирована.</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
+</main>
+</body>
+</html>

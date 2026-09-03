@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Модели и ORM (осправочник) — django-guide</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav><a href="index.html">Разделы</a></nav>
+  </div>
+</header>
+<main class="wrap">
+<h1>Модели и ORM (осправочник)</h1>
+<h2>Поля моделей (часто используемые)</h2>
+<table><tr><th>Поле</th><th>Назначение</th></tr><tr><td>------</td><td>-----------</td></tr><tr><td><code>CharField(max_length=N)</code></td><td>строка (текст) фикс. длины</td></tr><tr><td><code>TextField()</code></td><td>длинный текст</td></tr><tr><td><code>IntegerField()</code></td><td>целое число</td></tr><tr><td><code>FloatField()</code></td><td>число с плавающей точкой</td></tr><tr><td><code>BooleanField()</code></td><td>True/False</td></tr><tr><td><code>DateTimeField()</code></td><td>дата и время</td></tr><tr><td><code>DateField()</code></td><td>дата</td></tr><tr><td><code>ForeignKey(Модель, on_delete=...)</code></td><td>связь многие-к-одному</td></tr><tr><td><code>ManyToManyField(Модель)</code></td><td>связь многие-ко-многим</td></tr><tr><td><code>OneToOneField(Модель)</code></td><td>связь один-к-одному</td></tr></table>
+<h2>on_delete (что делать при удалении родителя)</h2>
+<ul><li><code>CASCADE</code> — удалить зависимые записи (часто)</li><li><code>SET_NULL</code> — поставить NULL (нужно <code>null=True</code>)</li><li><code>PROTECT</code> — запретить удаление, если есть зависимые</li><li><code>DO_NOTHING</code> — ничего не делать</li></ul>
+<h2>Метаданные и __str__</h2>
+<pre>class Author(models.Model):
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ["name"]       # сортировка по умолчанию
+
+    def __str__(self):
+        return self.name</pre>
+<h2>CRUD через ORM</h2>
+<h3>Создать</h3>
+<pre>b = Book(title="Война и мир", author=author_obj)
+b.save()
+# или
+b = Book.objects.create(title="...", author=author_obj)</pre>
+<h3>Прочитать (выборка)</h3>
+<pre>Book.objects.all()                        # все
+Book.objects.get(id=1)                    # один (ошибка если нет/несколько)
+Book.objects.filter(author=author_obj)    # фильтр
+Book.objects.exclude(title="...")         # исключить
+Book.objects.order_by("-id")[:10]         # сортировка (-" — убывание), лимит
+Book.objects.get_or_create(...)           # получить или создать</pre>
+<h3>Обновить</h3>
+<pre>b.title = "Новое название"
+b.save()
+# массово:
+Book.objects.filter(...).update(pages=10)</pre>
+<h3>Удалить</h3>
+<pre>b.delete()
+Book.objects.filter(...).delete()</pre>
+<h2>Связанные объекты</h2>
+<pre>choice_set.all()      # обратная связь ForeignKey: q.choice_set.all()
+question.author       # прямая связь
+question.author_set   # обратная (ManyToMany) — convention _set</pre>
+<h2>Агрегации (через expressions)</h2>
+<pre>from django.db.models import Count, Sum, Avg, Max
+Book.objects.aggregate(total=Sum("pages"), avg=Avg("pages"))
+Author.objects.annotate(num_books=Count("book"))</pre>
+<h2>Q-объекты (сложные условия)</h2>
+<pre>from django.db.models import Q
+Book.objects.filter(Q(title__icontains="война") | Q(pages__gt=500))</pre>
+<h2>ForeignKey: related_name</h2>
+<pre>class Book(models.Model):
+    author = models.ForeignKey(Author, on_delete=models.CASCADE,
+                               related_name="books")
+# тогда обратная связь: author.books.all()</pre>
+<h2>Всё для реального проекта</h2>
+<p>Модель = таблица; миграции применяются <code>python manage.py migrate</code>.<br>Поля-связи, Meta, __str__ — базовый стандарт любой Django-модели.</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
+</main>
+</body>
+</html>

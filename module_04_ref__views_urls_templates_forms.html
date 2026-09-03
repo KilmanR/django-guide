@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Views, URLconf, Templates, Forms (справочник) — django-guide</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav><a href="index.html">Разделы</a></nav>
+  </div>
+</header>
+<main class="wrap">
+<h1>Views, URLconf, Templates, Forms (справочник)</h1>
+<h2>View (представление) — функция</h2>
+<pre>from django.http import HttpResponse, JsonResponse, Http404
+from django.shortcuts import render, redirect, get_object_or_404
+
+def index(request):
+    return HttpResponse("Привет")
+
+def page(request):
+    return render(request, "app/page.html", {"title": "Моя"})
+
+def obj(request, pk):
+    model = get_object_or_404(MyModel, pk=pk)
+    return render(request, "app/obj.html", {"obj": model})
+
+def json_view(request):
+    data = {"status": "ok"}
+    return JsonResponse(data)
+
+def redir(request):
+    return redirect("app:index")</pre>
+<h2>Generic Class-Based Views (краткие)</h2>
+<pre>from django.views import generic
+from .models import Book
+
+class BookList(generic.ListView):
+    model = Book
+    template_name = "app/book_list.html"
+
+class BookDetail(generic.DetailView):
+    model = Book
+    template_name = "app/book_detail.html"</pre>
+<h2>URLconf (urls.py)</h2>
+<pre>from django.urls import path, re_path
+from . import views
+
+app_name = "app"
+urlpatterns = [
+    path("", views.index, name="index"),
+    path("books/", views.book_list, name="book_list"),
+    path("books/&lt;int:pk&gt;/", views.book_detail, name="book_detail"),
+    path("search/", views.search, name="search"),
+]</pre>
+<h2>Конвертеры path</h2>
+<pre>&lt;int:...&gt;   целое число
+&lt;str:...&gt;   строка
+&lt;slug:...&gt;  slug (буквы-цифры и "-")
+&lt;uuid:...&gt;  UUID
+&lt;path:...&gt;  путь (включая слэши)</pre>
+<h2>Namespace в шаблонах</h2>
+<pre>{% url 'app:book_detail' book.id %}</pre>
+<h2>Templates (шаблоны) — базовые теги</h2>
+<pre>{{ variable }}
+{% if %} {% else %} {% endif %}
+{% for item in list %} ... {% endfor %}
+{% url 'name' arg1 %}
+{% include "partial.html" %}
+{% extends "base.html" %}
+{% block content %} ... {% endblock %}
+{% load static %}&lt;img src="{% static 'img/a.png' %}"&gt;</pre>
+<h2>Наследование шаблонов</h2>
+<p><code>base.html</code>:<br>``<code>html&lt;br&gt;&lt;!DOCTYPE html&gt;&lt;br&gt;&lt;html&gt;&lt;body&gt;&lt;br&gt;{% block content %}{% endblock %}&lt;br&gt;&lt;/body&gt;&lt;/html&gt;&lt;br&gt;</code>`<code>&lt;br&gt;дочерний:&lt;br&gt;</code>`<code>html&lt;br&gt;{% extends "base.html" %}&lt;br&gt;{% block content %}&lt;h1&gt;Мой контент&lt;/h1&gt;{% endblock %}&lt;br&gt;</code>``</p>
+<h2>Forms (Формы)</h2>
+<pre>from django import forms
+
+class ContactForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    email = forms.EmailField()
+    message = forms.CharField(widget=forms.Textarea)
+
+def contact(request):
+    if request.method == "POST":
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            # обработать form.cleaned_data
+            return redirect("success")
+    else:
+        form = ContactForm()
+    return render(request, "app/contact.html", {"form": form})</pre>
+<h2>ModelForm (формы от моделей)</h2>
+<pre>from django import forms
+from .models import Book
+
+class BookForm(forms.ModelForm):
+    class Meta:
+        model = Book
+        fields = ["title", "author", "pages"]</pre>
+<h2>CSRF</h2>
+<p>В любой POST-форме в шаблоне обязателен:<br>``<code>html&lt;br&gt;{% csrf_token %}&lt;br&gt;</code>``</p>
+<h2>Безопасность</h2>
+<ul><li>Всегда валидируйте вход от пользователя (<code>is_valid()</code>).</li><li>Используйте ORM-фильтры (а не raw SQL) — защита от injection.</li><li>В формах доверяйте <code>cleaned_data</code>, а не <code>request.POST</code> напрямую.</li></ul>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
+</main>
+</body>
+</html>

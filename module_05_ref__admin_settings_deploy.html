@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin, Settings, Deploy (справочник) — django-guide</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav><a href="index.html">Разделы</a></nav>
+  </div>
+</header>
+<main class="wrap">
+<h1>Admin, Settings, Deploy (справочник)</h1>
+<h2>Админка (django.contrib.admin)</h2>
+<h3>Регистрация модели</h3>
+<pre>from django.contrib import admin
+from .models import Book
+
+@admin.register(Book)          # декомантор
+class BookAdmin(admin.ModelAdmin):
+    pass</pre>
+<h3>Полезные опции ModelAdmin</h3>
+<pre>class BookAdmin(admin.ModelAdmin):
+    list_display = ("title", "author", "price")   # колонки списка
+    list_filter = ("author",)                     # фильтры сбоку
+    search_fields = ("title",)                    # поле поиска
+    list_editable = ("price",)                    # редактирование из списка
+    ordering = ("-price",)                        # сортировка
+    fields = ("title", "pages")                   # поля в форме
+    readonly_fields = ("slug",)                   # только чтение
+    prepopulated_fields = {"slug": ("title",)}    # авто-free slug</pre>
+<h3>Inline (связанные в одной форме)</h3>
+<pre>class ChapterInline(admin.TabularInline):
+    model = Chapter
+    extra = 1
+
+@admin.register(Book)
+class BookAdmin(admin.ModelAdmin):
+    inlines = [ChapterInline]</pre>
+<h2>Settings — ключевые настройки</h2>
+<pre># settings.py
+SECRET_KEY = "..."            # держите в секрете (env)
+DEBUG = True                  # False в проде
+ALLOWED_HOSTS = ["example.com"]  # домен/публичный адрес
+INSTALLED_APPS = ["django.contrib.admin", "django.contrib.auth", ...]
+DATABASES["default"]["ENGINE"] = "django.db.backends.postgresql"
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+LANGUAGE_CODE = "ru-ru"
+TIME_ZONE = "Europe/Moscow"   # или ваши</pre>
+<h3>Хранение секретов через переменные окружения</h3>
+<pre>import os
+SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
+DEBUG = os.environ.get("DJANGO_DEBUG", "false") == "true"
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",")</pre>
+<p>Проще всего через <code>.env</code> + <code>python-dotenv</code>, или в Docker-env.</p>
+<h2>Deploy (публикация)</h2>
+<h3>Миграции и статика (обязательно перед выкатом)</h3>
+<pre>python manage.py migrate
+python manage.py collectstatic --noinput</pre>
+<h3>Проверка продакшн-готовности</h3>
+<pre>python manage.py check --deploy</pre>
+<p>Выведет предупреждения (секреты, DEBUG, allowed_hosts) — устраните их.</p>
+<h3>Запуск через Gunicorn (WSGI-сервер)</h3>
+<pre>pip install gunicorn
+gunicorn mysite.wsgi:application --bind 0.0.0.0:8000 --workers 3</pre>
+<h3>Django + Gunicorn + Nginx + PostgreSQL (типовая связка)</h3>
+<ul><li><strong>Nginx</strong> — отдаёт статику/меdia, проксирует / на 8000.</li><li><strong>Gunicorn</strong> — запускает Django (WSGI на 8000).</li><li><strong>PostgreSQL</strong> — база (subtitute на проде вместо sqlite).</li><li><strong>collectstatic</strong> — статика лежит в STATIC_ROOT, её отдаёт Nginx.</li><li><strong>Миграции</strong> применяются до запуска Gunicorn.</li></ul>
+<h3>Простая автоматизация (как у нас на сервере)</h3>
+<pre># systemd unit mysite.service
+[Unit]
+Description=Django app
+After=network.target
+
+[Service]
+User=www-data
+WorkingDirectory=/srv/www/mysite
+ExecStart=/srv/www/mysite/venv/bin/gunicorn mysite.wsgi:application --bind 127.0.0.1:8000
+EnvironmentFile=/srv/www/mysite/.env
+Restart=always
+
+[Install]
+WantedBy=multi-user.target</pre>
+<pre>sudo systemctl daemon-reload
+sudo systemctl enable --now mysite</pre>
+<h2>Полезные проверки безопасности (deploy)</h2>
+<ul><li><code>DEBUG=False</code> всегда в проде.</li><li>Свой <code>SECRET_KEY</code> (не дефолтный) через env.</li><li><code>ALLOWED_HOSTS</code> заполнен доменом.</li><li>HTTPS через Nginx (certbot / Let's Encrypt).</li><li>Переменные окружения вместо хардкода паролей/ключей.</li></ul>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
+</main>
+</body>
+</html>

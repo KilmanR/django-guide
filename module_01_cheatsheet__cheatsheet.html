@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Шпаргалка команд Django — django-guide</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav><a href="index.html">Разделы</a></nav>
+  </div>
+</header>
+<main class="wrap">
+<h1>Шпаргалка команд Django</h1>
+<p>Обновлено 2026-09-03. Версия Django: 5.x (актуальная стабильная).</p>
+<h2>Создание и запуск проекта</h2>
+<h3>1. Создать проект</h3>
+<pre>django-admin startproject mysite
+cd mysite</pre>
+<h3>2. Запустить dev-сервер</h3>
+<pre>python manage.py runserver
+# по умолчанию http://127.0.0.1:8000
+# укажите порт: python manage.py runserver 8080</pre>
+<h3>3. Создать приложение</h3>
+<pre>python manage.py startapp polls</pre>
+<p>Приложение нужно «зарегистрировать» в <code>settings.py</code> → INSTALLED_APPS.</p>
+<h2>Команды manage.py (часто используемые)</h2>
+<table><tr><th>Команда</th><th>Что делает</th></tr><tr><td>---------</td><td>-----------</td></tr><tr><td><code>runserver</code></td><td>dev-сервер (автоперезагрузка при изменениях)</td></tr><tr><td><code>startapp</code></td><td>создать новое приложение</td></tr><tr><td><code>makemigrations</code></td><td>создать миграции из изменений моделей</td></tr><tr><td><code>migrate</code></td><td>применить миграции к базе</td></tr><tr><td><code>sqlmigrate</code></td><td>показать SQL для миграции</td></tr><tr><td><code>check</code></td><td>проверка проекта на ошибки</td></tr><tr><td><code>shell</code></td><td>интерактивная оболочка Python с Django</td></tr><tr><td><code>createsuperuser</code></td><td>создать суперпользователя (для админки)</td></tr><tr><td><code>runserver</code></td><td>старт сервера</td></tr><tr><td><code>test</code></td><td>запуск тестов</td></tr><tr><td><code>collectstatic</code></td><td>собрать статику в одну папку</td></tr></table>
+<h2>Миграции</h2>
+<pre># 1. Создать миграции после изменения models.py
+python manage.py makemigrations polls
+
+# 2. Показать SQL (не применяя)
+python manage.py sqlmigrate polls 0001
+
+# 3. Применить
+python manage.py migrate</pre>
+<h2>Работа с БД в shell</h2>
+<pre>python manage.py shell</pre>
+<pre>from polls.models import Question, Choice
+# создать
+q = Question(question_text="Как дела?")
+q.save()
+# выборка
+Question.objects.all()
+Question.objects.get(pk=1)
+# связанные записи
+q.choice_set.create(choice_text="Хорошо", votes=0)</pre>
+<h2>Админка</h2>
+<pre>python manage.py createsuperuser
+# затем http://127.0.0.1:8000/admin/</pre>
+<h2>Полезно</h2>
+<ul><li>Показать все команды: <code>python manage.py help</code></li><li>Показать помощь по команде: <code>python manage.py help cmd</code></li><li>Django-расширения (отладка): <code>pip install django-extensions</code></li></ul>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
+</main>
+</body>
+</html>
