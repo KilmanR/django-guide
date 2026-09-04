@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Часть 21: Расширение шаблона — django-guide</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav><a href="index.html">Разделы</a></nav>
+  </div>
+</header>
+<main class="wrap">
+<h1>Часть 21: Расширение шаблона</h1>
+<h1>Расширение шаблона</h1>
+<p>Ещё одной удобной вещью в Django является __расширение шаблонов__. Что это значит? Ты можешь использовать одни и те же блоки HTML-кода для разных частей своего веб-сайта.</p>
+<p>Так тебе не придётся повторяться каждый раз, когда потребуется использовать ту же информацию/структуру. И если появится необходимость что-то изменить, не придётся вносить правки в каждую страницу: достаточно скорректировать шаблон!</p>
+<h2>Создаём базовый шаблон</h2>
+<p>Базовый шаблон — это наиболее общая типовая форма страницы, которую ты расширяешь для отдельных случев.</p>
+<p>Давай создадим файл <code>base.html</code> в директории <code>blog/templates/blog/</code>:</p>
+<pre>blog
+└───templates
+    └───blog
+            base.html
+            post_list.html</pre>
+<p>Теперь открой его и скопируй всё из <code>post_list.html</code> в <code>base.html</code>:</p>
+<p>{% filename %}blog/templates/blog/base.html{% endfilename %}<br>```html<br>{% load static %}<br><html><br>    <head><br>        <title>Django Girls blog</title><br>        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"><br>        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"><br>        <link href='//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext' rel='stylesheet' type='text/css'><br>        <link rel="stylesheet" href="{% static 'css/blog.css' %}"><br>    </head><br>    <body><br>        <div class="page-header"><br>            <h1><a href="/">Django Girls Blog</a></h1><br>        </div></p>
+<p>        <div class="content container"><br>            <div class="row"><br>                <div class="col-md-8"><br>                {% for post in posts %}<br>                    <div class="post"><br>                        <div class="date"><br>                            {{ post.published_date }}<br>                        </div><br>                        <h1><a href="">{{ post.title }}</a></h1><br>                        <p>{{ post.text|linebreaksbr }}</p><br>                    </div><br>                {% endfor %}<br>                </div><br>            </div><br>        </div><br>    </body><br></html><br>```</p>
+<p>Затем в файле <code>base.html</code> замени всё между тегами <code>&lt;body&gt;</code> и <code>&lt;/body&gt;</code> следующим кодом:</p>
+<p>{% filename %}blog/templates/blog/base.html{% endfilename %}<br>``<code>html&lt;br&gt;&lt;body&gt;&lt;br&gt;    &lt;div class="page-header"&gt;&lt;br&gt;        &lt;h1&gt;&lt;a href="/"&gt;Django Girls Blog&lt;/a&gt;&lt;/h1&gt;&lt;br&gt;    &lt;/div&gt;&lt;br&gt;    &lt;div class="content container"&gt;&lt;br&gt;        &lt;div class="row"&gt;&lt;br&gt;            &lt;div class="col-md-8"&gt;&lt;br&gt;            {% block content %}&lt;br&gt;            {% endblock %}&lt;br&gt;            &lt;/div&gt;&lt;br&gt;        &lt;/div&gt;&lt;br&gt;    &lt;/div&gt;&lt;br&gt;&lt;/body&gt;&lt;br&gt;</code>``</p>
+<p>Мы просто заменили всё между <code>{% for post in posts %}{% endfor %}</code> следующим:</p>
+<p>{% filename %}blog/templates/blog/base.html{% endfilename %}<br>``<code>html&lt;br&gt;{% block content %}&lt;br&gt;{% endblock %}&lt;br&gt;</code>``</p>
+<p>Что это означает? Ты только что создала <code>block</code> — тег шаблона, позволяющий вставлять HTML-код этого блока в другие шаблоны, расширяющие <code>base.html</code>. Мы покажем, как это сделать, через секунду.</p>
+<p>Теперь сохрани всё и открой <code>blog/templates/blog/post_list.html</code> снова.<br>{% raw %}Тебе нужно удалить всё до <code>{% for post in posts %}</code> и после <code>{% endfor %}</code>. В итоге файл будет выглядеть следующим образом:{% endraw %}</p>
+<p>{% filename %}blog/templates/blog/post_list.html{% endfilename %}<br>``<code>html&lt;br&gt;{% for post in posts %}&lt;br&gt;    &lt;div class="post"&gt;&lt;br&gt;        &lt;div class="date"&gt;&lt;br&gt;            {{ post.published_date }}&lt;br&gt;        &lt;/div&gt;&lt;br&gt;        &lt;h1&gt;&lt;a href=""&gt;{{ post.title }}&lt;/a&gt;&lt;/h1&gt;&lt;br&gt;        &lt;p&gt;{{ post.text|linebreaksbr }}&lt;/p&gt;&lt;br&gt;    &lt;/div&gt;&lt;br&gt;{% endfor %}&lt;br&gt;</code>``</p>
+<p>Мы хотим использовать это фрагмент в твоём шаблоне для отображения содержимого. Пора добавить теги блоков в этот файл!</p>
+<p>{% raw %}Нам нужно, чтобы новый тег блока соответствовал тегу в файле <code>base.html</code>. Также нам необходимо включить весь код, который соответствует твоему блоку с содержимым. Для этого расположи всё между <code>{% block content %}</code> и <code>{% endblock %}</code>. Вот так:{% endraw %}</p>
+<p>{% filename %}blog/templates/blog/post_list.html{% endfilename %}<br>``<code>html&lt;br&gt;{% block content %}&lt;br&gt;    {% for post in posts %}&lt;br&gt;        &lt;div class="post"&gt;&lt;br&gt;            &lt;div class="date"&gt;&lt;br&gt;                {{ post.published_date }}&lt;br&gt;            &lt;/div&gt;&lt;br&gt;            &lt;h1&gt;&lt;a href=""&gt;{{ post.title }}&lt;/a&gt;&lt;/h1&gt;&lt;br&gt;            &lt;p&gt;{{ post.text|linebreaksbr }}&lt;/p&gt;&lt;br&gt;        &lt;/div&gt;&lt;br&gt;    {% endfor %}&lt;br&gt;{% endblock %}&lt;br&gt;</code>``</p>
+<p>Осталось последнее: нам нужно связать эти два шаблона друг с другом. Ведь именно для этого и нужно расширение шаблонов! Мы сделаем это, добавив тег <code>extends</code> в начало файла. Вот так:</p>
+<p>{% filename %}blog/templates/blog/post_list.html{% endfilename %}<br>```html<br>{% extends 'blog/base.html' %}</p>
+<p>{% block content %}<br>    {% for post in posts %}<br>        <div class="post"><br>            <div class="date"><br>                {{ post.published_date }}<br>            </div><br>            <h1><a href="">{{ post.title }}</a></h1><br>            <p>{{ post.text|linebreaksbr }}</p><br>        </div><br>    {% endfor %}<br>{% endblock %}<br>```</p>
+<p>Готово! Проверь, что твой веб-сайт работает нормально :)</p>
+<p>> Если появилась ошибка <code>TemplateDoesNotExists</code>, это значит, что нет файла <code>blog/base.html</code> и <code>runserver</code> запущен в командной строке. Попробуй остановить его (одновременно нажми Ctrl + C) и перезапусти веб-сервер командой <code>python manage.py runserver</code>.</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
+</main>
+</body>
+</html>
