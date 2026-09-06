@@ -37,7 +37,7 @@
   </div>
 </header>
 <main class="wrap">
-<h1>Модели и ORM (осправочник)</h1>
+<h1>Модели и ORM (справочник)</h1>
 <h2>Поля моделей (часто используемые)</h2>
 <table><tr><th>Поле</th><th>Назначение</th></tr><tr><td>------</td><td>-----------</td></tr><tr><td><code>CharField(max_length=N)</code></td><td>строка (текст) фикс. длины</td></tr><tr><td><code>TextField()</code></td><td>длинный текст</td></tr><tr><td><code>IntegerField()</code></td><td>целое число</td></tr><tr><td><code>FloatField()</code></td><td>число с плавающей точкой</td></tr><tr><td><code>BooleanField()</code></td><td>True/False</td></tr><tr><td><code>DateTimeField()</code></td><td>дата и время</td></tr><tr><td><code>DateField()</code></td><td>дата</td></tr><tr><td><code>ForeignKey(Модель, on_delete=...)</code></td><td>связь многие-к-одному</td></tr><tr><td><code>ManyToManyField(Модель)</code></td><td>связь многие-ко-многим</td></tr><tr><td><code>OneToOneField(Модель)</code></td><td>связь один-к-одному</td></tr></table>
 <h2>on_delete (что делать при удалении родителя)</h2>

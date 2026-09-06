@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Часть 13: Публикация в интернет — django-guide</title>
+<meta name="description" content="django-guide · Часть 13: Публикация в интернет — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Часть 13: Публикация в интернет, on русском, github pages">
+<meta name="author" content="Big Pickle from OpenCode Zen">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Часть 13: Публикация в интернет — django-guide">
+<meta property="og:description" content="django-guide · Часть 13: Публикация в интернет — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<h1>Часть 13: Публикация в интернет</h1>
+<h1>Публикация в Интернете!</h1>
+<p>> <strong>Примечание</strong>: Эта глава может показаться сложной. Будь упорна, развертывание сайта на сервере является важной частью веб-разработки. Данная глава намеренно расположена в середине учебника для того, чтобы твой наставник смог помочь с таким мудреным процессом, как публикация сайта. Так ты сможешь самостоятельно закончить все главы, даже если время будет поджимать.</p>
+<p>До настоящего момента твой сайт был доступен только для локального просмотра, теперь же ты узнаешь, как развернуть его на удалённом сервере! Развертывание (deploy) — это процесс публикации приложения в интернете, чтобы люди могли наконец увидеть твое творение :)</p>
+<p>Как ты уже знаешь, веб-сайт должен располагаться на сервере. Есть много компаний, предоставляющих сервера в интернете. Мы воспользуемся услугами одной из них, с довольно простым процессом публикации: <a href="https://www.pythonanywhere.com/">PythonAnywhere</a>. PythonAnywhere бесплатен для маленьких приложений с небольшим числом посетителей, и этого будет для нас более чем достаточно.</p>
+<p>Другим внешним сервисом, которым мы воспользуемся, будет <a href="https://www.github.com">GitHub</a> — сервис хостинга кода. Существуют и другие похожие сервисы, но практически у каждого программиста есть GitHub аккаунт, теперь будет и у тебя!</p>
+<p>В итоге твой код будет в трёх местах. На локальном компьютере ты будешь заниматься разработкой и тестированием. Когда результат тебя устроит, ты загрузишь свою программу на GitHub. А твой сайт будет на PythonAnywhere, и ты сможешь обновлять его, просто загружая новую версию кода с GitHub.</p>
+<h1>Git</h1>
+<p>> <strong>Примечание:</strong> если ты уже выполнила установку, незачем повторять её вновь — можешь сразу переходить к следующему разделу и начать создание собственного Git-репозитория.</p>
+<p>Git — это «система управления версиями», используемая множеством программистов. Эта программа отслеживает изменения, происходящие с файлами, чтобы впоследствии можно было восстановить состояние кода на нужный момент времени. Это немного похоже на функцию отслеживания изменений в Microsoft Word, но куда мощнее.</p>
+<h2>Установка Git</h2>
+<p>Ты можешь загрузить Git с официального сайта <a href="https://git-scm.com/">git-scm.com</a>. Ты можешь нажимать "дальше, дальше, дальше" на всех этапах установки за исключением одного: на пятом шаге, который называется "Adjusting your PATH environment" (Настройка системной переменной Path), выбери "Use Git and optional Unix tools from the Windows Command Prompt" (Запуск Git и соответствующих Unix утилит через командную строку Windows, нижняя опция). Все остальные настройки можно оставить по умолчанию. Также неплохо будет выбрать опцию "Checkout Windows-style, commit Unix-style line endings".</p>
+<p>После окончания установки не забудь перезапустить командную строку или PowerShell.</p>
+<p>Загрузи Git с официального сайта <a href="https://git-scm.com/">git-scm.com</a> и просто следуй инструкциям по установке.</p>
+<p>> <strong>Примечание:</strong> если ты используешь OS X 10.6, 10.7 или 10.8, тебе придётся установить git отсюда: <a href="https://sourceforge.net/projects/git-osx-installer/files/git-2.3.5-intel-universal-snow-leopard.dmg/download">Установка Git для OS X Snow Leopard</a></p>
+<p><strong>command-line:</strong></p>
+<pre>$ sudo apt install git</pre>
+<p><strong>command-line:</strong></p>
+<pre>$ sudo dnf install git</pre>
+<p><strong>command-line:</strong></p>
+<pre>$ sudo zypper install git</pre>
+<h2>Создаём Git-репозиторий</h2>
+<p>Git отслеживает изменения определенного набора файлов, который называется репозиторием (сокращенно "репо"). Давайте создадим такой для нашего проекта. Открой консоль и запусти эти команды в папке <code>djangogirls</code>:</p>
+<p>> <strong>Примечание:</strong> проверь текущий рабочий каталог с помощью команд <code>pwd</code> (OSX/Linux) или <code>cd</code> (Windows) перед инициализацией нового репозитория. Ты должна находиться в директории <code>djangogirls</code>.</p>
+<p><strong>command-line:</strong></p>
+<pre>$ git init
+Initialized empty Git repository in ~/djangogirls/.git/
+$ git config --global user.name "Your Name"
+$ git config --global user.email you@example.com</pre>
+<p>Инициализировать git-репозиторий придется только один раз за проект (и тебе больше не придется вводить имя пользователя и адрес электронной почты).</p>
+<p>Git будет отслеживать изменения всех файлов и каталогов в заданной директории, однако некоторые из них мы предпочли бы игнорировать. Для этого нам нужно создать файл <code>.gitignore</code> в корневом каталоге репозитория. Открой редактор и создай новый файл со следующим содержанием:</p>
+<p><strong>.gitignore:</strong></p>
+<pre>*.pyc
+*~
+__pycache__
+myvenv
+db.sqlite3
+/static
+.DS_Store</pre>
+<p>И сохрани его как <code>.gitignore</code> в корневом каталоге "djangogirls".</p>
+<p>> <strong>Примечание:</strong> точка в начале имени файла имеет важное значение! Если у тебя есть проблемы с созданием таких файлов (Mac не позволит создать файл с названием, начинающимся с точки, через Finder, например), тогда используй кнопку «Сохранить как» в меню своего редактора кода, это точно поможет.</p>
+<p>> <strong>Примечание:</strong> среди файлов, которые мы перечислили в <code>.gitignore</code>, есть <code>db.sqlite3</code>. Этот файл содержит твою локальную базу данных, где будут храниться твои посты. Мы не добавляем его в репозиторий, поскольку твой сайт на PythonAnywhere будет использовать другую базу данных. Эта база данных тоже может быть SQLite, как на твоём рабочем компьютере, но обычно используется MySQL, которая может справиться с большим количеством посетителей, чем SQLite. В любом случае, поскольку мы не копируем базу данных SQLite на GitHub, все посты, которые ты уже создала, будут доступны только на твоём локальном компьютере, и тебе придётся заново создать их на опубликованном сайте. Рассматривай свою локальную базу данных как удобную игровую площадку, где ты можешь тестировать различные идеи и не бояться удалить настоящий пост из своего блога.</p>
+<p>Используй команду <code>git status</code> перед <code>git add</code> или в любой другой момент, когда ты не уверена, что изменения — хорошая идея. Это убережёт тебя от таких неприятных сюрпризов, как добавление неправильных файлов. Команда <code>git status</code> возвращает информацию обо всех ранее неотслеживаемых/изменённых/добавленных в git файлах, а также статус ветки и многое другое. Результат должен быть похож на:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ git status
+On branch master
+
+No commits yet
+
+Untracked files:
+  (use "git add &lt;file&gt;..." to include in what will be committed)
+
+        .gitignore
+        blog/
+        manage.py
+        mysite/
+
+nothing added to commit but untracked files present (use "git add" to track)</pre>
+<p>И, наконец, мы сохраним наши изменения. Переключись на консоль и набери:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ git add --all .
+$ git commit -m "My Django Girls app, first commit"
+ [...]
+ 13 files changed, 200 insertions(+)
+ create mode 100644 .gitignore
+ [...]
+ create mode 100644 mysite/wsgi.py</pre>
+<h2>Загружаем код в репозиторий GitHub</h2>
+<p>Зайди на <a href="https://www.github.com">GitHub.com</a> и создай новую бесплатную учётную запись (если это уже сделано во время подготовки к воркшопу — здорово!). Убедись, что запомнила свой пароль (добавь его в свой менеджер паролей, если им пользуешься).</p>
+<p>Затем создай новый репозиторий и назови его "my-first-blog". Не выбирай опцию "initialise with a README", не создавай файл .gitignore (мы уже сделали это сами) и оставь лицензию None.</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/deploy/images/new_github_repo.png" alt="images/new_github_repo.png"></p>
+<p>> <strong>Примечание:</strong> имя репозитория <code>my-first-blog</code> для нас очень важно — ты можешь, конечно, придумать другое название, но оно будет встречаться множество раз в руководстве, и тебе придется заменять его каждый раз на своё. Будет проще для начала остановиться на нашем варианте: <code>my-first-blog</code>.</p>
+<p>На следующем экране ты найдёшь URL для клонирования репозитория. Выбери вариант "HTTPS" и скопируй ссылку:</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/deploy/images/github_get_repo_url_screenshot.png" alt="images/github_get_repo_url_screenshot.png"></p>
+<p>Теперь нужно связать локальный репозиторий с репозиторием на GitHub.</p>
+<p>Напечатай у себя в консоли следующую команду (замени <code>&lt;your-github-username&gt;</code> на имя, указанное при создании аккаунта на GitHub, но без угловых скобок):</p>
+<p><strong>command-line:</strong></p>
+<pre>$ git remote add origin https://github.com/&lt;your-github-username&gt;/my-first-blog.git
+$ git push -u origin master</pre>
+<p>Введи свое имя пользователя и пароль от аккаунта GitHub; ты должна увидеть что-то такое:</p>
+<p><strong>command-line:</strong></p>
+<pre>Username for 'https://github.com': hjwp
+Password for 'https://hjwp@github.com':
+Counting objects: 6, done.
+Writing objects: 100% (6/6), 200 bytes | 0 bytes/s, done.
+Total 3 (delta 0), reused 0 (delta 0)
+To https://github.com/hjwp/my-first-blog.git
+ * [new branch]      master -&gt; master
+Branch master set up to track remote branch master from origin.</pre>
+<p><!--TODO: maybe do ssh keys installs in install party, and point ppl who dont have it to an extension --></p>
+<p>Твой код теперь на GitHub. Зайди на сайт и проверь! Ты найдешь его в хорошей компании: <a href="https://github.com/django/django">фреймворк Django</a>, <a href="https://github.com/DjangoGirls/tutorial">этот учебник</a>, а также многие другие великолепные проекты с исходным кодом размещены на GitHub :)</p>
+<h1>Настройка блога на PythonAnywhere</h1>
+<h2>Регистрация на PythonAnywhere</h2>
+<p>> <strong>Примечание:</strong> возможно, ты уже завела учётную запись на PythonAnywhere ранее — если так, нет нужды повторять это вновь.</p>
+<p>PythonAnywhere — это сервис по запуску кода на Python в облаке. Мы будем использовать его, чтобы разместить наш сайт «вживую» в интернете.</p>
+<p>Создай аккаунт уровня "Beginner" на PythonAnywhere. Он бесплатный, так что кредитка не понадобится.</p>
+<p>  * <a href="https://www.pythonanywhere.com/">www.pythonanywhere.com</a></p>
+<p>  <img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/deploy/images/pythonanywhere_beginner_account_button.png" alt="Страница регистрации на PythonAnywhere с кнопкой создания бесплатного &#x27;Beginner&#x27; аккаунта"></p>
+<p>> <strong>Примечание:</strong> при выборе имени пользователя помни, что URL блога примет вид <code>yourusername.pythonanywhere.com</code>, так что остановись либо на своём нике, либо на имени, связанном с тематикой блога. Кроме того, убедись в том, что запомнила пароль (сохрани его в своём менеджере паролей, если им пользуешься).</p>
+<h2>Создание API токена для PythonAnywhere</h2>
+<p>Это нужно будет сделать только один раз. Когда ты зарегистрируешься на PythonAnywhere, откроется панель управления (dashboard). На ней в правом верхнем углу будет ссылка на страницу «Account»:</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/deploy/images/pythonanywhere_account.png" alt="Account link on the top right on the page"></p>
+<p>Там выбери вкладку «API token» и нажми кнопку, на которой написано «Create new API token» (создать новый API token).</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/deploy/images/pythonanywhere_create_api_token.png" alt="The API token tab on the Account page"></p>
+<h2>Настройка сайта на PythonAnywhere</h2>
+<p>Вернись на <a href="https://www.pythonanywhere.com/">главную страницу PythonAnywhere</a>, кликнув логотип. Затем запусти Bash-консоль. Нажав на кнопку bash ты запускаешь командную строку, которая находится на серверах PythonAnywhere. Эта командная строка аналогична той, что есть на твоём собственном компьютере.</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/deploy/images/pythonanywhere_bash_console.png" alt="Раздел «New Console» (новая консоль) в веб-интерфейсе PythonAnywhere с кнопкой «bash»" /></p>
+<p>> <strong>Примечание:</strong> PythonAnywhere использует Linux, так что если ты используешь Windows, то терминал и команды могут немного отличаться от того, к чему ты привыкла на своём компьютере.</p>
+<p>Чтобы опубликовать сайт на PythonAnywhere, нужно загрузить на PythonAnywhere твой код с Github и затем настроить PythonAnywhere так, чтобы он распознал твой код и запустил твоё веб-приложение. Существуют способы сделать это «вручную», но для PythonAnywhere есть программа-помощник, которая сделает это для тебя. Давай её установим.</p>
+<p><strong>PythonAnywhere command-line:</strong></p>
+<pre>$ pip3.6 install --user pythonanywhere</pre>
+<p>Когда ты это запустишь, в консоли будет печататься лог установки. Он начнётся с чего-то вроде <code>Collecting pythonanywhere</code>, а последней будет строчка <code>Successfully installed (...) pythonanywhere- (...)</code>.</p>
+<p>Теперь запустим эту вспомогательную утилиту, которую ты только что установила. Она настроит твоё приложение, скачав его код с GitHub. Напечатай следующее в консоли PythonAnywhere (не забудь использовать свой ник на GitHub вместо <code>&lt;your-github-username&gt;</code>, URL в консольной команде должен совпадать с URL, используемым в команде clone):</p>
+<p><strong>PythonAnywhere command-line:</strong></p>
+<pre>$ pa_autoconfigure_django.py https://github.com/&lt;your-github-username&gt;/my-first-blog.git</pre>
+<p>Утилита будет печатать в консоль, что она делает:</p>
+<ul><li>Скачивает твой код с GitHub</li><li>Создаёт виртуальное окружение на PythonAnywhere, такое же, как на твоём компьютере</li><li>Обновляет твой файл настроек с настройками деплоя</li><li>Создаёт базу данных на PythonAnywhere, используя команду <code>manage.py migrate</code></li><li>Разбирается с твоими статическими файлами (о них будет дальше)</li><li>Настраивает PythonAnywhere так, чтобы твоё приложение было доступно в интернете</li></ul>
+<p>Все эти шаги автоматизированы на PythonAnywhere, но они совершенно такие же, какие надо было бы совершить с любым другим хостинговым сервисом.</p>
+<p>Главное, на что нужно обратить внимание сейчас, — это то, что твоя база данных на PythonAnywhere никак не связана с базой данных на твоём компьютере. Поэтому там будут разные посты и разные аккаунты администраторов. Как следствие, для базы на PythonAnywhere необходимо создать аккаунт администратора так же, как ты это делала у себя локально с помощью команды <code>createsuperuser</code>. На PythonAnywhere заранее активировано виртуальное окружение, так что всё, что тебе нужно сделать — это запустить в консоли PythonAnywhere команду:</p>
+<p><strong>PythonAnywhere command-line:</strong></p>
+<pre>(ola.pythonanywhere.com) $ python manage.py createsuperuser</pre>
+<p>Введи параметры для своего пользователя-админа. Лучше всего использовать те же самые данные, что и у тебя на локальном компьютере, чтобы избежать путаницы, если ты конечно не хочешь сделать пароль на сервере PythonAnywhere более надёжным.</p>
+<p>Сейчас, если хочешь, посмотри на файлы на PythonAnywhere с помощью команды <code>ls</code>:</p>
+<p><strong>PythonAnywhere command-line:</strong></p>
+<pre>(ola.pythonanywhere.com) $ ls
+blog  db.sqlite3  manage.py  mysite requirements.txt static
+(ola.pythonanywhere.com) $ ls blog/
+__init__.py  __pycache__  admin.py  apps.py  migrations  models.py
+tests.py  views.py</pre>
+<p>Ты также можешь заглянуть на страницу «Files» и посмотреть, что лежит на сервере, используя встроенный в PythonAnywhere файловый менеджер. (Со страницы «Console» ты можешь попасть на другие страницы PythonAnywhere, используя кнопку меню в правом верхнем углу. Находясь на какой-либо странице, ты можешь найти ссылки на другие вверху.)</p>
+<h2>Ты в сети!</h2>
+<p>Ура, твой сайт теперь доступен всем в интернете! Ты можешь найти ссылку на него на странице «Web» на PythonAnywhere. Этой ссылкой можно делиться с кем хочешь :)</p>
+<p>> <strong>Примечание</strong> Это туториал для начинающих, поэтому публикуя сайт, мы использовали несколько хаков, которые не очень хороши с точки зрения безопасности. Если ты захочешь сделать что-то на основе этого проекта или начать новый, прочитай <a href="https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/">Django deployment checklist</a> для советов по безопасности на твоём сайте.</p>
+<h2>Советы по отладке</h2>
+<p>Если ты столкнулась с ошибкой, запуская скрипт <code>pa_autoconfigure_django.py</code>, вот несколько частых причин:</p>
+<ul><li>Ты забыла создать PythonAnywhere API токен</li><li>Ошибка в GitHub URL</li><li>Если ты видишь сообщение <em>"Could not find your settings.py"</em> (невозможно найти settings.py), это может быть вызвано тем, что ты не добавила все файлы в Git или не загрузила их на GitHub. Перечитай Git-секцию выше</li><li>Если ты до этого уже регистрировала аккаунт на PythonAnywhere и наткнулась на ошибку collectstatic, вполне вероятно, что у тебя устаревшая версия SQLite (например, 3.8.2). В этом случае зарегистрируй новый аккаунт и попробуй ещё раз ввести команды, упомянутые в разделе __Настройка блога на PythonAnywhere__.</li></ul>
+<p>Если ты столкнулась с ошибкой при попытке открыть свой сайт, первое место, где нужно искать отладочную информацию — твой <strong>error log</strong>. Ты найдёшь ссылку на него на странице <a href="https://www.pythonanywhere.com/web_app_setup/">"Web"</a> на PythonAnywhere. Глянь, есть ли там какие-либо сообщения об ошибках; самые новые находятся внизу.</p>
+<p>Ещё есть <a href="http://help.pythonanywhere.com/pages/DebuggingImportError">общие советы по отладке на PythonAnywhere</a>.</p>
+<p>И помни, твой тренер здесь, чтобы помочь!</p>
+<h1>Ты в сети!</h1>
+<p>Стандартная страница твоего сайта должна включать приветствие "It worked!", точно так же как было на локальном компьютере. Попробуй добавить <code>/admin/</code> к концу адреса сайта, и перейдёшь к панели администратора сайта. Войди под своим именем и паролем и увидишь форму для добавления новых записей в блог.</p>
+<p>После того, как создашь несколько записей, ты можешь вернуться к своей локальной версии приложения (а не на PythonAnywhere). С этого момента для внесения изменений тебе нужно работать в своей локальной версии. Это обычный подход в веб-программировании: изменять код локально, загружать изменения на GitHub, а затем подтягивать изменения на сервер с сайтом. Такой подход позволяет тебе работать и экспериментировать, не рискуя сломать свой сайт. Круто, правда?</p>
+<p>Ты заслужила <em>огромную</em> похвалу! Развёртывание сервера — одна из самых каверзных частей веб-разработки, и нередко уходит несколько дней, прежде чем заставишь всё работать. А у нас уже есть работающий в сети веб-сайт, вот так вот!</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>

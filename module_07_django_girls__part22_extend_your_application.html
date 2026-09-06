@@ -38,7 +38,6 @@
 </header>
 <main class="wrap">
 <h1>Часть 22: Расширяем приложение</h1>
-<p>{% set warning_icon = '<span class="glyphicon glyphicon-exclamation-sign" style="color: red;" aria-hidden="true" data-toggle="tooltip" title="Этот код ожидаемо вызовет ошибку!" ></span>' %}</p>
 <h1>Расширяем свое приложение</h1>
 <p>Мы уже выполнили часть необходимых шагов для создания веб-сайта: мы знаем как создать модель, URL, представление и шаблон. Мы также знаем, как улучшить визуальный дизайн с помощью CSS.</p>
 <p>Время для практики!</p>
@@ -46,77 +45,114 @@
 <p>У нас уже есть модель <code>Post</code>, так что нам не нужно добавлять дополнительный код в файл <code>models.py</code>.</p>
 <h2>Создадим в шаблоне ссылку на страницу поста</h2>
 <p>Мы начнём с добавления ссылки внутри файла <code>blog/templates/blog/post_list.html</code>. Пока он выглядит следующим образом:</p>
-<p>{% filename %}blog/templates/blog/post_list.html{% endfilename %}<br>```html<br>{% extends 'blog/base.html' %}</p>
-<p>{% block content %}<br>    {% for post in posts %}<br>        <div class="post"><br>            <div class="date"><br>                {{ post.published_date }}<br>            </div><br>            <h1><a href="">{{ post.title }}</a></h1><br>            <p>{{ post.text|linebreaksbr }}</p><br>        </div><br>    {% endfor %}<br>{% endblock %}<br>```</p>
-<p>{% raw %}Нам хотелось бы иметь ссылку с заголовка поста в списке на страницу с подробной информацией о посте. Давай изменим <code>&lt;h1&gt;&lt;a href=""&gt;{{ post.title }}&lt;/a&gt;&lt;/h1&gt;</code>, чтобы получилась ссылка на пост:{% endraw %}</p>
-<p>{% filename %}{{ warning_icon }} blog/templates/blog/post_list.html{% endfilename %}<br>``<code>html&lt;br&gt;&lt;h1&gt;&lt;a href="{% url 'post_detail' pk=post.pk %}"&gt;{{ post.title }}&lt;/a&gt;&lt;/h1&gt;&lt;br&gt;</code>``</p>
-<p>{% raw %}Самое время разобраться с загадочным <code>{% url 'post_detail' pk=post.pk %}</code>. Как можешь предположить, синтаксис <code>{% %}</code> означает использование тегов шаблонов Django. На этот раз мы используем тот, что создаст для нас URL!{% endraw %}</p>
+<p><strong>blog/templates/blog/post_list.html:</strong></p>
+<pre>{% extends 'blog/base.html' %}
+
+{% block content %}
+    {% for post in posts %}
+        &lt;div class="post"&gt;
+            &lt;div class="date"&gt;
+                {{ post.published_date }}
+            &lt;/div&gt;
+            &lt;h1&gt;&lt;a href=""&gt;{{ post.title }}&lt;/a&gt;&lt;/h1&gt;
+            &lt;p&gt;{{ post.text|linebreaksbr }}&lt;/p&gt;
+        &lt;/div&gt;
+    {% endfor %}
+{% endblock %}</pre>
+<p>Нам хотелось бы иметь ссылку с заголовка поста в списке на страницу с подробной информацией о посте. Давай изменим <code>&lt;h1&gt;&lt;a href=""&gt;{{ post.title }}&lt;/a&gt;&lt;/h1&gt;</code>, чтобы получилась ссылка на пост:</p>
+<p><strong>blog/templates/blog/post_list.html:</strong></p>
+<pre>&lt;h1&gt;&lt;a href="{% url 'post_detail' pk=post.pk %}"&gt;{{ post.title }}&lt;/a&gt;&lt;/h1&gt;</pre>
+<p>Самое время разобраться с загадочным <code>{% url 'post_detail' pk=post.pk %}</code>. Как можешь предположить, синтаксис <code>{% %}</code> означает использование тегов шаблонов Django. На этот раз мы используем тот, что создаст для нас URL!</p>
 <p>Параметр <code>post_detail</code> означает, что Django будет искать URL с именем <code>post_detail</code> в файле <code>blog.urls.py</code>.</p>
 <p>А что насчёт <code>pk=post.pk</code>? <code>pk</code> — это сокращение от primary key (первичный ключ). Он уникальным образом определяет каждую запись в базе данных. Поскольку мы не задали первичного ключа в нашей модели <code>Post</code>, Django создал такой ключ за нас (по умолчанию это порядковый номер, то есть 1, 2, 3…) и добавил поле <code>pk</code> к каждой записи блога. Для получения первичного ключа мы напишем <code>post.pk</code> — точно так же, как мы получали значения остальных полей (<code>title</code>, <code>author</code> и т.д.) нашего объекта <code>Post</code>.</p>
 <p>Теперь, когда мы перейдем по адресу http://127.0.0.1:8000/, мы получим ошибку (как и ожидается, поскольку у нас нет прописанного URL и <em>представления</em> для <code>post_detail</code>). Она будет выглядеть следующим образом:</p>
-<p>![Ошибка NoReverseMatch][1]</p>
-<p> [1]: images/no_reverse_match2.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/extend_your_application/images/no_reverse_match2.png" alt="Ошибка NoReverseMatch"></p>
 <h2>Создадим URL для страницы поста</h2>
 <p>Давай создадим в <code>urls.py</code> URL для <em>представления</em> <code>post_detail</code>!</p>
 <p>Мы хотим, чтобы наш первый пост отображался на странице со следующим <strong>URL</strong>-адресом: http://127.0.0.1:8000/post/1/</p>
 <p>Давай создадим URL в файле <code>blog/urls.py</code> и укажем Django на <em>представление</em> под названием <code>post_detail</code>, которое будет отображать пост целиком. Добавь строчку <code>path('post/&lt;int:pk&gt;/', views.post_detail, name='post_detail')</code> в файл <code>blog/urls.py</code>. Файл должен выглядеть так:</p>
-<p>{% filename %}{{ warning_icon }} blog/urls.py{% endfilename %}<br>```python<br>from django.urls import path<br>from . import views</p>
-<p>urlpatterns = [<br>    path('', views.post_list, name='post_list'),<br>    path('post/<int:pk>/', views.post_detail, name='post_detail'),<br>]<br>```</p>
+<p><strong>blog/urls.py:</strong></p>
+<pre>from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.post_list, name='post_list'),
+    path('post/&lt;int:pk&gt;/', views.post_detail, name='post_detail'),
+]</pre>
 <p>Фрагмент <code>post/&lt;int:pk&gt;/</code> определяет шаблон URL-адреса. Сейчас мы его поясним:<br>- <code>post/</code> значит, что после начала строки URL должен содержать слово <strong>post</strong> и косую черту <strong>/</strong>. Пока всё в порядке.<br>- <code>&lt;int:pk&gt;</code> — эта часть посложнее. Она означает, что Django ожидает целочисленное значение и преобразует его в представление — переменную <code>pk</code>.<br>- <code>/</code> — затем нам нужен еще один символ __/__ перед тем, как адрес закончится.</p>
 <p>Славненько, мы добавили новый шаблон URL в файл <code>blog/urls.py</code>! Давай обновим страницу: http://127.0.0.1:8000/. Бууум! Сервер снова перестал работать. Проверь консоль — как и ожидалось, ещё одна ошибка!</p>
-<p>![AttributeError][2]</p>
-<p> [2]: images/attribute_error2.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/extend_your_application/images/attribute_error2.png" alt="AttributeError"></p>
 <p>Помнишь, каким должен быть следующий шаг? Конечно: добавить представление!</p>
 <h2>Добавим представление для страницы поста</h2>
 <p>В этот раз <em>представление</em> получит дополнительный параметр <code>pk</code>. Но как дать нашему <em>представлению</em> знать о нём? Для этого мы определим функцию как <code>def post_detail(request, pk):</code>. Обрати внимание, что мы должны использовать то же имя переменной, что мы выбрали для обработки URL (<code>pk</code>). Пропуск переменной будет неправилен и приведёт к ошибке!</p>
 <p>Теперь мы хотим получить одну конкретную запись из блога. Для этого потребуется использовать QuerySet:</p>
-<p>{% filename %}{{ warning_icon }} blog/views.py{% endfilename %}<br>``<code>python&lt;br&gt;Post.objects.get(pk=pk)&lt;br&gt;</code>``</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>Post.objects.get(pk=pk)</pre>
 <p>Однако в этом коде есть проблема. Если не существует экземпляра объекта <code>Post</code> с заданным <code>primary key</code> (<code>pk</code>), мы получим страшную ошибку!</p>
-<p>![Ошибка DoesNotExist][3]</p>
-<p> [3]: images/does_not_exist2.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/extend_your_application/images/does_not_exist2.png" alt="Ошибка DoesNotExist"></p>
 <p>Мы этого не хотим! Однако в Django, конечно, есть средство, которое позволит нам её обойти: <code>get_object_or_404</code>. В случае, если не существует экземпляра объекта <code>Post</code> с заданным <code>pk</code>, мы получим намного более приятную страницу (которая называется <code>Page Not Found 404</code>).</p>
-<p>![Страница не найдена][4]</p>
-<p> [4]: images/404_2.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/extend_your_application/images/404_2.png" alt="Страница не найдена"></p>
 <p>Хорошая новость состоит в том, что ты можешь сделать свою страницу <code>Page not found</code>. Но для нас сейчас это не самая важная задача, и мы её пропустим.</p>
 <p>Хорошо, пришло время добавить <em>представление</em> в файл <code>views.py</code>!</p>
 <p>В файле <code>blog/urls.py</code> мы создали шаблон URL под названием <code>post_detail</code>, который ссылался на представление под названием <code>views.post_detail</code>. Это значит, что Django ожидает найти функцию-представление с названием <code>post_detail</code> в <code>blog/views.py</code>.</p>
 <p>Нам нужно открыть файл <code>blog/views.py</code> и добавить в него следующий код:</p>
-<p>{% filename %}blog/views.py{% endfilename %}<br>``<code>python&lt;br&gt;from django.shortcuts import render, get_object_or_404&lt;br&gt;</code>``</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>from django.shortcuts import render, get_object_or_404</pre>
 <p>— рядом с другими строками, начинающимися с <code>from</code>. В конец же файла мы добавим наше новое <em>представление</em>:</p>
-<p>{% filename %}blog/views.py{% endfilename %}<br>``<code>python&lt;br&gt;def post_detail(request, pk):&lt;br&gt;    post = get_object_or_404(Post, pk=pk)&lt;br&gt;    return render(request, 'blog/post_detail.html', {'post': post})&lt;br&gt;</code>``</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>def post_detail(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    return render(request, 'blog/post_detail.html', {'post': post})</pre>
 <p>Вот так. Теперь обнови страницу http://127.0.0.1:8000/</p>
-<p>![Представление списка записей][5]</p>
-<p> [5]: images/post_list2.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/extend_your_application/images/post_list2.png" alt="Представление списка записей"></p>
 <p>Заработало! Только что произойдёт, если ты попробуешь перейти по ссылке из заголовка записи?</p>
-<p>![Ошибка TemplateDoesNotExist][6]</p>
-<p> [6]: images/template_does_not_exist2.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/extend_your_application/images/template_does_not_exist2.png" alt="Ошибка TemplateDoesNotExist"></p>
 <p>Ой, нет! Другая ошибка! Но мы уже знаем, как иметь с ней дело, верно? Нам нужно добавить шаблон!</p>
 <h2>Создадим шаблон для страницы поста</h2>
 <p>Мы создадим файл <code>post_detail.html</code> в директории <code>blog/templates/blog</code>.</p>
 <p>Он должен содержать следующее:</p>
-<p>{% filename %}blog/templates/blog/post_detail.html{% endfilename %}<br>```html<br>{% extends 'blog/base.html' %}</p>
-<p>{% block content %}<br>    <div class="post"><br>        {% if post.published_date %}<br>            <div class="date"><br>                {{ post.published_date }}<br>            </div><br>        {% endif %}<br>        <h1>{{ post.title }}</h1><br>        <p>{{ post.text|linebreaksbr }}</p><br>    </div><br>{% endblock %}<br>```</p>
+<p><strong>blog/templates/blog/post_detail.html:</strong></p>
+<pre>{% extends 'blog/base.html' %}
+
+{% block content %}
+    &lt;div class="post"&gt;
+        {% if post.published_date %}
+            &lt;div class="date"&gt;
+                {{ post.published_date }}
+            &lt;/div&gt;
+        {% endif %}
+        &lt;h1&gt;{{ post.title }}&lt;/h1&gt;
+        &lt;p&gt;{{ post.text|linebreaksbr }}&lt;/p&gt;
+    &lt;/div&gt;
+{% endblock %}</pre>
 <p>И снова мы расширяем <code>base.html</code>. В блоке <code>content</code> мы отображаем дату публикации (published_date, если она существует), заголовок и текст. Нам также нужно обсудить пару важных вещей, хорошо?</p>
-<p>{% raw %}<code>{% if ... %} ... {% endif %}</code> — это тег шаблона, который мы можем использовать, если нам нужно что-то проверить (помнишь конструкцию <code>if ... else ..</code> из главы <strong>Введение в Python</strong>?). В данном случае мы хотим проверить, не пуста ли дата публикации  поста — <code>published_date</code>.{% endraw %}</p>
+<p><code>{% if ... %} ... {% endif %}</code> — это тег шаблона, который мы можем использовать, если нам нужно что-то проверить (помнишь конструкцию <code>if ... else ..</code> из главы <strong>Введение в Python</strong>?). В данном случае мы хотим проверить, не пуста ли дата публикации  поста — <code>published_date</code>.</p>
 <p>Отлично, можешь перезагрузить страницу и проверить, пропала ли ошибка <code>Page not found</code>.</p>
-<p>![Отдельная страницы записи][7]</p>
-<p> [7]: images/post_detail2.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/extend_your_application/images/post_detail2.png" alt="Отдельная страницы записи"></p>
 <p>Ура! Всё работает!</p>
 <h2>Ещё одна вещь: развёртывание!</h2>
 <p>Было бы неплохо проверить, что веб-сайт всё ещё будет работать на PythonAnywhere, верно? Давай еще раз проведём развёртывание.</p>
-<p>{% filename %}command-line{% endfilename %}<br>``<code>&lt;br&gt;$ git status&lt;br&gt;$ git add --all .&lt;br&gt;$ git status&lt;br&gt;$ git commit -m "Added view and template for detailed blog post as well as CSS for the site."&lt;br&gt;$ git push&lt;br&gt;</code>``</p>
-<p>Затем набери в [Bash-консоли PythonAnywhere][8]:</p>
-<p> [8]: https://www.pythonanywhere.com/consoles/</p>
-<p>{% filename %}PythonAnywhere command-line{% endfilename %}<br>``<code>&lt;br&gt;$ cd ~/&lt;your-pythonanywhere-domain&gt;.pythonanywhere.com&lt;br&gt;$ git pull&lt;br&gt;[...]&lt;br&gt;</code>``</p>
-<p>И нажми <strong>Reload</strong> на вкладке [Web][9].</p>
-<p> [9]: https://www.pythonanywhere.com/web_app_setup/</p>
+<p><strong>command-line:</strong></p>
+<pre>$ git status
+$ git add --all .
+$ git status
+$ git commit -m "Added view and template for detailed blog post as well as CSS for the site."
+$ git push</pre>
+<p>Затем набери в <a href="https://www.pythonanywhere.com/consoles/">Bash-консоли PythonAnywhere</a>:</p>
+<p><strong>PythonAnywhere command-line:</strong></p>
+<pre>$ cd ~/&lt;your-pythonanywhere-domain&gt;.pythonanywhere.com
+$ git pull
+[...]</pre>
+<p>И нажми <strong>Reload</strong> на вкладке <a href="https://www.pythonanywhere.com/web_app_setup/">Web</a>.</p>
 <h2>Обновим статические файлы на сервере</h2>
 <p>Серверы вроде PythonAnywhere часто обрабатывают статические файлы (например, CSS) не так, как Python-файлы. Так происходит потому, что сервера могут оптимизировать их использование так, чтобы они быстрее загружались. В результате после того, как мы поменяли CSS-файлы, надо дать серверу команду обновить их. Эта команда называется <code>collectstatic</code>.</p>
 <p>Начни с активации virtualenv, если окружение уже не активно (PythonAnywhere использует для этого команду <code>workon</code>. Она работает так же, как <code>source myenv/bin/activate</code>, которую ты используешь на своём компьютере.</p>
-<p>{% filename %}PythonAnywhere command-line{% endfilename %}<br>``<code>&lt;br&gt;$ workon &lt;your-pythonanywhere-domain&gt;.pythonanywhere.com&lt;br&gt;(ola.pythonanywhere.com)$ python manage.py collectstatic&lt;br&gt;[...]&lt;br&gt;</code>``</p>
+<p><strong>PythonAnywhere command-line:</strong></p>
+<pre>$ workon &lt;your-pythonanywhere-domain&gt;.pythonanywhere.com
+(ola.pythonanywhere.com)$ python manage.py collectstatic
+[...]</pre>
 <p>Команда <code>manage.py collectstatic</code> немножко похожа на <code>manage.py migrate</code>. Мы сперва вносим какие-то изменения в наш код, а затем сообщаем Django <em>применить</em> эти изменения — к набору статических файлов на сервере или к базе данных.</p>
-<p>В любом случае, мы теперь готовы перейти по ссылке ["Web" page][10] (нажав на кнопку в меню в правом верхнем углу консоли) и кликнуть на <strong>Reload</strong>, а затем посмотреть на страницу [https://subdomain.pythonanywhere.com][11], где отобразится результат.</p>
-<p> [10]: https://www.pythonanywhere.com/web_app_setup/<br> [11]: https://subdomain.pythonanywhere.com</p>
+<p>В любом случае, мы теперь готовы перейти по ссылке <a href="https://www.pythonanywhere.com/web_app_setup/">"Web" page</a> (нажав на кнопку в меню в правом верхнем углу консоли) и кликнуть на <strong>Reload</strong>, а затем посмотреть на страницу <a href="https://subdomain.pythonanywhere.com">https://subdomain.pythonanywhere.com</a>, где отобразится результат.</p>
 <p>Вот и всё! Поздравляем :)</p>
 <footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
 </main>

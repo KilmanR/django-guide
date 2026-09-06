@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Часть 14: URL-адреса Django — django-guide</title>
+<meta name="description" content="django-guide · Часть 14: URL-адреса Django — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Часть 14: URL-адреса Django, on русском, github pages">
+<meta name="author" content="Big Pickle from OpenCode Zen">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Часть 14: URL-адреса Django — django-guide">
+<meta property="og:description" content="django-guide · Часть 14: URL-адреса Django — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<h1>Часть 14: URL-адреса Django</h1>
+<h1>URL-адреса Django</h1>
+<p>Мы собираемся сделать нашу первую веб-страничку — домашнюю страницу твоего блога! Но для начала давай чуть ближе познакомимся с URL-адресами в Django.</p>
+<h2>Что такое URL-адрес?</h2>
+<p>URL — это просто адрес в интернете. Ты можешь увидеть URL каждый раз, когда посещаешь веб-сайт — он отображается в адресной строке твоего браузера (да, <code>127.0.0.1:8000</code> — это URL-адрес! И <code>https://djangogirls.org</code> — тоже URL):</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/django_urls/images/url.png" alt="URL-адрес"></p>
+<p>Любая страница в Интернете нуждается в собственном URL-адресе. Таким образом ваше приложение точно знает, что показать пользователю, который открывает конкретный URL-адрес. В Django мы используем так называемый <code>URLconf</code> (англ. URL configuration, конфигурация URL). URLconf — это набор шаблонов, которые Django попробует сравнить с полученным URL, чтобы выбрать правильный метод для отображения (view).</p>
+<h2>Как URL-адреса работают в Django?</h2>
+<p>Давай откроем файл <code>mysite/urls.py</code> в нашем редакторе и посмотрим, как он выглядит:</p>
+<p><strong>mysite/urls.py:</strong></p>
+<pre>"""mysite URL Configuration
+
+[...]
+"""
+from django.contrib import admin
+from django.urls import path
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+]</pre>
+<p>Как можешь заметить, Django уже кое-что разместил здесь для нас.</p>
+<p>Строки, расположенные между тройными кавычками (<code>'''</code> или <code>"""</code>), называются <code>docstrings</code> — ты можешь добавить их в начале файла, класса или метода для описания их функциональности. Python будет их игнорировать при запуске приложения.</p>
+<p>URL-адрес раздела администрирования, который мы посещали в предыдущей главе, уже здесь присутствует:</p>
+<p><strong>mysite/urls.py:</strong></p>
+<pre>    path('admin/', admin.site.urls),</pre>
+<p>Таким образом, любому URL-адресу, начинающемуся с <code>admin/</code>, Django будет находить соответствующее <em>view</em> (представление). В этом случае мы охватываем большое количество различных URL-адресов, которые явно не прописаны в этом маленьком файле — так он становится более аккуратным и удобочитаемым.</p>
+<h2>Твой первый URL-адрес в Django!</h2>
+<p>Пришло время создать твой первый URL-адрес! Мы хотим, чтобы 'http://127.0.0.1:8000/' возвращал домашнюю страничку нашего блога со списком записей в нём.</p>
+<p>Мы также хотим сохранить файл <code>mysite/urls.py</code> в максимально аккуратном виде, так что мы импортируем URL-адреса для нашего приложения <code>blog</code> в <code>mysite/urls.py</code>.</p>
+<p>Вперёд, добавь строку для импорта <code>blog.urls</code>. Обрати внимание, что здесь мы используем функцию <code>include</code>, поэтому тебе придется импортировать её в строке <code>from django.urls...</code>.</p>
+<p>Файл <code>mysite/urls.py</code> должен выглядеть следующим образом:</p>
+<p><strong>mysite/urls.py:</strong></p>
+<pre>from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('blog.urls')),
+]</pre>
+<p>Django теперь будет перенаправлять все запросы 'http://127.0.0.1:8000/' к <code>blog.urls</code> и искать там дальнейшие инструкции.</p>
+<h2>blog.urls</h2>
+<p>Создай новый пустой файл <code>blog/urls.py</code>. Отлично! Добавь в него следующие две строки:</p>
+<p><strong>blog/urls.py:</strong></p>
+<pre>from django.urls import path
+from . import views</pre>
+<p>Так мы импортировали функцию <code>path</code> Django и все <code>views</code> (представления) из приложения <code>blog</code> (у нас их пока нет, но через минуту они появятся!)</p>
+<p>После этого мы можем добавить наш первый URL-шаблон:</p>
+<p><strong>blog/urls.py:</strong></p>
+<pre>urlpatterns = [
+    path('', views.post_list, name='post_list'),
+]</pre>
+<p>Как ты можешь заметить, мы связали <code>view</code> под именем <code>post_list</code> с корневым URL-адресом (<code>''</code>). Этот шаблон URL будет соответствовать пустой строке. Это правильно, потому что для обработчиков URL в Django 'http://127.0.0.1:8000/' не является частью URL. Этот шаблон скажет Django, что <code>views.post_list</code> — это правильное направление для запроса к твоему веб-сайту по адресу 'http://127.0.0.1:8000/'.</p>
+<p>Последняя часть <code>name='post_list'</code> — это имя URL, которое будет использовано, чтобы идентифицировать его. Оно может быть таким же, как имя представления (англ. view), а может и чем-то совершенно другим. Мы будем использовать именованные URL позднее в проекте, поэтому важно указывать их имена уже сейчас. Мы также должны попытаться сохранить имена URL-адресов уникальными и легко запоминающимися.</p>
+<p>Если сейчас ты попытаешься открыть страницу http://127.0.0.1:8000/ в браузере, то увидишь сообщение о том, что веб-страница недоступна. Это произошло потому, что сервер (помнишь, как мы набирали <code>runserver</code>?) перестал обрабатывать запросы. Чтобы понять почему, открой окно своей командной строки.</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/django_urls/images/error1.png" alt="Ошибка"></p>
+<p>В твоей командной строке появилось сообщение об ошибке, но не беспокойся — оно, на самом деле, довольно полезно. Ты можешь прочесть, что не существует атрибута с именем 'post_list' — __no attribute 'post_list'__. Это название <strong>представления</strong>, которое Django пытается найти и использовать, но мы же его ещё не создали. В данный момент раздел <code>/admin/</code> тоже не будет работать. Не беспокойся, мы этим займёмся.</p>
+<p>> Если хочешь узнать больше о Django URLconfs, посмотри официальную документацию: https://docs.djangoproject.com/en/2.0/topics/http/urls/</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>

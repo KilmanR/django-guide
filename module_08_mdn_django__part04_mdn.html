@@ -37,8 +37,7 @@
   </div>
 </header>
 <main class="wrap">
-<h1>Часть 4: Часть 2: Создание скелета сайта</h1>
-<p>{{LearnSidebar}}{{PreviousMenuNext("Learn_web_development/Extensions/Server-side/Django/Tutorial_local_library_website", "Learn_web_development/Extensions/Server-side/Django/Models", "Learn_web_development/Extensions/Server-side/Django")}}</p>
+<h1>Часть 4: Создание скелета сайта</h1>
 <p>Это вторая статья из нашего , которая показывает, как можно создать "скелет" сайта, как фундамент, на котором можно строить всё остальное: настройки, ссылки, модели, контроллеры и представления.</p>
 <table><tr><th>Необходимо:</th><th>. Прочитать первую статью .</th></tr><tr><td>-----------</td><td>----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</td></tr><tr><td>Цель:</td><td>Научиться использовать инструменты Django для создания новых веб-сайтов.</td></tr></table>
 <h2>Обзор</h2>
@@ -168,7 +167,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)</pre>
-<p>> [!NOTE]<br>> Существуют различные способы дополнения списка <code>urlpatterns</code> (в примере мы просто добавляли объект, используя оператор <code>+=</code> чтобы чётко разделить изначальный и дописанный код). Вместо этого, мы могли бы добавить соотношения внутрь определения переменной:<br>><br>> ``<code>&lt;br&gt;&gt; urlpatterns = [   path('admin/', admin.site.urls),&lt;br&gt;&gt; path('catalog/', include('catalog.urls')),path('',&lt;br&gt;&gt; RedirectView.as_view(url='/catalog/', permanent=True)), ] +&lt;br&gt;&gt; static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)&lt;br&gt;&gt; </code>`<code>&lt;br&gt;&gt;&lt;br&gt;&gt; Кроме того, мы добавили import вниз файла (</code>from django.urls import include`) ,чтобы видеть, что мы добавили, но обычно все инструкции import добавляются в верхнюю часть файла.</p>
+<p>> [!NOTE]<br>> Существуют различные способы дополнения списка <code>urlpatterns</code> (в примере мы просто добавляли объект, используя оператор <code>+=</code> чтобы чётко разделить изначальный и дописанный код). Вместо этого, мы могли бы добавить соотношения внутрь определения переменной:<br>><br>> `<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt; urlpatterns = [   path('admin/', admin.site.urls),&amp;lt;br&amp;gt;&amp;gt; path('catalog/', include('catalog.urls')),path('',&amp;lt;br&amp;gt;&amp;gt; RedirectView.as_view(url='/catalog/', permanent=True)), ] +&amp;lt;br&amp;gt;&amp;gt; static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)&amp;lt;br&amp;gt;&amp;gt; &lt;/code&gt;</code><code>&lt;br&gt;&gt;&lt;br&gt;&gt; Кроме того, мы добавили import вниз файла (</code>from django.urls import include`) ,чтобы видеть, что мы добавили, но обычно все инструкции import добавляются в верхнюю часть файла.</p>
 <p>Напоследок, создайте файл <strong>urls.py</strong> внутри папки <strong>catalog</strong>, и добавьте следующий код, чтобы определить (пустой) <code>urlpatterns</code>. Сюда мы будем добавлять наши URL соотношения, по мере разработки сайта.</p>
 <pre>from django.urls import path
 from . import views
@@ -202,7 +201,7 @@ python3 manage.py migrate</pre>
  Starting development server at http://127.0.0.1:8000/
  Quit the server with CTRL-BREAK.</pre>
 <p>Когда сервер запустится, вы сможете посетить сайт по адресу <code>http://127.0.0.1:8000/</code> в вашем веб-браузере. Вы должны увидеть страницу с ошибкой, навроде этой:</p>
-<p>!<a href="django_404_debug_page.png">Django debug page for a 404 not found error</a></p>
+<p><img src="https://raw.githubusercontent.com/mdn/translated-content/main/files/ru/learn_web_development/extensions/server-side/django/skeleton_website/django_404_debug_page.png" alt="Django debug page for a 404 not found error"></p>
 <p>Не волнуйтесь! Эта страница должна появиться и сообщить нам, что мы ещё не настроили ни одной страницы в модуле <code>catalogs.urls</code> (на который мы были перенаправлены запросили корневой URL сайта).</p>
 <p>> [!NOTE]<br>> Показанная выше страница открывает нам одно из замечательных свойств Django — автоматические отчёты об ошибках. На экране с ошибкой отображается множество полезной информации, когда страница не найдена, или ошибка была вызвана кодом. В данном случае, мы видим, что запрошенный URL не соответствует ни одному шаблону (из указанных). Подобные отчёты будут выключены при DEBUG=False (когда мы разместим приложение в Сеть), в этом случае будет показана менее информативная, но более дружелюбная к пользователю страница(которую вам надо будет создать - прим. переводчика).</p>
 <p>На данном этапе, мы поняли, что Django работает должным образом!</p>
@@ -215,7 +214,6 @@ python3 manage.py migrate</pre>
 <p>Теперь скелет  сделан и запущен, теперь самое время начать писать код, который научит сайт делать то, что он должен делать.</p>
 <h2>Смотрите также</h2>
 <ul><li><a href="https://docs.djangoproject.com/en/2.2/intro/tutorial01/">Пишем своё первое приложение на Django - часть 1</a> (документация Django)</li><li><a href="https://docs.djangoproject.com/en/2.2/ref/applications/">Приложения</a> (документация Django). содержит информацию о настройке приложений.</li></ul>
-<p>{{PreviousMenuNext("Learn_web_development/Extensions/Server-side/Django/Tutorial_local_library_website", "Learn_web_development/Extensions/Server-side/Django/Models", "Learn_web_development/Extensions/Server-side/Django")}}</p>
 <footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
 </main>
 

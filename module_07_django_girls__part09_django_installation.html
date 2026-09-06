@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Часть 9: Установка Django — django-guide</title>
+<meta name="description" content="django-guide · Часть 9: Установка Django — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Часть 9: Установка Django, on русском, github pages">
+<meta name="author" content="Big Pickle from OpenCode Zen">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Часть 9: Установка Django — django-guide">
+<meta property="og:description" content="django-guide · Часть 9: Установка Django — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<h1>Часть 9: Установка Django</h1>
+<h1>Установка Django</h1>
+<p>> <strong>Примечание:</strong> если ты используешь Chromebook, пропусти эту главу, но выполни инструкции по <strong>настройке для Chromebook</strong></p>
+<p>> <strong>Примечание:</strong> если ты уже выполнила установку — можешь пропустить эту часть и сразу перейти к следующей главе!</p>
+<p>> Отдельные части этой главы основаны на учебных пособиях Geek Girls Carrots (https://github.com/ggcarrots/django-carrots).</p>
+<p>> Отдельные части этой главы основаны на <a href="http://django-marcador.keimlink.de/">учебном пособии django-marcador</a>, лицензированном под Creative Commons Attribution-ShareAlike 4.0 International License. Руководство django-marcador защищено авторским правом Markus Zapke-Gründemann et al.</p>
+<h2>Виртуальное окружение</h2>
+<p>Перед установкой Django мы попросим тебя установить крайне полезный инструмент, который поможет тебе содержать среду разработки в чистоте. Можно пропустить этот шаг, но мы очень советуем этого не делать. Использование лучших рекомендаций с самого начала убережёт от многих проблем в будущем!</p>
+<p>Итак, давай создадим <strong>виртуальное окружение</strong> (оно также называется <em>virtualenv</em>). Virtualenv будет изолировать настройки Python/Django для каждого отдельного проекта. Это значит, что изменения одного сайта не затронут другие сайты, которые ты разрабатываешь. Удобно, правда?</p>
+<p>Всё, что тебе нужно сделать — найти директорию, в которой мы создадим <code>virtualenv</code>; домашний каталог вполне подойдёт. Для Windows адрес будет выглядеть так: <code>C:\Users\Name</code> (где <code>Name</code> — твоё имя пользователя).</p>
+<p>> __Примечание:__ Если ты работаешь в Windows, удостоверься, что в названии директории нет специальных символов или символов с диакритическими знаками; если в твоём имени пользователя есть такие символы, выбери другую директорию, например, <code>C:\djangogirls</code>.</p>
+<p>Мы будем использовать отдельную директорию <code>djangogirls</code> в домашнем каталоге:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ mkdir djangogirls
+$ cd djangogirls</pre>
+<p>Мы создадим виртуальное окружение под именем <code>myvenv</code>. В общем случае команда будет выглядеть так:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ python3 -m venv myvenv</pre>
+<p>Чтобы создать новое <code>virtualenv</code>, тебе нужно открыть командную строку и набрать <code>python -m venv myvenv</code>. Это будет выглядеть так:</p>
+<p><strong>command-line:</strong></p>
+<pre>C:\Users\Name\djangogirls&gt; python -m venv myvenv</pre>
+<p>Здесь <code>myvenv</code> — имя твоего <code>virtualenv</code>. Ты можешь выбрать другое имя, но используй только строчные буквы, без пробелов и специальных символов. Имя виртуального окружения выбирай покороче — тебе придётся часто его набирать!</p>
+<p>В Linux и macOS достаточно набрать <code>python3 -m venv myvenv</code>, чтобы создать <code>virtualenv</code>:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ python3 -m venv myvenv</pre>
+<p><code>myvenv</code> — имя виртуального окружения <code>virtualenv</code>. Можешь выбрать другое имя, но используй только строчные буквы и никаких пробелов. Имя виртуального окружения лучше выбирать покороче — набирать его предстоит не раз!</p>
+<p>> __Примечание:__ В некоторых версиях Debian/Ubuntu может произойти следующая ошибка:</p>
+<p>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;The virtual environment was not created successfully because ensurepip is not available.  On Debian/Ubuntu systems, you need to install the python3-venv package using the following command.&amp;lt;br&amp;gt;&amp;gt;    apt install python3-venv&amp;lt;br&amp;gt;&amp;gt;You may need to use sudo with that command.  After installing the python3-venv package, recreate your virtual environment.&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code><code>&lt;br&gt;&gt;&lt;br&gt;&gt; В таком случае следуй приведённым инструкциям и установи пакет </code>python3-venv`:<br>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;$ sudo apt install python3-venv&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code>`</p>
+<p>> __Примечание:__ В некоторых версиях Debian/Ubuntu при таком способе создания виртуального окружения ты можешь получить такую ошибку:</p>
+<p>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;Error: Command '['/home/eddie/Slask/tmp/venv/bin/python3', '-Im', 'ensurepip', '--upgrade', '--default-pip']' returned non-zero exit status 1&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code>`</p>
+<p>> Чтобы обойти её, используй команду <code>virtualenv</code>.</p>
+<p>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;$ sudo apt install python-virtualenv&amp;lt;br&amp;gt;&amp;gt;$ virtualenv --python=python3.14 myvenv&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code>`</p>
+<p>> __Примечание:__ Если ты получаешь следующую ошибку</p>
+<p>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;E: Unable to locate package python3-venv&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code>`</p>
+<p>> то запусти команду:<br>><br>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;sudo apt install python3.14-venv&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code>`</p>
+<h2>Работаем с virtualenv</h2>
+<p>Указанная выше команда создаст директорию <code>myvenv</code> (или другую, в зависимости от выбранного тобой имени), которая будет содержать виртуальное окружение (по сути — набор файлов и папок).</p>
+<p>Запусти виртуальное окружение, выполнив:</p>
+<p><strong>command-line:</strong></p>
+<pre>C:\Users\Name\djangogirls&gt; myvenv\Scripts\activate</pre>
+<p>> __ПРИМЕЧАНИЕ:__ в Windows 10 при работе в Windows PowerShell ты можешь получить ошибку вида <code>execution of scripts is disabled on this system</code>. В этом случае открой ещё одно окно Windows PowerShell, выбрав опцию «Запустить от имени Администратора». Затем перед использованием виртуального окружения попробуй запустить следующую команду:<br>><br>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;C:\WINDOWS\system32&amp;gt; Set-ExecutionPolicy -ExecutionPolicy RemoteSigned&amp;lt;br&amp;gt;&amp;gt;     Execution Policy Change&amp;lt;br&amp;gt;&amp;gt;     The execution policy helps protect you from scripts that you do not trust. Changing the execution policy might expose you to the security risks described in the about_Execution_Policies help topic at http://go.microsoft.com/fwlink/?LinkID=135170. Do you want to change the execution policy? [Y] Yes  [A] Yes to All  [N] No  [L] No to All  [S] Suspend  [?] Help (default is "N"): A&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code>`</p>
+<p>Запусти виртуальное окружение, выполнив:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ source myvenv/bin/activate</pre>
+<p>Не забудь поменять <code>myvenv</code> на выбранное тобой имя для <code>virtualenv</code>!</p>
+<p>> __ПРИМЕЧАНИЕ:__ иногда команда <code>source</code> может быть недоступна. В таком случае используй следующий метод:<br>><br>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;$ . myvenv/bin/activate&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code>`</p>
+<p>Ты поймёшь, что <code>virtualenv</code> запущено, когда увидишь префикс <code>(myvenv)</code> в начале приглашения командной строки.</p>
+<p>При работе с виртуальным окружением команда <code>python</code> будет автоматически обращаться к правильной версии языка, так что ты можешь использовать просто <code>python</code> вместо <code>python3</code>.</p>
+<p>Отлично, теперь мы будем хранить все важные зависимости в одном месте. Наконец можно установить Django!</p>
+<h2>Установка Django</h2>
+<p>После запуска <code>virtualenv</code> ты можешь установить Django.</p>
+<p>Перед этим мы должны удостовериться, что у тебя установлена последняя версия <code>pip</code> — программы, которую мы используем для установки Django.</p>
+<p><strong>command-line:</strong></p>
+<pre>(myvenv) ~$ python3 -m pip install --upgrade pip</pre>
+<h3>Установка библиотек через указание требований</h3>
+<p>Файл с требованиями (requirements) хранит список зависимостей, которые нужно установить с помощью<br><code>pip install</code>:</p>
+<p>Для начала создай файл <code>requirements.txt</code> внутри директории <code>djangogirls/</code>, используя текстовый редактор, который ты установила ранее. Просто создай в редакторе новый файл, а затем сохрани его под именем <code>requirements.txt</code> в директории <code>djangogirls/</code>. После этого твоя директория будет выглядеть так:</p>
+<pre>djangogirls
+└───requirements.txt</pre>
+<p>В файл <code>djangogirls/requirements.txt</code> нужно добавить такой текст:</p>
+<p><strong>djangogirls/requirements.txt:</strong></p>
+<pre>Django~=5.2.12</pre>
+<p>Теперь выполни команду <code>pip install -r requirements.txt</code>, чтобы установить Django.</p>
+<p><strong>command-line:</strong></p>
+<pre>(myvenv) ~$ pip install -r requirements.txt
+Collecting Django~=5.2.12 (from -r requirements.txt (line 1))
+  Downloading Django-5.2.12-py3-none-any.whl (7.1MB)
+Installing collected packages: Django
+Successfully installed Django-5.2.12</pre>
+<p>> Если при запуске pip в Windows ты получаешь сообщение об ошибке, проверь, что путь к директории с проектом не содержит пробелов или специальных символов (<code>C:\Users\User Name\djangogirls</code>). Если проблема в этом, то, пожалуйста, перенеси свой проект в другое место, адрес которого не будет содержать пробелов и специальных символов (предлагаем <code>C:\djangogirls</code>). Создай новое виртуальное окружение в новой директории, после этого удали старое и попробуй запустить команды выше заново (перемещение виртуального окружения не сработает, поскольку в нём используются абсолютные пути).</p>
+<p>> При попытке установки Django твоя командная строка может зависнуть. Если это произошло, вместо приведённой выше команды используй:<br>><br>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;C:\Users\Name\djangogirls&amp;gt; python -m pip install -r requirements.txt&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code>`</p>
+<p>Вот и всё! Теперь ты (наконец-то) готова создать своё Django-приложение!</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>

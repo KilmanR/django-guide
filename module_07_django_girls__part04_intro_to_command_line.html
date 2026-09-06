@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Часть 4: Знакомство с командной строкой — django-guide</title>
+<meta name="description" content="django-guide · Часть 4: Знакомство с командной строкой — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Часть 4: Знакомство с командной строкой, on русском, github pages">
+<meta name="author" content="Big Pickle from OpenCode Zen">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Часть 4: Знакомство с командной строкой — django-guide">
+<meta property="og:description" content="django-guide · Часть 4: Знакомство с командной строкой — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<h1>Часть 4: Знакомство с командной строкой</h1>
+<h1>Знакомство с командной строкой</h1>
+<p>> Для тех, кто проходит руководство дома: о материале этой главы рассказывает видео <a href="https://www.youtube.com/watch?v=jvZLWhkzX-8">Ваш новый друг — командная строка</a>.</p>
+<p>Вот это да! Всего через несколько минут ты напишешь свою первую строку кода! :)</p>
+<p>__Позволь представить нашего первого нового друга: командную строку!__</p>
+<p>Следующие шаги покажут, как использовать чёрное окно, которым пользуются все хакеры. В начале оно может показаться немного пугающим, но, на самом деле это просто окно, которое ждет от тебя команды.</p>
+<p>> <strong>Примечание</strong> Пожалуйста, обрати внимание, что в этом руководстве мы используем термины «каталог» и «папка» взаимозаменяемо: эти слова обозначают одно и то же.</p>
+<h2>Что такое командная строка?</h2>
+<p>Окно, которое обычно называют __командной строкой__ или __интерфейсом командной строки (англ. CLI, Command Line Interface)__, является текстовым приложением для просмотра, обработки и манипулирования файлами на вашем компьютере. Она делает то же, что и Проводник в Windows или Finder в macOS, но у неё нет графического интерфейса. Другими названиями для командной строки являются: <em>cmd</em>, <em>CLI</em>, <em>prompt</em>, <em>консоль</em> или <em>терминал</em>.</p>
+<h2>Открываем интерфейс командной строки</h2>
+<p>Для того, чтобы начать экспериментировать, нам нужно сначала открыть интерфейс командной строки.</p>
+<p>В зависимости от твоей версии Windows и того, какая у тебя клавиатура, одно из следующих действий откроет окно командной строки (возможно, придётся немного поэкспериментировать, но все варианты пробовать необязательно):<br>- Перейди в меню Пуск (или на экран Пуск), в строке поиска набери "Командная строка".<br>- Перейди в меню Пуск → Windows → Командная строка.<br>- Перейди в меню Пуск → Все программы → Служебные → Командная строка.<br>- Перейди на экран Пуск, наведи мышь на нижний левый угол экрана и нажми на стрелочку вниз, которая появится там. (Если у тебя тачскрин, листни пальцем снизу вверх.) Откроется страница "Приложения". Выбери пункт "Командная строка" в разделе "Windows".<br>- Удерживая клавишу Windows на клавиатуре, нажми X. В появившемся меню выбери пункт "Командная строка".<br>- Удерживая клавишу Windows, нажми R, чтобы появилось окно "Выполнить". Набери в строке cmd и нажми OK.</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/python_installation/images/windows-plus-r.png" alt="Type &quot;cmd&quot; in the &quot;Run&quot; window"></p>
+<p>В какой-то момент тебе понадобятся два окна командной строки одновременно. Однако в некоторых версиях Windows, если ты попытаешься запустить вторую командную строку, когда одна уже запущена тем же способом, ты вместо этого попадёшь в уже открытое окно командной строки. Попробуй у себя на компьютере и посмотри, что будет! Если у тебя получается открыть только одно окно командной строки, попробуй какой-нибудь другой из вышеприведённых способов в списке. По крайней мере один из них сможет открыть новое окно командной строки.</p>
+<p>Перейди в Приложения → Прочие → Терминал.</p>
+<p>Вероятно, командная строка скрывается по адресу: Приложения → Стандартные → Терминал или Приложения → Система → Терминал, но это может зависеть от конкретной системы. Если не сможешь найти — Google поможет :)</p>
+<h2>Командная строка</h2>
+<p>Перед тобой должно появиться белое или чёрное окошко. Оно ожидает, когда ты введёшь команду.</p>
+<p>Если у тебя Mac или Linux, ты, скорее всего, увидишь знак <code>$</code> в конце строки (перед курсором):</p>
+<p><strong>command-line:</strong></p>
+<pre>$</pre>
+<p>Если у тебя Windows, строка будет оканчиваться символом <code>&gt;</code>, вот так:</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;</pre>
+<p>Можешь заглянуть в инструкцию для пользовательниц Linux чуть выше -- нам что-то подобное ещё встретится, когда мы дойдём до PythonAnywhere.</p>
+<p>Перед каждой твоей командой будет стоять знак <code>$</code> или <code>&gt;</code> и пробел. Но тебе не нужно их печатать! Компьютер уже сделал это за тебя. :)</p>
+<p>> Небольшое примечание: перед курсором командной строки может быть написано что-то вроде <code>C:\Users\ola&gt;</code> или <code>Olas-MacBook-Air:~ ola$</code>. Это абсолютно нормально.</p>
+<p>То, что написано до знака <code>$</code> или <code>&gt;</code>, плюс сам знак, всё вместе называется <em>приглашением командной строки</em>. Как правило, оно включает адрес папки, в которой ты сейчас находишься. Оно приглашает тебя ввести в окно команду.</p>
+<p>Далее в руководстве перед каждой командой, которую тебе нужно будет ввести, мы будем писать символ <code>$</code> или <code>&gt;</code>. Иногда слева от него мы будем добавлять ещё немного текста. Не обращай внимания на левую часть и просто печатай команду — она начинается после специального символа.</p>
+<h2>Твоя первая команда (УРА!)</h2>
+<p>Давай введём следующую команду:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ whoami</pre>
+<p><strong>command-line:</strong></p>
+<pre>&gt; whoami</pre>
+<p>Теперь нажми <code>Enter</code>. Вот что получилось:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ whoami
+olasitarska</pre>
+<p>Как видишь, компьютер только что вывел на экран твоё имя пользователя. Классно, а? :)</p>
+<p>> Постарайся набирать каждую команду вручную, а не копировать и вставлять. Так ты больше запомнишь!</p>
+<h2>Основы</h2>
+<p>В каждой операционной системе набор команд для командной строки немного отличается, поэтому не забывай следовать инструкциям для своей операционной системы. Давай попробуем, готова?</p>
+<h3>Текущий каталог</h3>
+<p>Было бы неплохо знать, где мы находимся сейчас, верно? Давай посмотрим. Набери эту команду и нажми <code>Enter</code>:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ pwd
+/Users/olasitarska</pre>
+<p>> Примечание: 'pwd' означает 'print working directory' (вывести рабочий каталог).</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt; cd
+C:\Users\olasitarska</pre>
+<p>> Примечание: 'cd' означает 'change directory'(сменить каталог). Если ты пользуешься PowerShell, можешь ввести pwd — как на Linux или macOS.</p>
+<p>Ты, вероятно, увидишь нечто похожее на своем компьютере. Когда ты открываешь командную строку, то обычно находишься в домашнем каталоге текущего пользователя.</p>
+<p>---</p>
+<h3>Как узнать больше о командах</h3>
+<p>У многих команд для командной строки есть встроенная справка! Например, вот как узнать подробнее о команде, которая показывает, в какой папке ты сейчас находишься:</p>
+<p>В macOS и Linux есть команда <code>man</code> — справка о других командах (на английском языке). Набери <code>man pwd</code> и посмотри, что пишут о команде <code>pwd</code>. Используй <code>man</code> с другими командами, чтобы посмотреть для них справку. Как правило, справки <code>man</code> выводятся постранично. Нажми пробел, чтобы перейти на следующую страницу. Чтобы выйти, нажми  <code>q</code>.</p>
+<p>Чтобы вывести справку, почти к любой команде можно добавить <code>/?</code>. Чтобы прочитать всю справку, возможно, придётся прокрутить текст вниз. Попробуй набрать <code>cd /?</code>.</p>
+<h3>Список файлов и каталогов</h3>
+<p>Так что же в нем? Было бы здорово узнать. Давай посмотрим:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ ls
+Applications
+Desktop
+Downloads
+Music
+...</pre>
+<p><strong>command-line:</strong></p>
+<pre>&gt; dir
+ Directory of C:\Users\olasitarska
+05/08/2014 07:28 PM &lt;DIR&gt;      Applications
+05/08/2014 07:28 PM &lt;DIR&gt;      Desktop
+05/08/2014 07:28 PM &lt;DIR&gt;      Downloads
+05/08/2014 07:28 PM &lt;DIR&gt;      Music
+...</pre>
+<p>> Примечание: в PowerShell можешь использовать 'ls' — как в Linux или macOS.</p>
+<p>---</p>
+<h3>Смена текущего каталога</h3>
+<p>Теперь вернёмся в наш каталог рабочего стола:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ cd Desktop</pre>
+<p><strong>command-line:</strong></p>
+<pre>$ cd Desktop</pre>
+<p>Обрати внимание, что название каталога "Desktop" может быть переведено на язык твоей учётной записи в системе Linux.<br>В таком случае набери вместо <code>Desktop</code> переводное название: например, <code>Рабочий стол</code> (в кавычках — они нужны, чтобы командная строка поняла кириллицу).</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt; cd Desktop</pre>
+<p>Проверь, что рабочий каталог действительно изменился:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ pwd
+/Users/olasitarska/Desktop</pre>
+<p><strong>command-line:</strong></p>
+<pre>&gt; cd
+C:\Users\olasitarska\Desktop</pre>
+<p>Вот и он!</p>
+<p>> Совет от профи: если ты введешь <code>cd D</code> и затем нажмешь <code>tab</code> на клавиатуре, в командной строке будет автоматически набрана остальная часть имени, что позволит быстрее перемещаться по каталогам. Если c "D", начинается название не одной папки, нажми <code>Tab</code> дважды, чтобы получить список вариантов.</p>
+<p>---</p>
+<h3>Создание каталога</h3>
+<p>Как насчет создания каталога practice на рабочем столе? Ты можешь сделать это так:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ mkdir practice</pre>
+<p><strong>command-line:</strong></p>
+<pre>&gt; mkdir practice</pre>
+<p>Эта маленькая команда создаст папку с именем <code>practice</code> на рабочем столе. Ты можешь проверить, появилась ли она, просто взглянув на рабочий стол или введя команду <code>ls</code> (для Linux и macOS) или <code>dir</code> (если у тебя Windows)! Попробуй. :)</p>
+<p>> Совет от профи: если ты не хочешь вводить одни и те же команды снова и снова, попробуй нажать на <code>стрелку вверх</code> и <code>стрелку вниз</code> на клавиатуре для просмотра недавно использованных команд.</p>
+<p>---</p>
+<h3>Тренируемся!</h3>
+<p>Небольшая задачка: в недавно созданной папке <code>practice</code> создай папку с названием <code>test</code>. Используй команды <code>cd</code> и <code>mkdir</code>.</p>
+<h4>Решение:</h4>
+<p><strong>command-line:</strong></p>
+<pre>$ cd practice
+$ mkdir test
+$ ls
+test</pre>
+<p><strong>command-line:</strong></p>
+<pre>&gt; cd practice
+&gt; mkdir test
+&gt; dir
+05/08/2014 07:28 PM &lt;DIR&gt;      test</pre>
+<p>Поздравляем! :)</p>
+<p>---</p>
+<h3>Чистка</h3>
+<p>Мы не хотим оставлять беспорядок, поэтому давай удалим всё, что мы создали до этого момента.</p>
+<p>Во-первых, мы должны вернуться на рабочий стол:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ cd ..</pre>
+<p><strong>command-line:</strong></p>
+<pre>&gt; cd ..</pre>
+<p>Используя <code>..</code> с командой <code>cd</code>, ты можешь сменить текущий каталог на родительский (то есть каталог, который содержит в себе текущий).</p>
+<p>Проверь, где ты находишься:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ pwd
+/Users/olasitarska/Desktop</pre>
+<p><strong>command-line:</strong></p>
+<pre>&gt; cd
+C:\Users\olasitarska\Desktop</pre>
+<p>Пришло время удалить каталог <code>practice</code>:</p>
+<p>> __Внимание__: удаление файлов с помощью <code>del</code>, <code>rmdir</code> или <code>rm</code> необратимо. Это означает, что _удалённые файлы будут потеряны навсегда_! Поэтому будь очень осторожна с этими командами.</p>
+<p><strong>command-line:</strong></p>
+<pre>$ rm -r practice</pre>
+<p><strong>command-line:</strong></p>
+<pre>&gt; rmdir /S practice
+practice, Are you sure &lt;Y/N&gt;? Y</pre>
+<p>Готово! Давай проверим, что папка действительно удалена:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ ls</pre>
+<p><strong>command-line:</strong></p>
+<pre>&gt; dir</pre>
+<h3>Выход</h3>
+<p>Вот и всё на данный момент! Теперь можно безопасно закрыть командную строку. Давай сделаем это как хакеры, согласна? :)</p>
+<p><strong>command-line:</strong></p>
+<pre>$ exit</pre>
+<p><strong>command-line:</strong></p>
+<pre>&gt; exit</pre>
+<p>Круто, да?:)</p>
+<h2>Подведём итоги</h2>
+<p>Вот краткий обзор некоторых полезных команд:</p>
+<p>Команда (Windows) | Команда (Mac OS / Linux) | Описание                | Пример<br>----------------- | ------------------------ | ----------------------- | ---------------------------------------------<br>exit              | exit                     | закрыть окно            | <strong>exit</strong><br>cd                | cd                       | изменить каталог        | <strong>cd test</strong><br>cd                | pwd                      | вывести текущий каталог | <strong>cd</strong> (Windows) или <strong>pwd</strong> (Mac OS / Linux)<br>dir               | ls                       | список каталогов/файлов | <strong>dir</strong><br>copy              | cp                       | копировать файл         | <strong>copy c:\test\test.txt c:\windows\test.txt</strong><br>move              | mv                       | переместить файл        | <strong>move c:\test\test.txt c:\windows\test.txt</strong><br>mkdir             | mkdir                    | создать новый каталог   | <strong>mkdir testdirectory</strong><br>rmdir (или del)   | rm                       | удалить файл            | <strong>del c:\test\test.txt</strong><br>rmdir /S          | rm -r                    | удалить каталог         | <strong>rm -r testdirectory</strong><br>[CMD] /?          | man [CMD]                | справка для команды     | <strong>cd /?</strong> (Windows) или <strong>man cd</strong> (Mac OS / Linux)</p>
+<p>Это лишь некоторые из команд, которые можно использовать в командной строке, но сегодня тебе больше и не пригодится.</p>
+<p>Если тебе интересно, на <a href="http://ss64.com">ss64.com</a> можно найти полный справочник команд для всех операционных систем (на английском языке).</p>
+<h2>Готова продолжить?</h2>
+<p>Давай погрузимся в мир Python!</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>

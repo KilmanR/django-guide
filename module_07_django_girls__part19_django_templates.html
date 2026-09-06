@@ -46,37 +46,57 @@
 <h2>Отображаем шаблон списка записей</h2>
 <p>В предыдущей главе мы передали нашему шаблону список записей в переменной <code>posts</code>. Теперь мы отобразим его в HTML.</p>
 <p>Чтобы вставить переменную в шаблон Django, нам нужно использовать двойные фигурные скобки с именем переменной внутри:</p>
-<p>{% filename %}blog/templates/blog/post_list.html{% endfilename %}<br>``<code>html&lt;br&gt;{{ posts }}&lt;br&gt;</code>``</p>
+<p><strong>blog/templates/blog/post_list.html:</strong></p>
+<pre>{{ posts }}</pre>
 <p>Попробуй это в шаблоне <code>blog/templates/blog/post_list.html</code>. Замени всё, начиная со второго <code>&lt;div&gt;</code> и вплоть до третьего <code>&lt;/div&gt;</code> кодом <code>{{ posts }}</code>. Сохрани файл и обнови страницу, чтобы увидеть результат:</p>
-<p>![Рисунок 13.1][1]</p>
-<p> [1]: images/step1.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/django_templates/images/step1.png" alt="Рисунок 13.1"></p>
 <p>Как ты можешь заметить, мы получили следующую строку:</p>
-<p>{% filename %}blog/templates/blog/post_list.html{% endfilename %}<br>``<code>html&lt;br&gt;&lt;QuerySet [&lt;Post: My second post&gt;, &lt;Post: My first post&gt;]&gt;&lt;br&gt;</code>``</p>
+<p><strong>blog/templates/blog/post_list.html:</strong></p>
+<pre>&lt;QuerySet [&lt;Post: My second post&gt;, &lt;Post: My first post&gt;]&gt;</pre>
 <p>Это показывает, что Django понял переменную как список объектов. Помнишь из главы __Введение в Python__, как мы можем аккуратно отобразить список? Правильно, циклом for! В шаблонах Django ты можешь использовать их таким образом:</p>
-<p>{% filename %}blog/templates/blog/post_list.html{% endfilename %}<br>``<code>html&lt;br&gt;{% for post in posts %}&lt;br&gt;    {{ post }}&lt;br&gt;{% endfor %}&lt;br&gt;</code>``</p>
+<p><strong>blog/templates/blog/post_list.html:</strong></p>
+<pre>{% for post in posts %}
+    {{ post }}
+{% endfor %}</pre>
 <p>Попробуй вставить это в свой шаблон.</p>
-<p>![Рисунок 13.2][2]</p>
-<p> [2]: images/step2.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/django_templates/images/step2.png" alt="Рисунок 13.2"></p>
 <p>Сработало! Но мы хотим, чтобы они отображались как статические записи, которые мы создавали в главе __Введение в HTML__. Ты можешь смешивать HTML и теги шаблонов. Наш элемент <code>body</code> будет выглядеть следующим образом:</p>
-<p>{% filename %}blog/templates/blog/post_list.html{% endfilename %}<br>```html<br><div><br>    <h1><a href="/">Django Girls Blog</a></h1><br></div></p>
-<p>{% for post in posts %}<br>    <div><br>        <p>published: {{ post.published_date }}</p><br>        <h1><a href="">{{ post.title }}</a></h1><br>        <p>{{ post.text|linebreaksbr }}</p><br>    </div><br>{% endfor %}<br>```</p>
-<p>{% raw %}Всё, что ты поместишь между <code>{% for %}</code> и <code>{% endfor %}</code>, будет повторено для каждого объекта в списке. Обнови страницу:{% endraw %}</p>
-<p>![Рисунок 13.3][3]</p>
-<p> [3]: images/step3.png</p>
+<p><strong>blog/templates/blog/post_list.html:</strong></p>
+<pre>&lt;div&gt;
+    &lt;h1&gt;&lt;a href="/"&gt;Django Girls Blog&lt;/a&gt;&lt;/h1&gt;
+&lt;/div&gt;
+
+{% for post in posts %}
+    &lt;div&gt;
+        &lt;p&gt;published: {{ post.published_date }}&lt;/p&gt;
+        &lt;h1&gt;&lt;a href=""&gt;{{ post.title }}&lt;/a&gt;&lt;/h1&gt;
+        &lt;p&gt;{{ post.text|linebreaksbr }}&lt;/p&gt;
+    &lt;/div&gt;
+{% endfor %}</pre>
+<p>Всё, что ты поместишь между <code>{% for %}</code> и <code>{% endfor %}</code>, будет повторено для каждого объекта в списке. Обнови страницу:</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/django_templates/images/step3.png" alt="Рисунок 13.3"></p>
 <p>Ты заметила, что мы использовали немного другую запись в этот раз: <code>{{ post.title }}</code> или <code>{{ post.text }}</code>? Мы обращаемся к различным полям нашей модели <code>Post</code>. Также <code>|linebreaksbr</code> прогоняет текст через фильтр для преобразования переносов строк в параграфы.</p>
 <h2>Ещё один момент</h2>
 <p>Пришло время ещё раз убедиться, что наш сайт будет работать в сети, согласна? Попробуем развернуть новую версию сайта на PythonAnywhere. Краткий обзор необходимых шагов...</p>
 <p>* Сначала загружаем код на GitHub</p>
-<p>{% filename %}command-line{% endfilename %}<br>``<code>&lt;br&gt;$ git status&lt;br&gt;[...]&lt;br&gt;$ git add --all .&lt;br&gt;$ git status&lt;br&gt;[...]&lt;br&gt;$ git commit -m "Modified templates to display posts from database."&lt;br&gt;[...]&lt;br&gt;$ git push&lt;br&gt;</code>``</p>
-<p>* Затем заходим на [PythonAnywhere][4], открываем <strong>Bash console</strong> и набираем команду:</p>
-<p> [4]: https://www.pythonanywhere.com/consoles/</p>
-<p>{% filename %}PythonAnywhere command-line{% endfilename %}<br>``<code>&lt;br&gt;$ cd $USER.pythonanywhere.com&lt;br&gt;$ git pull&lt;br&gt;[...]&lt;br&gt;</code>``</p>
-<p>* Наконец, переключаемся на вкладку [Web][5] и жмём кнопку <strong>Reload</strong>. Обновления запущены в жизнь! Даже если записи в твоём блоге на PythonAnywhere отличаются от записей в блоге на локальном сервере, то всё в порядке. Базы данных на твоём локальном компьютере и на PythonAnywhere не синхронизируются, в отличиет от остальных файлов проекта.</p>
-<p> [5]: https://www.pythonanywhere.com/web_app_setup/</p>
+<p><strong>command-line:</strong></p>
+<pre>$ git status
+[...]
+$ git add --all .
+$ git status
+[...]
+$ git commit -m "Modified templates to display posts from database."
+[...]
+$ git push</pre>
+<p>* Затем заходим на <a href="https://www.pythonanywhere.com/consoles/">PythonAnywhere</a>, открываем <strong>Bash console</strong> и набираем команду:</p>
+<p><strong>PythonAnywhere command-line:</strong></p>
+<pre>$ cd $USER.pythonanywhere.com
+$ git pull
+[...]</pre>
+<p>* Наконец, переключаемся на вкладку <a href="https://www.pythonanywhere.com/web_app_setup/">Web</a> и жмём кнопку <strong>Reload</strong>. Обновления запущены в жизнь! Даже если записи в твоём блоге на PythonAnywhere отличаются от записей в блоге на локальном сервере, то всё в порядке. Базы данных на твоём локальном компьютере и на PythonAnywhere не синхронизируются, в отличиет от остальных файлов проекта.</p>
 <p>Поздравляем! Теперь попробуй добавить новые записи через панель администратора Django (не забывай указывать published_date!). Удостоверься, что ты в панели администратора своего сайта на PythonAnywhere (https://yourname.pythonanywhere.com/admin). Затем обнови страницу, чтобы проверить, появились ли новые записи.</p>
 <p>Работает как по волшебству? Есть чем гордиться! Отойди от компьютера на секунду — ты заслужила перерыв :)</p>
-<p>![Рисунок 13.4][6]</p>
-<p> [6]: images/donut.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/django_templates/images/donut.png" alt="Рисунок 13.4"></p>
 <footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
 </main>
 

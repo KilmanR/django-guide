@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Часть 18: Динамические данные в шаблонах — django-guide</title>
+<meta name="description" content="django-guide · Часть 18: Динамические данные в шаблонах — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Часть 18: Динамические данные в шаблонах, on русском, github pages">
+<meta name="author" content="Big Pickle from OpenCode Zen">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Часть 18: Динамические данные в шаблонах — django-guide">
+<meta property="og:description" content="django-guide · Часть 18: Динамические данные в шаблонах — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<h1>Часть 18: Динамические данные в шаблонах</h1>
+<h1>Динамически изменяющиеся данные в шаблонах</h1>
+<p>Отдельные части уже размещены в нужных местах: модель <code>Post</code> определена в файле <code>models.py</code>, <code>post_list</code> — в файле <code>views.py</code>, и добавлен шаблон. Но как нам отобразить записи в шаблоне HTML-страницы? Ведь именно этого нам и нужно добиться: взять определённый контент (модели, сохранённые в базе данных) и аккуратно отобразить их в шаблоне, верно?</p>
+<p>Для этого и предназначены <em>представления</em>: соединять между собой модели и шаблоны. В <code>post_list</code> <em>представлению</em> нужно будет взять модели, которые мы хотим отобразить, и передать их шаблону. Таким образом, в <em>представлениях</em> мы определяем, что (какая модель) будет отображена в шаблоне.</p>
+<p>Хорошо, так как мы этого добьёмся?</p>
+<p>Нам нужно открыть файл <code>blog/views.py</code>. Пока что <em>представление</em> <code>post_list</code> выглядит следующим образом:</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>from django.shortcuts import render
+
+def post_list(request):
+    return render(request, 'blog/post_list.html', {})</pre>
+<p>Помнишь, мы говорили о включении кода из других файлов? Теперь нам нужно включить модель, которую мы определили в файле <code>models.py</code>. Мы добавим строку <code>from .models import Post</code> следующим образом:</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>from django.shortcuts import render
+from .models import Post</pre>
+<p>Точка перед <code>models</code> означает <em>текущую директорию</em> или <em>текущее приложение</em>. Поскольку <code>views.py</code> и <code>models.py</code> находятся в одной директории, мы можем использовать точку <code>.</code> и имя файла (без расширения <code>.py</code>). Затем мы импортируем модель (<code>Post</code>).</p>
+<p>Но что дальше? Чтобы получить реальную запись из модели <code>Post</code>, нам нужен <code>QuerySet</code>.</p>
+<h2>QuerySet</h2>
+<p>Ты уже должна быть знакома с принципом работы QuerySet. Мы говорили о нём в главе <a href="../django_orm/README.md">Django ORM (QuerySets)</a>.</p>
+<p>Сейчас нас интересует список записей блога, отсортированных по <code>published_date</code>, согласна? Мы уже делали это в главе о QuerySet!</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')</pre>
+<p>Теперь нам нужно включить эту строку кода в файл<code>blog/views.py</code>, добавив её в функцию <code>def post_list(request)</code>, но сначала не забудь добавить строку <code>from django.utils import timezone</code>:</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>from django.shortcuts import render
+from django.utils import timezone
+from .models import Post
+
+def post_list(request):
+    posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
+    return render(request, 'blog/post_list.html', {})</pre>
+<p>Нам осталось передать QuerySet <code>posts</code> в шаблон (мы расскажем о том, как отобразить его на странице, в следующей главе).</p>
+<p>Пожалуйста, обрати внимание, что мы создали <em>переменную</em> для QuerySet: <code>posts</code>. Можешь думать о ней как об имени для нашего QuerySet. Теперь мы можем обращаться к нему, используя имя.</p>
+<p>В функции <code>render</code> у нас уже есть параметр <code>request</code> (т.е. всё, что мы получим от пользователя в качестве запроса через Интернет) и файл шаблона <code>'blog/post_list.html'</code>. Последний параметр, который выглядит как <code>{}</code>, — это место, куда мы можем добавить что-нибудь для использования в шаблоне. Мы должны задавать имена передаваемым шаблону вещам (прямо сейчас мы остановимся на <code>'posts'</code> :)). В итоге параметр будет выглядеть следующим образом: <code>{'posts': posts}</code>. Обрати внимание, что часть перед <code>:</code> является строкой; её нужно обернуть в кавычки <code>''</code>.</p>
+<p>В результате файл <code>blog/views.py</code> должен выглядеть следующим образом:</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>from django.shortcuts import render
+from django.utils import timezone
+from .models import Post
+
+def post_list(request):
+    posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
+    return render(request, 'blog/post_list.html', {'posts': posts})</pre>
+<p>Вот и всё! Теперь пришло время перейти к шаблону и отобразить QuerySet на странице!</p>
+<p>Подробнее о QuerySets в Django можно узнать в официальной документации: https://docs.djangoproject.com/en/1.11/ref/models/querysets/</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>

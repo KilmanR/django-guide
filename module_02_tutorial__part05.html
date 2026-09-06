@@ -40,8 +40,17 @@
 <h1>Часть 5: Тестирование</h1>
 <p>Тесты защищают код: находим ошибки до пользователя.</p>
 <h2>Простой тест модели</h2>
-<p>В <code>polls/tests.py</code>:<br>```python<br>from django.test import TestCase<br>from .models import Question</p>
-<p>class QuestionModelTests(TestCase):<br>    def test_was_published_recently_with_future(self):<br>        # Вопрос из будущего не должен считаться недавним.<br>        import datetime<br>        from django.utils import timezone<br>        future_question = Question(pub_date=timezone.now() + datetime.timedelta(days=30))<br>        self.assertIs(future_question.was_published_recently(), False)<br>```</p>
+<p>В <code>polls/tests.py</code>:</p>
+<pre>from django.test import TestCase
+from .models import Question
+
+class QuestionModelTests(TestCase):
+    def test_was_published_recently_with_future(self):
+        # Вопрос из будущего не должен считаться недавним.
+        import datetime
+        from django.utils import timezone
+        future_question = Question(pub_date=timezone.now() + datetime.timedelta(days=30))
+        self.assertIs(future_question.was_published_recently(), False)</pre>
 <h2>Тест view</h2>
 <pre>def test_no_questions(self):
     response = self.client.get("/polls/")

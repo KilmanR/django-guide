@@ -46,21 +46,209 @@
 <p>Если ты находишься на одном из <a href="https://djangogirls.org/events/">мероприятий Django Girls</a>:<br>- Эта страница для тебя, если ты находишься на встрече Django Girls "вечер настроек" перед основным семинаром! Следуй инструкции ниже, а если возникнут трудности, попроси наставника помочь. На основном мастер-классе ты можешь пропускать инструкции по установке, с которыми столкнёшься.<br>- Возможно, организаторы мастер-класса, в котором ты будешь участвовать, попросили установить всё необходимое перед событием. Если это так, то эта страница для тебя! Следуй инструкции ниже. Если что-то самостоятельно выполнить не получилось, ничего страшного, на мероприятии ты можешь воспользоваться помощью наставника.<br>- Если мастер-класс, участницей которого ты являешься, не организует встречу "вечер настроек" (или ты не смогла присутствовать), и организаторы не попросили тебя попытаться установить все до начала мероприятия, пропусти этот раздел и переходи к главе <strong>Как работает интернет</strong>. Не переживай, ты установишь все необходимое во время прохождения руководства на самом мастер-классе.</p>
 <h1>Установка</h1>
 <p>На мастер-классе ты будешь создавать блог. Также по мере необходимости, ты узнаешь, как устанавливать различное программное обеспечение и создашь некоторые учетные записи. Данная страница является местом, где собраны вместе все необходимые инструкции по установке и регистрации.</p>
-<p><!--sec data-title="Настройка Chromebook (если ты используешь его)"<br>data-id="chromebook_setup" data-collapse=true ces--><br>{% include "/chromebook_setup/instructions.md" %}<br><!--endsec--></p>
+<p>Если ты не используешь Chromebook, можешь пропустить эту секцию. <br>В противном случае процесс установки будет немного другим, и тебе нужно будет пройти только эту инструкцию по установке.</p>
+<h3>Облачная IDE (PaizaCloud Cloud IDE, AWS Cloud9)</h3>
+<p>Облачная IDE — это инструмент, который предоставляет тебе редактор кода и доступ к компьютеру, <br>запущенному в интернете. На этом удалённом компьютере ты можешь устанавливать, создавать и запускать программы.<br>На время прохождения этого руководства облачная IDE будет вести себя как _локальный компьютер_.<br>Ты будешь так же, как и другие участницы с macOS, Ubuntu или Windows, выполнять команды в командной строке,<br>но она будет подключена к компьютеру облачной IDE, который находится где-то в другом месте.</p>
+<p>Ниже ты увидишь инструкции для настройки облачных IDE (PaizaCloud Cloud IDE, AWS Cloud9).<br>Ты можешь выбрать одну из них и выполнить соответствующие действия.</p>
+<h4>PaizaCloud Cloud IDE</h4>
+<p>1. Перейди на сайт <a href="https://paiza.cloud/">PaizaCloud Cloud IDE</a><br>2. Войди в свой аккаунт<br>3. Нажми _New Server_<br>4. Нажми кнопку Terminal (в левой части окна)</p>
+<p>Теперь ты должна увидеть интерфейс с боковой панелью, кнопки расположены слева. <br>Нажми кнопку "Terminal", чтобы открыть командную строку. Ты увидишь приглашение командной строки:</p>
+<p><strong>Terminal:</strong></p>
+<pre>$</pre>
+<p>Командная строка в PaizaCloud Cloud IDE готова к твоим командам. <br>Ты можешь изменить размер этого окна, чтобы сделать его немного больше.</p>
+<h4>AWS Cloud9</h4>
+<p>1. Перейди на сайт <a href="https://aws.amazon.com/cloud9/">AWS Cloud9</a><br>2. Войди в свой аккаунт<br>3. Нажми _Create Environment_</p>
+<p>Теперь ты должна увидеть интерфейс с боковой панелью, большим основным окном с текстом, <br>а также маленьким окошком снизу, которое выглядит как-то так:</p>
+<p><strong>bash:</strong></p>
+<pre>yourusername:~/workspace $</pre>
+<p>Эта область внизу и есть твоя командная строка. Ты можешь использовать её, чтобы давать команды <br>удалённому компьютеру в Cloud9. Ты можешь изменить размер этого окна, чтобы сделать его немного больше.</p>
+<h3>Виртуальное окружение</h3>
+<p>Виртуальное окружение (его также называют virtualenv) похоже на личную коробку, куда мы можем <br>сложить полезный код для проекта, над которым работаем. Виртуальные окружения нужны нам, чтобы держать отдельно<br>разные кусочки кода для наших проектов — так они не перемешаются между разными проектами.</p>
+<p>В твоей командной строке в нижней части интерфейса Cloud 9 запусти следующие команды:</p>
+<p><strong>Cloud 9:</strong></p>
+<pre>sudo apt update
+sudo apt install python3.6-venv</pre>
+<p>Если они не сработают, попроси своего тренера помочь.</p>
+<p>Далее запусти:</p>
+<p><strong>Cloud 9:</strong></p>
+<pre>mkdir djangogirls
+cd djangogirls
+python3.6 -mvenv myvenv
+source myvenv/bin/activate
+pip install django~=5.2.12</pre>
+<p>(обрати внимание, что в последней строчке мы используем сочетание тильды и знака равенства: <code>~=</code>).</p>
+<h3>GitHub</h3>
+<p>Создай аккаунт на <a href="https://github.com">GitHub</a>.</p>
+<h3>PythonAnywhere</h3>
+<p>Руководство Django Girls включает в себя раздел «Публикация». Этим словом описывается процесс,<br>когда ты переносишь код, запускающий твоё новое веб-приложение, на публично доступный компьютер <br>(он называется сервер), чтобы другие люди могли видеть результаты твоей работы.</p>
+<p>Если ты проходишь это руководство на Chromebook, этап публикации может выглядеть немного нетипично, так как<br>для разработки мы уже используем удалённый компьютер где-то в интернете (а, например, не мощности своего ноутбука).<br>Тем не менее, будет полезно пройти раздел «Публикация», ведь мы можем рассматривать наше рабочее пространство <br>в Cloud9 или PaizaCloud как место для незавершенной работы, а PythonAnywhere как место<br>для демонстрации законченных дел.</p>
+<p>Так что тебе нужно будет завести аккаунт на сайте <a href="https://www.pythonanywhere.com">www.pythonanywhere.com</a>.</p>
 <h1>Краткое введение в командную строку</h1>
-<p>В инструкции ниже ты часто будешь встречать такие термины, как "консоль", "терминал", "командная строка", на самом деле, они обозначают одно и тоже - окно на компьютере, в которое ты можешь вводить команды. Когда приступишь к основному руководству, ты узнаешь больше о командной строке. На данном этапе необходимо знать только, как открыть окно и как оно выглядит.<br>{% include "/intro_to_command_line/open_instructions.md" %}</p>
+<p>В инструкции ниже ты часто будешь встречать такие термины, как "консоль", "терминал", "командная строка", на самом деле, они обозначают одно и тоже - окно на компьютере, в которое ты можешь вводить команды. Когда приступишь к основному руководству, ты узнаешь больше о командной строке. На данном этапе необходимо знать только, как открыть окно и как оно выглядит.</p>
+<p>В зависимости от твоей версии Windows и того, какая у тебя клавиатура, одно из следующих действий откроет окно командной строки (возможно, придётся немного поэкспериментировать, но все варианты пробовать необязательно):<br>- Перейди в меню Пуск (или на экран Пуск), в строке поиска набери "Командная строка".<br>- Перейди в меню Пуск → Windows → Командная строка.<br>- Перейди в меню Пуск → Все программы → Служебные → Командная строка.<br>- Перейди на экран Пуск, наведи мышь на нижний левый угол экрана и нажми на стрелочку вниз, которая появится там. (Если у тебя тачскрин, листни пальцем снизу вверх.) Откроется страница "Приложения". Выбери пункт "Командная строка" в разделе "Windows".<br>- Удерживая клавишу Windows на клавиатуре, нажми X. В появившемся меню выбери пункт "Командная строка".<br>- Удерживая клавишу Windows, нажми R, чтобы появилось окно "Выполнить". Набери в строке cmd и нажми OK.</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/python_installation/images/windows-plus-r.png" alt="Type &quot;cmd&quot; in the &quot;Run&quot; window"></p>
+<p>В какой-то момент тебе понадобятся два окна командной строки одновременно. Однако в некоторых версиях Windows, если ты попытаешься запустить вторую командную строку, когда одна уже запущена тем же способом, ты вместо этого попадёшь в уже открытое окно командной строки. Попробуй у себя на компьютере и посмотри, что будет! Если у тебя получается открыть только одно окно командной строки, попробуй какой-нибудь другой из вышеприведённых способов в списке. По крайней мере один из них сможет открыть новое окно командной строки.</p>
+<p>Перейди в Приложения → Прочие → Терминал.</p>
+<p>Вероятно, командная строка скрывается по адресу: Приложения → Стандартные → Терминал или Приложения → Система → Терминал, но это может зависеть от конкретной системы. Если не сможешь найти — Google поможет :)</p>
 <h1>Установка Python</h1>
-<p>{% include "/python_installation/instructions.md" %}</p>
+<p>> Для проходящих руководство дома: эта глава рассмотрена в видео <a href="https://www.youtube.com/watch?v=pVTaqzKZCdA">Installing Python & Code Editor</a>.</p>
+<p>> Этот подраздел основан на руководстве Geek Girls Carrots (https://github.com/ggcarrots/django-carrots)</p>
+<p>Django написан на Python. Нам нужен Python, чтобы сделать что-нибудь в Django. Давай начнем с его установки! Мы хотим, чтобы ты установила самую свежую версию Python 3, поэтому, если у тебя уже есть более ранняя версия, то её придется обновить. Если у тебя уже установлена версия 3.10 или более высокая, она должна подойти.</p>
+<p>Для начала проверь, какая версия Windows у тебя на компьютере — 32-битная или 64-битная. Это будет указано в строке «Тип системы» на странице «Сведения о системе». Чтобы попасть туда, попробуй один из этих способов:<br><em> Нажми одновременно клавиши Windows и Pause/Break<br></em> Открой панель управления из меню Windows, оттуда перейди в «Система и безопасность», затем в «Система»<br>* Нажми клавишу Windows, затем перейди по разделам Настройки > Система > О системе</p>
+<p>Ты можешь загрузить Python для Windows с официального веб-сайта: https://www.python.org/downloads/windows/. Перейди по ссылке «Latest Python 3 Release - Python x.x.x». Если у тебя установлена <strong>64-битная</strong> версия Windows, скачай <strong>Windows installer (64-bit)</strong>. Если нет — скачай <strong>Windows installer (32-bit)</strong>.  После загрузки дистрибутива ты должна запустить его (двойным щелчком) и следовать инструкциям.</p>
+<p>Обрати внимание на экран мастера установки, который называется «Setup» (Настройка): тебе нужно пролистать его вниз и выбрать опцию «Add Python 3.14 to the PATH» (Добавить Python 3.14 к системной переменной PATH), как на рисунке (это может выглядеть по-разному в зависимости от версии, которую ты устанавливаешь):</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/python_installation/images/python-installation-options.png" alt="Не забудь добавить Python в системную переменную Path"></p>
+<p>Когда установка закончится, ты можешь увидеть предложение узнать больше о Python или об установленной тобой версии. Закрой это окно — ты узнаешь намного больше в этом руководстве!</p>
+<p>Примечание: если ты используешь старую версию Windows (7, Vista или ещё более старую версию), и установка Python 3.14 завершается выводом сообщения об ошибке, ты можешь попробовать:<br>1. либо установить все доступные обновления Windows и попробовать установить Python 3.14 заново;<br>2. либо установить <a href="https://www.python.org/downloads/windows/">более раннюю версию Python</a>, например, <a href="https://www.python.org/downloads/release/python-346/">3.4.6</a>.</p>
+<p>Если тебе пришлось установить раннюю версию Python, экран установки может выглядеть чуть иначе, чем показано выше. Не забудь прокрутить окно до строки «Add python.exe to Path», затем нажми кнопку слева от неё и выбери пункт «Will be installed on local hard drive»:</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/python_installation/images/add_python_to_windows_path.png" alt="Добавление Python в переменную Path, ранние версии"></p>
+<p>> <strong>Примечание:</strong> перед установкой Python в macOS тебе нужно проверить, что в настройках твоего Mac разрешено устанавливать пакеты, загруженные не из App Store. Перейди в Системные настройки (в папке «Программы»), нажми «Защита и безопасность» и выбери вкладку «Общие». Если в разделе «Разрешать загрузки из:» выбран вариант «App Store для Mac», смени его на «App Store для Mac и от установленных разработчиков».</p>
+<p>Тебе нужно перейти по ссылке https://www.python.org/downloads/ и скачать дистрибутив Python:</p>
+<p>  <em> Скачай файл </em>macOS installer<em>,<br>  </em> Сделай двойной щелчок на <em>python-3.14.3-macosx11.pkg</em> для запуска установщика.</p>
+<p>Вполне вероятно, что у тебя уже установлен Python. Чтобы проверить это (а также версию языка), открой консоль и введи следующую команду:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ python3 --version
+Python 3.14.3</pre>
+<p>Если у тебя установлена другая версия Python, не меньше чем 3.10 (например, 3.10.13), то нет необходимости обновляться.<br>Если Python не установлен, или ты хочешь использовать другую версию языка, то можешь установить его следующим образом:</p>
+<p>Введи эту команду в консоль:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ sudo apt install python3</pre>
+<p>Используй следующую команду в консоли:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ sudo dnf install python3</pre>
+<p>Если у тебя старая версия Fedora, то ты можешь получить ошибку «command <code>dnf</code> is not found». В этом случае используй <code>yum</code>.</p>
+<p>Используй следующую команду в консоли:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ sudo zypper install python3</pre>
+<p>Убедись, что установка прошла успешно, открыв приложение <em>Терминал</em> и запустив команду <code>python3</code>:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ python3 --version
+Python 3.14.3</pre>
+<p>Версия, которую ты увидишь, может быть и не 3.14.3 — там будет такая версия, которую ты установила.</p>
+<p><strong>ПРИМЕЧАНИЕ:</strong> если ты используешь Windows и получила ошибку с сообщением, что <code>python3</code> не найден, попробуй ввести <code>python</code> (без <code>3</code>) и проверь, будет ли это версия Python 3.10 или выше.</p>
+<p>----</p>
+<p>Если у тебя остались какие-либо сомнения, или что-то пошло не так, и ты понятия не имеешь, что делать дальше, — спроси своего тренера! Иногда дела идут не совсем гладко, поэтому лучше попросить помощи у кого-то с большим опытом.</p>
 <h1>Установка редактора кода</h1>
-<p>{% include "/code_editor/instructions.md" %}</p>
+<p>Существует много различных редакторов, и в основном все сводится к личным предпочтениям. Большинство Python-программистов используют сложные, но чрезвычайно мощные IDE (англ. Integrated Development Environments — Интегрированные среды разработки), такие как PyCharm. Однако они, вероятно, не очень подходят для начинающих; мы предлагаем столь же мощные, но куда более простые варианты.</p>
+<p>Ниже приведен перечень наших предпочтений, но также можешь попросить совета у своего тренера — будет проще получить помощь от него.</p>
+<h2>Gedit</h2>
+<p>Gedit является открытым, бесплатным редактором, доступным для всех операционных систем.</p>
+<p><a href="https://wiki.gnome.org/Apps/Gedit#Download">Скачать его можно здесь</a></p>
+<h2>Sublime Text</h2>
+<p>Sublime Text — это очень популярный текстовый редактор с бесплатным пробным периодом. Он легко устанавливается и прост в использовании, а также доступен для всех операционных систем.</p>
+<p><a href="https://www.sublimetext.com/">Скачать его можно здесь</a></p>
+<h2>Atom</h2>
+<p>Atom — это новейший текстовый редактор от <a href="https://github.com/">GitHub</a>. Он является бесплатным, открытым, легко устанавливается и прост в использовании. Доступен для Windows, OSX и Linux.</p>
+<p><a href="https://atom.io/">Скачать его можно здесь</a></p>
+<h2>Зачем нам нужен редактор кода?</h2>
+<p>Ты можешь спросить — зачем устанавливать отдельную программу для редактирования кода, если можно использовать Word или Notepad?</p>
+<p>Во-первых, код должен должен храниться в виде <strong>простого текста</strong>, а проблема таких программ, как Word или Textedit в том, что они не сохраняют файлы в этом виде, а используют "обогащённый" текст (с форматированием и шрифтами), например, <a href="https://en.wikipedia.org/wiki/Rich_Text_Format">RTF (Rich Text Format)</a>.</p>
+<p>Вторая причина в том, что специализированные редакторы предоставляют множество полезных для программирования возможностей, таких как цветная подсветка кода в зависимости от его смысла и автоматически закрывающиеся кавычки.</p>
+<p>Позже мы увидим всё это в действии. Скоро ты начнешь думать о своем редакторе кода как о проверенном любимом инструменте :)</p>
 <h1>Настрока virtualenv и установка Django</h1>
-<p>{% include "/django_installation/instructions.md" %}</p>
+<p>> Отдельные части этой главы основаны на учебных пособиях Geek Girls Carrots (https://github.com/ggcarrots/django-carrots).</p>
+<p>> Отдельные части этой главы основаны на <a href="http://django-marcador.keimlink.de/">учебном пособии django-marcador</a>, лицензированном под Creative Commons Attribution-ShareAlike 4.0 International License. Руководство django-marcador защищено авторским правом Markus Zapke-Gründemann et al.</p>
+<h2>Виртуальное окружение</h2>
+<p>Перед установкой Django мы попросим тебя установить крайне полезный инструмент, который поможет тебе содержать среду разработки в чистоте. Можно пропустить этот шаг, но мы очень советуем этого не делать. Использование лучших рекомендаций с самого начала убережёт от многих проблем в будущем!</p>
+<p>Итак, давай создадим <strong>виртуальное окружение</strong> (оно также называется <em>virtualenv</em>). Virtualenv будет изолировать настройки Python/Django для каждого отдельного проекта. Это значит, что изменения одного сайта не затронут другие сайты, которые ты разрабатываешь. Удобно, правда?</p>
+<p>Всё, что тебе нужно сделать — найти директорию, в которой мы создадим <code>virtualenv</code>; домашний каталог вполне подойдёт. Для Windows адрес будет выглядеть так: <code>C:\Users\Name</code> (где <code>Name</code> — твоё имя пользователя).</p>
+<p>> __Примечание:__ Если ты работаешь в Windows, удостоверься, что в названии директории нет специальных символов или символов с диакритическими знаками; если в твоём имени пользователя есть такие символы, выбери другую директорию, например, <code>C:\djangogirls</code>.</p>
+<p>Мы будем использовать отдельную директорию <code>djangogirls</code> в домашнем каталоге:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ mkdir djangogirls
+$ cd djangogirls</pre>
+<p>Мы создадим виртуальное окружение под именем <code>myvenv</code>. В общем случае команда будет выглядеть так:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ python3 -m venv myvenv</pre>
+<p>Чтобы создать новое <code>virtualenv</code>, тебе нужно открыть командную строку и набрать <code>python -m venv myvenv</code>. Это будет выглядеть так:</p>
+<p><strong>command-line:</strong></p>
+<pre>C:\Users\Name\djangogirls&gt; python -m venv myvenv</pre>
+<p>Здесь <code>myvenv</code> — имя твоего <code>virtualenv</code>. Ты можешь выбрать другое имя, но используй только строчные буквы, без пробелов и специальных символов. Имя виртуального окружения выбирай покороче — тебе придётся часто его набирать!</p>
+<p>В Linux и macOS достаточно набрать <code>python3 -m venv myvenv</code>, чтобы создать <code>virtualenv</code>:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ python3 -m venv myvenv</pre>
+<p><code>myvenv</code> — имя виртуального окружения <code>virtualenv</code>. Можешь выбрать другое имя, но используй только строчные буквы и никаких пробелов. Имя виртуального окружения лучше выбирать покороче — набирать его предстоит не раз!</p>
+<p>> __Примечание:__ В некоторых версиях Debian/Ubuntu может произойти следующая ошибка:</p>
+<p>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;The virtual environment was not created successfully because ensurepip is not available.  On Debian/Ubuntu systems, you need to install the python3-venv package using the following command.&amp;lt;br&amp;gt;&amp;gt;    apt install python3-venv&amp;lt;br&amp;gt;&amp;gt;You may need to use sudo with that command.  After installing the python3-venv package, recreate your virtual environment.&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code><code>&lt;br&gt;&gt;&lt;br&gt;&gt; В таком случае следуй приведённым инструкциям и установи пакет </code>python3-venv`:<br>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;$ sudo apt install python3-venv&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code>`</p>
+<p>> __Примечание:__ В некоторых версиях Debian/Ubuntu при таком способе создания виртуального окружения ты можешь получить такую ошибку:</p>
+<p>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;Error: Command '['/home/eddie/Slask/tmp/venv/bin/python3', '-Im', 'ensurepip', '--upgrade', '--default-pip']' returned non-zero exit status 1&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code>`</p>
+<p>> Чтобы обойти её, используй команду <code>virtualenv</code>.</p>
+<p>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;$ sudo apt install python-virtualenv&amp;lt;br&amp;gt;&amp;gt;$ virtualenv --python=python3.14 myvenv&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code>`</p>
+<p>> __Примечание:__ Если ты получаешь следующую ошибку</p>
+<p>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;E: Unable to locate package python3-venv&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code>`</p>
+<p>> то запусти команду:<br>><br>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;sudo apt install python3.14-venv&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code>`</p>
+<h2>Работаем с virtualenv</h2>
+<p>Указанная выше команда создаст директорию <code>myvenv</code> (или другую, в зависимости от выбранного тобой имени), которая будет содержать виртуальное окружение (по сути — набор файлов и папок).</p>
+<p>Запусти виртуальное окружение, выполнив:</p>
+<p><strong>command-line:</strong></p>
+<pre>C:\Users\Name\djangogirls&gt; myvenv\Scripts\activate</pre>
+<p>> __ПРИМЕЧАНИЕ:__ в Windows 10 при работе в Windows PowerShell ты можешь получить ошибку вида <code>execution of scripts is disabled on this system</code>. В этом случае открой ещё одно окно Windows PowerShell, выбрав опцию «Запустить от имени Администратора». Затем перед использованием виртуального окружения попробуй запустить следующую команду:<br>><br>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;C:\WINDOWS\system32&amp;gt; Set-ExecutionPolicy -ExecutionPolicy RemoteSigned&amp;lt;br&amp;gt;&amp;gt;     Execution Policy Change&amp;lt;br&amp;gt;&amp;gt;     The execution policy helps protect you from scripts that you do not trust. Changing the execution policy might expose you to the security risks described in the about_Execution_Policies help topic at http://go.microsoft.com/fwlink/?LinkID=135170. Do you want to change the execution policy? [Y] Yes  [A] Yes to All  [N] No  [L] No to All  [S] Suspend  [?] Help (default is "N"): A&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code>`</p>
+<p>Запусти виртуальное окружение, выполнив:</p>
+<p><strong>command-line:</strong></p>
+<pre>$ source myvenv/bin/activate</pre>
+<p>Не забудь поменять <code>myvenv</code> на выбранное тобой имя для <code>virtualenv</code>!</p>
+<p>> __ПРИМЕЧАНИЕ:__ иногда команда <code>source</code> может быть недоступна. В таком случае используй следующий метод:<br>><br>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;$ . myvenv/bin/activate&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code>`</p>
+<p>Ты поймёшь, что <code>virtualenv</code> запущено, когда увидишь префикс <code>(myvenv)</code> в начале приглашения командной строки.</p>
+<p>При работе с виртуальным окружением команда <code>python</code> будет автоматически обращаться к правильной версии языка, так что ты можешь использовать просто <code>python</code> вместо <code>python3</code>.</p>
+<p>Отлично, теперь мы будем хранить все важные зависимости в одном месте. Наконец можно установить Django!</p>
+<h2>Установка Django</h2>
+<p>После запуска <code>virtualenv</code> ты можешь установить Django.</p>
+<p>Перед этим мы должны удостовериться, что у тебя установлена последняя версия <code>pip</code> — программы, которую мы используем для установки Django.</p>
+<p><strong>command-line:</strong></p>
+<pre>(myvenv) ~$ python3 -m pip install --upgrade pip</pre>
+<h3>Установка библиотек через указание требований</h3>
+<p>Файл с требованиями (requirements) хранит список зависимостей, которые нужно установить с помощью<br><code>pip install</code>:</p>
+<p>Для начала создай файл <code>requirements.txt</code> внутри директории <code>djangogirls/</code>, используя текстовый редактор, который ты установила ранее. Просто создай в редакторе новый файл, а затем сохрани его под именем <code>requirements.txt</code> в директории <code>djangogirls/</code>. После этого твоя директория будет выглядеть так:</p>
+<pre>djangogirls
+└───requirements.txt</pre>
+<p>В файл <code>djangogirls/requirements.txt</code> нужно добавить такой текст:</p>
+<p><strong>djangogirls/requirements.txt:</strong></p>
+<pre>Django~=5.2.12</pre>
+<p>Теперь выполни команду <code>pip install -r requirements.txt</code>, чтобы установить Django.</p>
+<p><strong>command-line:</strong></p>
+<pre>(myvenv) ~$ pip install -r requirements.txt
+Collecting Django~=5.2.12 (from -r requirements.txt (line 1))
+  Downloading Django-5.2.12-py3-none-any.whl (7.1MB)
+Installing collected packages: Django
+Successfully installed Django-5.2.12</pre>
+<p>> Если при запуске pip в Windows ты получаешь сообщение об ошибке, проверь, что путь к директории с проектом не содержит пробелов или специальных символов (<code>C:\Users\User Name\djangogirls</code>). Если проблема в этом, то, пожалуйста, перенеси свой проект в другое место, адрес которого не будет содержать пробелов и специальных символов (предлагаем <code>C:\djangogirls</code>). Создай новое виртуальное окружение в новой директории, после этого удали старое и попробуй запустить команды выше заново (перемещение виртуального окружения не сработает, поскольку в нём используются абсолютные пути).</p>
+<p>> При попытке установки Django твоя командная строка может зависнуть. Если это произошло, вместо приведённой выше команды используй:<br>><br>><br><strong>command-line:</strong></p>
+<p>>`<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt;C:\Users\Name\djangogirls&amp;gt; python -m pip install -r requirements.txt&amp;lt;br&amp;gt;&amp;gt;&lt;/code&gt;</code>`</p>
+<p>Вот и всё! Теперь ты (наконец-то) готова создать своё Django-приложение!</p>
 <h1>Установка Git</h1>
-<p>{% include "/deploy/install_git.md" %}</p>
+<p>Git — это «система управления версиями», используемая множеством программистов. Эта программа отслеживает изменения, происходящие с файлами, чтобы впоследствии можно было восстановить состояние кода на нужный момент времени. Это немного похоже на функцию отслеживания изменений в Microsoft Word, но куда мощнее.</p>
+<h2>Установка Git</h2>
+<p>Ты можешь загрузить Git с официального сайта <a href="https://git-scm.com/">git-scm.com</a>. Ты можешь нажимать "дальше, дальше, дальше" на всех этапах установки за исключением одного: на пятом шаге, который называется "Adjusting your PATH environment" (Настройка системной переменной Path), выбери "Use Git and optional Unix tools from the Windows Command Prompt" (Запуск Git и соответствующих Unix утилит через командную строку Windows, нижняя опция). Все остальные настройки можно оставить по умолчанию. Также неплохо будет выбрать опцию "Checkout Windows-style, commit Unix-style line endings".</p>
+<p>После окончания установки не забудь перезапустить командную строку или PowerShell.</p>
+<p>Загрузи Git с официального сайта <a href="https://git-scm.com/">git-scm.com</a> и просто следуй инструкциям по установке.</p>
+<p>> <strong>Примечание:</strong> если ты используешь OS X 10.6, 10.7 или 10.8, тебе придётся установить git отсюда: <a href="https://sourceforge.net/projects/git-osx-installer/files/git-2.3.5-intel-universal-snow-leopard.dmg/download">Установка Git для OS X Snow Leopard</a></p>
+<p><strong>command-line:</strong></p>
+<pre>$ sudo apt install git</pre>
+<p><strong>command-line:</strong></p>
+<pre>$ sudo dnf install git</pre>
+<p><strong>command-line:</strong></p>
+<pre>$ sudo zypper install git</pre>
 <h1>Создание учётной записи на GitHub</h1>
 <p>Перейди на <a href="https://www.github.com">GitHub.com</a> и зарегистрируй новый бесплатный аккаунт.</p>
 <h1>Создание учётной записи на PythonAnywhere</h1>
-<p>{% include "/deploy/signup_pythonanywhere.md" %}</p>
+<p>PythonAnywhere — это сервис по запуску кода на Python в облаке. Мы будем использовать его, чтобы разместить наш сайт «вживую» в интернете.</p>
+<p>Создай аккаунт уровня "Beginner" на PythonAnywhere. Он бесплатный, так что кредитка не понадобится.</p>
+<p>  * <a href="https://www.pythonanywhere.com/">www.pythonanywhere.com</a></p>
+<p>  <img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/deploy/images/pythonanywhere_beginner_account_button.png" alt="Страница регистрации на PythonAnywhere с кнопкой создания бесплатного &#x27;Beginner&#x27; аккаунта"></p>
+<p>> <strong>Примечание:</strong> при выборе имени пользователя помни, что URL блога примет вид <code>yourusername.pythonanywhere.com</code>, так что остановись либо на своём нике, либо на имени, связанном с тематикой блога. Кроме того, убедись в том, что запомнила пароль (сохрани его в своём менеджере паролей, если им пользуешься).</p>
+<h2>Создание API токена для PythonAnywhere</h2>
+<p>Это нужно будет сделать только один раз. Когда ты зарегистрируешься на PythonAnywhere, откроется панель управления (dashboard). На ней в правом верхнем углу будет ссылка на страницу «Account»:</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/deploy/images/pythonanywhere_account.png" alt="Account link on the top right on the page"></p>
+<p>Там выбери вкладку «API token» и нажми кнопку, на которой написано «Create new API token» (создать новый API token).</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/deploy/images/pythonanywhere_create_api_token.png" alt="The API token tab on the Account page"></p>
 <h1>Начинай читать</h1>
 <p>Поздравляем, всё готово к работе! Если у тебя ещё осталось немного свободного времени до семинара, было бы полезно начать читать одну из первых глав:</p>
 <p>  * <strong>Как работает Интернет</strong></p>

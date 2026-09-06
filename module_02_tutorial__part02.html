@@ -40,18 +40,33 @@
 <h1>Часть 2: Модели и база данных</h1>
 <p>Модель = таблица в базе. Django хранит логику в ORM.</p>
 <h2>Модели Question и Choice</h2>
-<p>В <code>polls/models.py</code>:<br>```python<br>from django.db import models</p>
-<p>class Question(models.Model):<br>    question_text = models.CharField(max_length=200)<br>    pub_date = models.DateTimeField("date published")</p>
-<p>    def __str__(self):<br>        return self.question_text</p>
-<p>class Choice(models.Model):<br>    question = models.ForeignKey(Question, on_delete=models.CASCADE)<br>    choice_text = models.CharField(max_length=200)<br>    votes = models.IntegerField(default=0)</p>
-<p>    def __str__(self):<br>        return self.choice_text<br>```</p>
+<p>В <code>polls/models.py</code>:</p>
+<pre>from django.db import models
+
+class Question(models.Model):
+    question_text = models.CharField(max_length=200)
+    pub_date = models.DateTimeField("date published")
+
+    def __str__(self):
+        return self.question_text
+
+class Choice(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    choice_text = models.CharField(max_length=200)
+    votes = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.choice_text</pre>
 <h2>Миграции</h2>
 <pre>python manage.py makemigrations polls   # создать миграции
 python manage.py sqlmigrate polls 0001  # увидеть SQL
 python manage.py migrate                # применить</pre>
 <h2>Регистрация в админке</h2>
-<p>В <code>polls/admin.py</code>:<br>```python<br>from django.contrib import admin<br>from .models import Question</p>
-<p>admin.site.register(Question)<br>```</p>
+<p>В <code>polls/admin.py</code>:</p>
+<pre>from django.contrib import admin
+from .models import Question
+
+admin.site.register(Question)</pre>
 <h2>Суперпользователь</h2>
 <pre>python manage.py createsuperuser</pre>
 <p>Админка: http://127.0.0.1:8000/admin/</p>

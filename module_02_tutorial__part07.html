@@ -39,15 +39,34 @@
 <main class="wrap">
 <h1>Часть 7: Кастомизация админки</h1>
 <h2>Улучшаем отображение вопроса</h2>
-<p><code>polls/admin.py</code>:<br>```python<br>from django.contrib import admin<br>from .models import Choice, Question</p>
-<p>class ChoiceInline(admin.TabularInline):<br>    model = Choice<br>    extra = 3</p>
-<p>class QuestionAdmin(admin.ModelAdmin):<br>    fieldsets = [<br>        (None, {"fields": ["question_text"]}),<br>        ("Данные", {"fields": ["pub_date"], "classes": ["collapse"]}),<br>    ]<br>    inlines = [ChoiceInline]<br>    list_display = ("question_text", "pub_date", "was_published_recently")</p>
-<p>admin.site.register(Question, QuestionAdmin)<br>```</p>
+<p><code>polls/admin.py</code>:</p>
+<pre>from django.contrib import admin
+from .models import Choice, Question
+
+class ChoiceInline(admin.TabularInline):
+    model = Choice
+    extra = 3
+
+class QuestionAdmin(admin.ModelAdmin):
+    fieldsets = [
+        (None, {"fields": ["question_text"]}),
+        ("Данные", {"fields": ["pub_date"], "classes": ["collapse"]}),
+    ]
+    inlines = [ChoiceInline]
+    list_display = ("question_text", "pub_date", "was_published_recently")
+
+admin.site.register(Question, QuestionAdmin)</pre>
 <h2>Добавим метод was_published_recently в модель</h2>
-<p>В <code>polls/models.py</code>:<br>```python<br>import datetime<br>from django.utils import timezone</p>
-<p>def was_published_recently(self):<br>    return self.pub_date >= timezone.now() - datetime.timedelta(days=1)<br>```</p>
+<p>В <code>polls/models.py</code>:</p>
+<pre>import datetime
+from django.utils import timezone
+
+def was_published_recently(self):
+    return self.pub_date &gt;= timezone.now() - datetime.timedelta(days=1)</pre>
 <h2>Фильтры и поиск</h2>
-<p>В <code>QuestionAdmin</code> добавьте:<br>``<code>python&lt;br&gt;list_filter = ["pub_date"]&lt;br&gt;search_fields = ["question_text"]&lt;br&gt;</code>``</p>
+<p>В <code>QuestionAdmin</code> добавьте:</p>
+<pre>list_filter = ["pub_date"]
+search_fields = ["question_text"]</pre>
 <p>Теперь админка удобная: карточки, инлайн-варианты, фильтры, поиск.</p>
 <footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
 </main>

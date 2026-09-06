@@ -38,8 +38,6 @@
 </header>
 <main class="wrap">
 <h1>Часть 2: Настройка среды разработки</h1>
-<p>{{LearnSidebar}}</p>
-<p>{{PreviousMenuNext("Learn_web_development/Extensions/Server-side/Django/Introduction", "Learn_web_development/Extensions/Server-side/Django/Tutorial_local_library_website", "Learn_web_development/Extensions/Server-side/Django")}}</p>
 <p>Теперь, когда вы знаете, что такое Django, мы покажем вам, как настроить и протестировать среду разработки Django для Windows, Linux (Ubuntu) и Mac OS X - какую бы операционную систему вы не использовали, эта статья должна дать вам все, что необходимо для возможности начать разрабатывать приложения Django.</p>
 <table><tr><th>Требования:</th><th>Знание как открыть терминал / командную строку, как устанавливать программные пакеты в операционной системе вашего компьютера.</th></tr><tr><td>-----------</td><td>------------------------------------------------------------------------------------------------------------------------------</td></tr><tr><td>Задача:</td><td>Создать среду разработки для Django (1.10) и запустить её на вашем компьютере.</td></tr></table>
 <h2>Обзор среды разработки Django</h2>
@@ -76,7 +74,7 @@
 <h2>Установка Python 3</h2>
 <p>Для использования Django вам необходимо установить _Python 3_ на свою операционную систему. Вам также понадобится инструмент <a href="https://pypi.python.org/pypi">Python Package Index</a> — _pip3_ — который используется для управления (установка, обновление и удаление) библиотек/пакетов Python, используемых Django и другими вашими приложениями Python.</p>
 <p>Этот раздел коротко описывает то, как вы можете проверить имеющиеся версии и при необходимости установить новые для Ubuntu Linux 16.04, Mac OS X, and Windows 10.</p>
-<p>> [!NOTE]<br>> В зависимости от платформы, вы можете иметь возможность установки Python/pip из собственного менеджера пакетов операционной системы или при помощи других инструментов. Для большинства платформ вы можете скачать необходимые установочные файлы из <https://www.python.org/downloads/> и установить их при помощи соответствующего специфичного для платформы метода.</p>
+<p>> [!NOTE]<br>> В зависимости от платформы, вы можете иметь возможность установки Python/pip из собственного менеджера пакетов операционной системы или при помощи других инструментов. Для большинства платформ вы можете скачать необходимые установочные файлы из <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a> и установить их при помощи соответствующего специфичного для платформы метода.</p>
 <h3>Ubuntu 16.04</h3>
 <p>Ubuntu Linux включает в себя Python 3 по умолчанию. Вы можете удостовериться в этом, выполнив следующую команду в терминале:</p>
 <pre>python3 -V
@@ -88,7 +86,7 @@
 <pre>python3 -V
  -bash: python3: command not found</pre>
 <p>Вы можете легко установить Python 3 (вместе с инструментом _pip3_) с <a href="https://www.python.org/">python.org</a>:</p>
-<p>1. Скачайте нужный установочный файл:<br>   1. Перейдите в <https://www.python.org/downloads/><br>   2. Нажмите на кнопку <strong>Скачать Python 3.6.4</strong> (точная основная версия может отличаться).</p>
+<p>1. Скачайте нужный установочный файл:<br>   1. Перейдите в <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a><br>   2. Нажмите на кнопку <strong>Скачать Python 3.6.4</strong> (точная основная версия может отличаться).</p>
 <p>2. Найдите файл при помощи _Finder_, дважды кликните по нему и следуйте подсказкам по установке.</p>
 <p>Удостовериться в успешной установке вы можете проверкой на наличие _Python 3_, как показано ниже:</p>
 <pre>python3 -V
@@ -97,7 +95,7 @@
 <pre>pip3 list</pre>
 <h3>Windows 10</h3>
 <p>Windows не включает Python по умолчанию, но вы можете легко установить его (вместе с инструментом _pip_) с <a href="https://www.python.org/">python.org</a>:</p>
-<p>1. Скачайте нужный установочный файл:<br>   1. Перейдите в <https://www.python.org/downloads/><br>   2. Нажмите на кнопку <strong>Скачать Python 3.6.4</strong> (точная основная версия может отличаться).</p>
+<p>1. Скачайте нужный установочный файл:<br>   1. Перейдите в <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a><br>   2. Нажмите на кнопку <strong>Скачать Python 3.6.4</strong> (точная основная версия может отличаться).</p>
 <p>2. Установите Python, дважды кликнув на скачанный файл и следуя инструкциям по установке.</p>
 <p>После этого вы сможете подтвердить успешную установку Python путём выполнения следующего текста в командной строке:</p>
 <pre>py -3 -V
@@ -139,7 +137,7 @@ export PROJECT_HOME=$HOME/Devel
 source /usr/local/bin/virtualenvwrapper.sh</pre>
 <p>> [!NOTE]<br>> Переменная <code>VIRTUALENVWRAPPER_PYTHON</code> указывает на обычное расположение Python3. Если virtualenv не работает во время тестирования, то вам следует проверить, находится ли интерпретатор Python в нужном расположении (и затем поменять его соответствующим образом в значении переменной).</p>
 <p>Эти строки такие же, как в случае с Ubuntu, но файл загрузки в вашей домашней директории назван иначе - <strong>.bash_profile</strong>.</p>
-<p>> [!NOTE]<br>> Если вы не можете найти и изменить <strong>.bash_profile</strong> при помощи Finder, то можно также открыть его при помощи редактора терминала _nano_.<br>><br>> Команды в этом случае выглядят примерно так:<br>><br>> ``<code>&lt;br&gt;&gt; cd ~ # Navigate to my home directory&lt;br&gt;&gt; ls -la #List the content of the directory. You should see .bash_profile&lt;br&gt;&gt; nano .bash_profile # Open the file in the nano text editor, within the terminal&lt;br&gt;&gt; # Scroll to the end of the file, and copy in the lines above&lt;br&gt;&gt; # Use Ctrl+X to exit nano, Choose Y to save the file.&lt;br&gt;&gt; </code>``</p>
+<p>> [!NOTE]<br>> Если вы не можете найти и изменить <strong>.bash_profile</strong> при помощи Finder, то можно также открыть его при помощи редактора терминала _nano_.<br>><br>> Команды в этом случае выглядят примерно так:<br>><br>> `<code>&lt;code&gt;&amp;lt;br&amp;gt;&amp;gt; cd ~ # Navigate to my home directory&amp;lt;br&amp;gt;&amp;gt; ls -la #List the content of the directory. You should see .bash_profile&amp;lt;br&amp;gt;&amp;gt; nano .bash_profile # Open the file in the nano text editor, within the terminal&amp;lt;br&amp;gt;&amp;gt; # Scroll to the end of the file, and copy in the lines above&amp;lt;br&amp;gt;&amp;gt; # Use Ctrl+X to exit nano, Choose Y to save the file.&amp;lt;br&amp;gt;&amp;gt; &lt;/code&gt;</code>`</p>
 <p>После этого перезагрузите файл загрузки путём выполнения следующей команды в терминале:</p>
 <pre>source ~/.bash_profile</pre>
 <p>В этот момент вы должны увидеть запуск группы скриптов (те же скрипты, что и в случае установки на Ubuntu).</p>
@@ -195,7 +193,7 @@ Starting development server at http://127.0.0.1:8000/
 Quit the server with CONTROL-C.</pre>
 <p>> [!NOTE]<br>> Указанная команда демонстрирует выполнение для Linux/Mac OS X. В настоящий момент вы можете проигнорировать предупреждения о "13 непримененных миграциях"!</p>
 <p>Как только сервер запущен, вы можете посмотреть сайт, перейдя по следующему адресу в вашем браузере: <code>http://127.0.0.1:8000/</code>. Вы должны увидеть, что сайт выглядит следующим образом:</p>
-<p>!<a href="django_skeleton_website_homepage.png">Django Skeleton App Homepage</a></p>
+<p><img src="https://raw.githubusercontent.com/mdn/translated-content/main/files/ru/learn_web_development/extensions/server-side/django/development_environment/django_skeleton_website_homepage.png" alt="Django Skeleton App Homepage"></p>
 <h2>Заключение</h2>
 <p>Теперь у вас на компьютере установлена и запущена среда разработки Django.</p>
 <p>В разделе проверки вам коротко был показан способ создания нового сайта на Django при помощи <code>django-admin startproject</code> и его запуск в вашем браузере при помощи веб-сервера разработки (<strong><code>python3 manage.py runserver</code></strong>). В следующей статье мы подробнее рассмотрим этот процесс создания простого, но полноценного веб-приложения.</p>

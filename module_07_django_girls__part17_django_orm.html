@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Часть 17: Django ORM (Querysets) — django-guide</title>
+<meta name="description" content="django-guide · Часть 17: Django ORM (Querysets) — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Часть 17: Django ORM (Querysets), on русском, github pages">
+<meta name="author" content="Big Pickle from OpenCode Zen">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Часть 17: Django ORM (Querysets) — django-guide">
+<meta property="og:description" content="django-guide · Часть 17: Django ORM (Querysets) — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<h1>Часть 17: Django ORM (Querysets)</h1>
+<h1>Django ORM и QuerySet</h1>
+<p>В этой главе ты узнаешь, как Django подключается к базе данных и сохраняет в неё информацию. Давай начнём!</p>
+<h2>Что такое QuerySet?</h2>
+<p>QuerySet, по сути, — список объектов заданной модели. QuerySet позволяет читать данные из базы данных, фильтровать и изменять их порядок.</p>
+<p>Проще научиться на примере. Давай попробуем, согласна?</p>
+<h2>Интерактивная консоль Django</h2>
+<p>Открой свой локальный терминал (не на PythonAnywhere) и набери следующую команду:</p>
+<p><strong>command-line:</strong></p>
+<pre>(myvenv) ~/djangogirls$ python manage.py shell</pre>
+<p>Результат должен быть таким:</p>
+<p><strong>command-line:</strong></p>
+<pre>(InteractiveConsole)
+&gt;&gt;&gt;</pre>
+<p>Ты находишься в интерактивной консоли Django. По сути, это та же интерактивная консоль Python, но с магией Django :) Ты можешь использовать весь синтаксис Python, разумеется.</p>
+<h3>Все объекты</h3>
+<p>Давай попробуем вывести на экран все записи в нашем блоге. Ты можешь сделать это следующей командой:</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; Post.objects.all()
+Traceback (most recent call last):
+      File "&lt;console&gt;", line 1, in &lt;module&gt;
+NameError: name 'Post' is not defined</pre>
+<p>Упс! Ошибка. Она говорит, что не существует объекта с именем Post. И это верно — мы забыли импортировать его!</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; from blog.models import Post</pre>
+<p>Всё просто: мы импортируем модель <code>Post</code> из <code>blog.models</code>. Давай попробуем получить все записи блога ещё раз:</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; Post.objects.all()
+&lt;QuerySet [&lt;Post: my post title&gt;, &lt;Post: another post title&gt;]&gt;</pre>
+<p>Это список записей, с которыми мы работали до этого! Мы создали их через панель администратора Django. Теперь же мы хотим создавать записи с помощью Python, так как же мы этого добьёмся?</p>
+<h3>Создаём объект</h3>
+<p>Создать объект Post в базе данных можно следующим образом:</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; Post.objects.create(author=me, title='Sample title', text='Test')</pre>
+<p>Но у нас есть один недочёт: <code>me</code>. Мы должны передать этой переменной экземпляр модели <code>User</code>, который будет отвечать за автора записи. Как это сделать?</p>
+<p>Давай для начала импортируем модель User:</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; from django.contrib.auth.models import User</pre>
+<p>Какие пользователи есть в нашей базе данных? Попробуй эту команду:</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; User.objects.all()
+&lt;QuerySet [&lt;User: ola&gt;]&gt;</pre>
+<p>Это суперпользователь, которого мы создали ранее! Нам нужен его экземпляр:</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; me = User.objects.get(username='ola')</pre>
+<p>Как ты можешь заметить, мы получили (<code>get</code>) пользователя (<code>User</code>) с именем <code>username</code> 'ola'. Шикарно! В твоём случае имя, конечно, может отличаться.</p>
+<p>Теперь мы, наконец, можем создать наш пост:</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; Post.objects.create(author=me, title='Sample title', text='Test')
+&lt;Post: Sample title&gt;</pre>
+<p>Ура! Хочешь проверить, что всё работает?</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; Post.objects.all()
+&lt;QuerySet [&lt;Post: my post title&gt;, &lt;Post: another post title&gt;, &lt;Post: Sample title&gt;]&gt;</pre>
+<p>Есть, ещё один пост в списке!</p>
+<h3>Добавляем записи</h3>
+<p>Можешь повеселиться и добавить ещё записей. 2-3 будет достаточно.</p>
+<h3>Фильтрация объектов</h3>
+<p>Важной особенностью QuerySets является возможность фильтровать объекты. Предположим, нам нужно найти все записи пользователя ola. Мы используем метод <code>filter</code> вместо метода <code>all</code> в <code>Post.objects.all()</code>. В скобках мы укажем условия, по которым будет построена выборка записей. В нашей ситуации условием будет являться равенство поля <code>author</code> переменной <code>me</code>. В Django мы можем написать это следующим образом: <code>author=me</code>. Теперь наш код выглядит следующим образом:</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; Post.objects.filter(author=me)
+&lt;QuerySet [&lt;Post: Sample title&gt;, &lt;Post: Post number 2&gt;, &lt;Post: My 3rd post!&gt;, &lt;Post: 4th title of post&gt;]&gt;</pre>
+<p>А может быть мы хотим получить все записи со словом 'title' в поле <code>title</code>?</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; Post.objects.filter(title__contains='title')
+&lt;QuerySet [&lt;Post: Sample title&gt;, &lt;Post: 4th title of post&gt;]&gt;</pre>
+<p>> <strong>Примечание</strong>: обрати внимание на два символа нижнего подчёркивания (<code>_</code>) между <code>title</code> и <code>contains</code>. Django ORM использует этот синтаксис для разделения имён полей ("title") и операций или фильтров ("contains"). Если ты используешь только один символ нижнего подчёркивания, то получишь ошибку "FieldError: Cannot resolve keyword title_contains".</p>
+<p>Ты также можешь получить список всех опубликованных записей. Мы просто отфильтруем записи по полю <code>published_date</code>:</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; from django.utils import timezone
+&gt;&gt;&gt; Post.objects.filter(published_date__lte=timezone.now())
+&lt;QuerySet []&gt;</pre>
+<p>К сожалению, пост, который мы добавили в консоли Python, ещё не опубликован. Мы можем изменить это! Сначала выберем запись, которую мы хотим опубликовать:</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; post = Post.objects.get(title="Sample title")</pre>
+<p>Дальше мы опубликуем её с помощью метода <code>publish</code>!</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; post.publish()</pre>
+<p>Теперь попробуй получить список опубликованных сообщений снова (нажми стрелку вверх 3 раза и затем <code>enter</code>):</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; Post.objects.filter(published_date__lte=timezone.now())
+&lt;QuerySet [&lt;Post: Sample title&gt;]&gt;</pre>
+<h3>Сортировка объектов</h3>
+<p>QuerySets позволяет сортировать объекты. Давай попробуем сортировку по полю <code>created_date</code>:</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; Post.objects.order_by('created_date')
+&lt;QuerySet [&lt;Post: Sample title&gt;, &lt;Post: Post number 2&gt;, &lt;Post: My 3rd post!&gt;, &lt;Post: 4th title of post&gt;]&gt;</pre>
+<p>Мы также можем изменить порядок на противоположный, добавив <code>-</code> в начало условия:</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; Post.objects.order_by('-created_date')
+&lt;QuerySet [&lt;Post: 4th title of post&gt;,  &lt;Post: My 3rd post!&gt;, &lt;Post: Post number 2&gt;, &lt;Post: Sample title&gt;]&gt;</pre>
+<h3>Соединение QuerySets</h3>
+<p>QuerySets можно <strong>сцеплять</strong>, создавая цепочки:</p>
+<pre>&gt;&gt;&gt; Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
+&lt;QuerySet [&lt;Post: Post number 2&gt;, &lt;Post: My 3rd post!&gt;, &lt;Post: 4th title of post&gt;, &lt;Post: Sample title&gt;]&gt;</pre>
+<p>Это мощный и удобный инструмент, позволяющий писать сложные запросы.</p>
+<p>Отлично! Теперь ты готова к следующей части! Чтобы закрыть интерактивную консоль, набери:</p>
+<p><strong>command-line:</strong></p>
+<pre>&gt;&gt;&gt; exit()
+$</pre>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>

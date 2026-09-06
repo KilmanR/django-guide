@@ -98,7 +98,14 @@ urlpatterns = [
 {% block content %} ... {% endblock %}
 {% load static %}&lt;img src="{% static 'img/a.png' %}"&gt;</pre>
 <h2>Наследование шаблонов</h2>
-<p><code>base.html</code>:<br>``<code>html&lt;br&gt;&lt;!DOCTYPE html&gt;&lt;br&gt;&lt;html&gt;&lt;body&gt;&lt;br&gt;{% block content %}{% endblock %}&lt;br&gt;&lt;/body&gt;&lt;/html&gt;&lt;br&gt;</code>`<code>&lt;br&gt;дочерний:&lt;br&gt;</code>`<code>html&lt;br&gt;{% extends "base.html" %}&lt;br&gt;{% block content %}&lt;h1&gt;Мой контент&lt;/h1&gt;{% endblock %}&lt;br&gt;</code>``</p>
+<p><code>base.html</code>:</p>
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;body&gt;
+{% block content %}{% endblock %}
+&lt;/body&gt;&lt;/html&gt;</pre>
+<p>дочерний:</p>
+<pre>{% extends "base.html" %}
+{% block content %}&lt;h1&gt;Мой контент&lt;/h1&gt;{% endblock %}</pre>
 <h2>Forms (Формы)</h2>
 <pre>from django import forms
 
@@ -125,7 +132,8 @@ class BookForm(forms.ModelForm):
         model = Book
         fields = ["title", "author", "pages"]</pre>
 <h2>CSRF</h2>
-<p>В любой POST-форме в шаблоне обязателен:<br>``<code>html&lt;br&gt;{% csrf_token %}&lt;br&gt;</code>``</p>
+<p>В любой POST-форме в шаблоне обязателен:</p>
+<pre>{% csrf_token %}</pre>
 <h2>Безопасность</h2>
 <ul><li>Всегда валидируйте вход от пользователя (<code>is_valid()</code>).</li><li>Используйте ORM-фильтры (а не raw SQL) — защита от injection.</li><li>В формах доверяйте <code>cleaned_data</code>, а не <code>request.POST</code> напрямую.</li></ul>
 <footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>

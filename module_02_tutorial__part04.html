@@ -39,12 +39,41 @@
 <main class="wrap">
 <h1>Часть 4: Формы и общие представления</h1>
 <h2>Форма голосования</h2>
-<p>В шаблоне <code>polls/detail.html</code>:<br>``<code>html&lt;br&gt;&lt;form action="{% url 'polls:vote' question.id %}" method="post"&gt;&lt;br&gt;{% csrf_token %}&lt;br&gt;{% for choice in question.choice_set.all %}&lt;br&gt;    &lt;input type="radio" name="choice" id="choice{{ forloop.counter }}"&lt;br&gt;           value="{{ choice.id }}"&gt;&lt;br&gt;    &lt;label for="choice{{ forloop.counter }}"&gt;{{ choice.choice_text }}&lt;/label&gt;&lt;br&gt;&lt;br&gt;{% endfor %}&lt;br&gt;&lt;input type="submit" value="Голосовать"&gt;&lt;br&gt;&lt;/form&gt;&lt;br&gt;</code>``</p>
+<p>В шаблоне <code>polls/detail.html</code>:</p>
+<pre>&lt;form action="{% url 'polls:vote' question.id %}" method="post"&gt;
+{% csrf_token %}
+{% for choice in question.choice_set.all %}
+    &lt;input type="radio" name="choice" id="choice{{ forloop.counter }}"
+           value="{{ choice.id }}"&gt;
+    &lt;label for="choice{{ forloop.counter }}"&gt;{{ choice.choice_text }}&lt;/label&gt;&lt;br&gt;
+{% endfor %}
+&lt;input type="submit" value="Голосовать"&gt;
+&lt;/form&gt;</pre>
 <h2>View для голосования</h2>
-<p><code>polls/views.py</code>:<br>```python<br>from django.shortcuts import get_object_or_404, render<br>from django.http import HttpResponseRedirect<br>from django.urls import reverse</p>
-<p>def vote(request, question_id):<br>    question = get_object_or_404(Question, pk=question_id)<br>    try:<br>        selected = question.choice_set.get(pk=request.POST["choice"])<br>    except (KeyError, Choice.DoesNotExist):<br>        return render(request, "polls/detail.html", {<br>            "question": question,<br>            "error_message": "Вы ничего не выбрали.",<br>        })<br>    selected.votes += 1<br>    selected.save()<br>    return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))<br>```</p>
+<p><code>polls/views.py</code>:</p>
+<pre>from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
+def vote(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    try:
+        selected = question.choice_set.get(pk=request.POST["choice"])
+    except (KeyError, Choice.DoesNotExist):
+        return render(request, "polls/detail.html", {
+            "question": question,
+            "error_message": "Вы ничего не выбрали.",
+        })
+    selected.votes += 1
+    selected.save()
+    return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))</pre>
 <h2>Паттерны URL с namespace</h2>
-<p>В <code>mysite/urls.py</code> замените include на:<br>``<code>python&lt;br&gt;path("polls/", include("polls.urls")),&lt;br&gt;</code>`<code>&lt;br&gt;а в </code>polls/urls.py<code> задайте:&lt;br&gt;</code>`<code>python&lt;br&gt;app_name = "polls"&lt;br&gt;urlpatterns = [ ... имя путь с name="vote", "results" ... ]&lt;br&gt;</code>`<code>&lt;br&gt;Тогда в шаблоне используйте </code>{% url 'polls:vote' %}`.</p>
+<p>В <code>mysite/urls.py</code> замените include на:</p>
+<pre>path("polls/", include("polls.urls")),</pre>
+<p>а в <code>polls/urls.py</code> задайте:</p>
+<pre>app_name = "polls"
+urlpatterns = [ ... имя путь с name="vote", "results" ... ]</pre>
+<p>Тогда в шаблоне используйте <code>{% url 'polls:vote' %}</code>.</p>
 <footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
 </main>
 

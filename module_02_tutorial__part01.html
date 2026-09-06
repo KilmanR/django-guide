@@ -45,14 +45,28 @@
 <h2>Регистрация приложения</h2>
 <p>В <code>mysite/settings.py</code> → <code>INSTALLED_APPS</code> добавить <code>'polls'</code>.</p>
 <h2>Первый view (представление)</h2>
-<p>В <code>polls/views.py</code>:<br>```python<br>from django.http import HttpResponse</p>
-<p>def index(request):<br>    return HttpResponse("Hello, world. Вы в опросе.")<br>```</p>
+<p>В <code>polls/views.py</code>:</p>
+<pre>from django.http import HttpResponse
+
+def index(request):
+    return HttpResponse("Hello, world. Вы в опросе.")</pre>
 <h2>URL для главной страницы</h2>
-<p>В <code>polls/urls.py</code> (создайте файл):<br>```python<br>from django.urls import path<br>from . import views</p>
-<p>urlpatterns = [<br>    path("", views.index, name="index"),<br>]<br>```</p>
+<p>В <code>polls/urls.py</code> (создайте файл):</p>
+<pre>from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("", views.index, name="index"),
+]</pre>
 <h2>Подключить к проекту</h2>
-<p>В <code>mysite/urls.py</code>:<br>```python<br>from django.contrib import admin<br>from django.urls import include, path</p>
-<p>urlpatterns = [<br>    path("polls/", include("polls.urls")),<br>    path("admin/", admin.site.urls),<br>]<br>```</p>
+<p>В <code>mysite/urls.py</code>:</p>
+<pre>from django.contrib import admin
+from django.urls import include, path
+
+urlpatterns = [
+    path("polls/", include("polls.urls")),
+    path("admin/", admin.site.urls),
+]</pre>
 <p>Запустите <code>python manage.py runserver</code> и перейдите на http://127.0.0.1:8000/polls/<br>— увидите «Hello, world.». Это и есть запрос-ответ.</p>
 <footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
 </main>

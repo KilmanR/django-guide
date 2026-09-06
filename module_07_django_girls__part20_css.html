@@ -48,10 +48,11 @@
 <p>Он был написан программистами, которые работали в Twitter, а сейчас совершенствуется волонтёрами со всего мира.</p>
 <h2>Установка Bootstrap</h2>
 <p>Для установки Bootstrap тебе нужно добавить следующие строки в <code>&lt;head&gt;</code> твоего <code>.html</code> файла (<code>blog/templates/blog/post_list.html</code>):</p>
-<p>{% filename %}blog/templates/blog/post_list.html{% endfilename %}<br>``<code>html&lt;br&gt;&lt;link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"&gt;&lt;br&gt;&lt;link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"&gt;&lt;br&gt;</code>``</p>
+<p><strong>blog/templates/blog/post_list.html:</strong></p>
+<pre>&lt;link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"&gt;
+&lt;link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"&gt;</pre>
 <p>Это не добавит ни одного файла к твоему проекту. Эти строки просто указывают на файлы, опубликованные в Интернете. Просто продолжай, открой свой веб-сайт и обнови страницу. Вот и результат!</p>
-<p>![Рисунок 14.1][1]</p>
-<p> [1]: images/bootstrap1.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/css/images/bootstrap1.png" alt="Рисунок 14.1"></p>
 <p>Выглядит уже лучше!</p>
 <h2>Статические файлы в Django</h2>
 <p>Теперь мы ближе познакомимся с теми таинственными <strong>статическими файлами</strong>. Статическими файлами называются все файлы CSS и изображения, т.е. файлы, которые не изменяются динамически, их содержание не зависит от контекста запроса и будет одинаково для всех пользователей.</p>
@@ -74,61 +75,157 @@
                └─── blog.css</pre>
 <p>Пришло время написать несколько строк CSS! Открой файл <code>blog/static/css/blog.css</code> в своем редакторе кода.</p>
 <p>Мы не будем здесь погружаться слишком глубоко в процесс настройки и изучения CSS, поскольку это так просто, что ты сможешь изучить этот материал самостоятельно после этого руководства. В конце этой главы мы порекомендуем тебе бесплатный курс для дальнейшего изучения.</p>
-<p>Но давай сделаем хотя бы немного. Возможно, мы могли бы изменить цвет заголовка?<br>Чтобы понимать цвета, компьютеры используют специальные коды. Они начинаются с <code>#</code> и далее следуют 6 букв (A-F) и цифр (0-9). Ты можешь найти коды цветов, например, здесь: http://www.colorpicker.com/. Также можешь пользоваться [предопределенными цветами][3], такими как <code>red</code> и <code>green</code>.</p>
-<p> [3]: http://www.w3schools.com/cssref/css_colornames.asp</p>
+<p>Но давай сделаем хотя бы немного. Возможно, мы могли бы изменить цвет заголовка?<br>Чтобы понимать цвета, компьютеры используют специальные коды. Они начинаются с <code>#</code> и далее следуют 6 букв (A-F) и цифр (0-9). Ты можешь найти коды цветов, например, здесь: http://www.colorpicker.com/. Также можешь пользоваться <a href="http://www.w3schools.com/cssref/css_colornames.asp">предопределенными цветами</a>, такими как <code>red</code> и <code>green</code>.</p>
 <p>В файле <code>blog/static/css/blog.css</code> тебе нужно добавить следующий код:</p>
-<p>{% filename %}blog/static/css/blog.css{% endfilename %}<br>``<code>css&lt;br&gt;h1 a {&lt;br&gt;    color: #FCA205;&lt;br&gt;}&lt;br&gt;</code>``</p>
+<p><strong>blog/static/css/blog.css:</strong></p>
+<pre>h1 a {
+    color: #FCA205;
+}</pre>
 <p><code>h1 a</code> — это CSS-селектор. Это означает, что мы применяем наши стили к каждому элементу <code>a</code> внутри элемента <code>h1</code> (например, когда у нас в коде что-то вроде: <code>&lt;h1&gt;&lt;a href=""&gt;link&lt;/a&gt;&lt;/h1&gt;</code>). В этом случае мы говорим о том, что нужно изменить цвет элемента на <code>#FCA205</code>, то есть на оранжевый. Конечно, ты можешь указать свой собственный цвет!</p>
 <p>В CSS файле мы определяем стили для элементов файла HTML. Элементы идентифицируются именами (то есть <code>a</code>, <code>h1</code>, <code>body</code>), атрибутом <code>class</code> или атрибутом <code>id</code>. Class и id – это имена, которые ты сама присваиваешь элементам. Классы (сlass) определяют группы элементов, а идентификаторы (id) указывают на конкретные элементы. Например, следующий тег может быть идентифицирован CSS с использованием имени тега <code>a</code>, класса <code>external_link</code> или идентификатора <code>link_to_wiki_page</code>:</p>
 <pre>&lt;a href="https://en.wikipedia.org/wiki/Django" class="external_link" id="link_to_wiki_page"&gt;</pre>
-<p>Почитай про CSS селекторы в [CSS Selectors на w3schools][4].</p>
-<p> [4]: http://www.w3schools.com/cssref/css_selectors.asp</p>
+<p>Почитай про CSS селекторы в <a href="http://www.w3schools.com/cssref/css_selectors.asp">CSS Selectors на w3schools</a>.</p>
 <p>Затем нам также нужно сообщить нашему HTML-шаблону о том, что мы добавили CSS. Открой файл <code>blog/templates/blog/post_list.html</code> и добавь эту строку в самое начало:</p>
-<p>{% filename %}blog/templates/blog/post_list.html{% endfilename %}<br>``<code>html&lt;br&gt;{% load static %}&lt;br&gt;</code>``</p>
+<p><strong>blog/templates/blog/post_list.html:</strong></p>
+<pre>{% load static %}</pre>
 <p>Мы просто загружаем здесь статические файлы :)<br>Далее между <code>&lt;head&gt;</code> и <code>&lt;/head&gt;</code>, после ссылок на файлы Bootstrap CSS, добавь такую строку:</p>
-<p>{% filename %}blog/templates/blog/post_list.html{% endfilename %}<br>``<code>html&lt;br&gt;&lt;link rel="stylesheet" href="{% static 'css/blog.css' %}"&gt;&lt;br&gt;</code>``<br>Браузер читает файлы в порядке их следования, поэтому нам необходимо удостовериться, что файл расположен в необходимом месте. Иначе код нашего файла может переопределить код в файлах Bootstrap.<br>Мы только что сказали нашему шаблону, где находится наш CSS файл.</p>
+<p><strong>blog/templates/blog/post_list.html:</strong></p>
+<pre>&lt;link rel="stylesheet" href="{% static 'css/blog.css' %}"&gt;</pre>
+<p>Браузер читает файлы в порядке их следования, поэтому нам необходимо удостовериться, что файл расположен в необходимом месте. Иначе код нашего файла может переопределить код в файлах Bootstrap.<br>Мы только что сказали нашему шаблону, где находится наш CSS файл.</p>
 <p>Твой файл должен теперь выглядеть следующим образом:</p>
-<p>{% filename %}blog/templates/blog/post_list.html{% endfilename %}<br>```html<br>{% load static %}<br><html><br>    <head><br>        <title>Django Girls blog</title><br>        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"><br>        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"><br>        <link rel="stylesheet" href="{% static 'css/blog.css' %}"><br>    </head><br>    <body><br>        <div><br>            <h1><a href="/">Django Girls Blog</a></h1><br>        </div></p>
-<p>        {% for post in posts %}<br>            <div><br>                <p>published: {{ post.published_date }}</p><br>                <h1><a href="">{{ post.title }}</a></h1><br>                <p>{{ post.text|linebreaksbr }}</p><br>            </div><br>        {% endfor %}<br>    </body><br></html><br>```</p>
+<p><strong>blog/templates/blog/post_list.html:</strong></p>
+<pre>{% load static %}
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Django Girls blog&lt;/title&gt;
+        &lt;link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"&gt;
+        &lt;link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"&gt;
+        &lt;link rel="stylesheet" href="{% static 'css/blog.css' %}"&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div&gt;
+            &lt;h1&gt;&lt;a href="/"&gt;Django Girls Blog&lt;/a&gt;&lt;/h1&gt;
+        &lt;/div&gt;
+
+        {% for post in posts %}
+            &lt;div&gt;
+                &lt;p&gt;published: {{ post.published_date }}&lt;/p&gt;
+                &lt;h1&gt;&lt;a href=""&gt;{{ post.title }}&lt;/a&gt;&lt;/h1&gt;
+                &lt;p&gt;{{ post.text|linebreaksbr }}&lt;/p&gt;
+            &lt;/div&gt;
+        {% endfor %}
+    &lt;/body&gt;
+&lt;/html&gt;</pre>
 <p>Ок, сохрани файл и обнови страницу!</p>
-<p>![Рисунок 14.2][5]</p>
-<p> [5]: images/color2.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/css/images/color2.png" alt="Рисунок 14.2"></p>
 <p>Отличная работа! Может быть, мы также хотели бы добавить нашему веб-сайту немного пространства и увеличить отступ слева? Давай попробуем!</p>
-<p>{% filename %}blog/static/css/blog.css{% endfilename %}<br>``<code>css&lt;br&gt;body {&lt;br&gt;    padding-left: 15px;&lt;br&gt;}&lt;br&gt;</code>``</p>
+<p><strong>blog/static/css/blog.css:</strong></p>
+<pre>body {
+    padding-left: 15px;
+}</pre>
 <p>Добавь это к твоему CSS, сохрани файл и посмотри, как это работает!</p>
-<p>![Рисунок 14.3][6]</p>
-<p> [6]: images/margin2.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/css/images/margin2.png" alt="Рисунок 14.3"></p>
 <p>Возможно, мы можем настроить шрифт нашего заголовка? Вставь это внутрь тега <code>&lt;head&gt;</code> в файле <code>blog/templates/blog/post_list.html</code>:</p>
-<p>{% filename %}blog/templates/blog/post_list.html{% endfilename %}<br>``<code>html&lt;br&gt;&lt;link href="https://fonts.googleapis.com/css?family=Lobster&amp;subset=latin,cyrillic" rel="stylesheet" type="text/css"&gt;&lt;br&gt;</code>``</p>
+<p><strong>blog/templates/blog/post_list.html:</strong></p>
+<pre>&lt;link href="https://fonts.googleapis.com/css?family=Lobster&amp;subset=latin,cyrillic" rel="stylesheet" type="text/css"&gt;</pre>
 <p>Как и ранее, проверь порядок и вставь эту строку перед ссылкой на <code>blog/static/css/blog.css</code>. Эта строка импортирует шрифт под названием <em>Lobster</em> из шрифтов Google (https://www.google.com/fonts).</p>
 <p>Теперь добавь строку <code>font-family: 'Lobster';</code> в CSS файле <code>blog/static/css/blog.css</code> внутри блока определения стиля <code>h1 a</code> (код помещается между скобками <code>{</code> и <code>}</code>) и обнови страницу:</p>
-<p>{% filename %}blog/static/css/blog.css{% endfilename %}<br>``<code>css&lt;br&gt;h1 a {&lt;br&gt;    color: #FCA205;&lt;br&gt;    font-family: 'Lobster';&lt;br&gt;}&lt;br&gt;</code>``</p>
-<p>![Рисунок 14.3][7]</p>
-<p> [7]: images/font.png</p>
+<p><strong>blog/static/css/blog.css:</strong></p>
+<pre>h1 a {
+    color: #FCA205;
+    font-family: 'Lobster';
+}</pre>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/css/images/font.png" alt="Рисунок 14.3"></p>
 <p>Отлично!</p>
 <p>Как было указано выше, в CSS используется концепция классов, которая позволяет назвать часть HTML кода и применять стили только для этой части без всякого эффекта для других. Это очень полезно, если у тебя есть, скажем, два блока div, но они выполняют совершенно разные функции (как ваш заголовок и пост), следовательно, ты не хочешь, чтобы они выглядели одинаково.</p>
 <p>Дадим имена определённым частям HTML кода. Добавь класс под названием <code>page-header</code> в блок <code>div</code>, содержащий наш заголовок, как это сделано здесь:</p>
-<p>{% filename %}blog/templates/blog/post_list.html{% endfilename %}<br>``<code>html&lt;br&gt;&lt;div class="page-header"&gt;&lt;br&gt;    &lt;h1&gt;&lt;a href="/"&gt;Django Girls Blog&lt;/a&gt;&lt;/h1&gt;&lt;br&gt;&lt;/div&gt;&lt;br&gt;</code>``</p>
+<p><strong>blog/templates/blog/post_list.html:</strong></p>
+<pre>&lt;div class="page-header"&gt;
+    &lt;h1&gt;&lt;a href="/"&gt;Django Girls Blog&lt;/a&gt;&lt;/h1&gt;
+&lt;/div&gt;</pre>
 <p>А теперь добавь класс <code>post</code> в твой <code>div</code>, содержащий сообщение в блоге:</p>
-<p>{% filename %}blog/templates/blog/post_list.html{% endfilename %}<br>``<code>html&lt;br&gt;&lt;div class="post"&gt;&lt;br&gt;    &lt;p&gt;published: {{ post.published_date }}&lt;/p&gt;&lt;br&gt;    &lt;h1&gt;&lt;a href=""&gt;{{ post.title }}&lt;/a&gt;&lt;/h1&gt;&lt;br&gt;    &lt;p&gt;{{ post.text|linebreaksbr }}&lt;/p&gt;&lt;br&gt;&lt;/div&gt;&lt;br&gt;</code>``</p>
+<p><strong>blog/templates/blog/post_list.html:</strong></p>
+<pre>&lt;div class="post"&gt;
+    &lt;p&gt;published: {{ post.published_date }}&lt;/p&gt;
+    &lt;h1&gt;&lt;a href=""&gt;{{ post.title }}&lt;/a&gt;&lt;/h1&gt;
+    &lt;p&gt;{{ post.text|linebreaksbr }}&lt;/p&gt;
+&lt;/div&gt;</pre>
 <p>Теперь добавим определения блоков для различных селекторов. Селекторы, которые начинают с символа <code>.</code>, относятся к классам. В Интернете много хороших справочников по CSS, которые могут помочь тебе понять следующий код. А сейчас просто скопируй и вставь код в файл <code>djangogirls/static/css/blog.css</code>:</p>
-<p>{% filename %}blog/static/css/blog.css{% endfilename %}<br>```css<br>.page-header {<br>    background-color: #ff9400;<br>    margin-top: 0;<br>    padding: 20px 20px 20px 40px;<br>}</p>
-<p>.page-header h1, .page-header h1 a, .page-header h1 a:visited, .page-header h1 a:active {<br>    color: #ffffff;<br>    font-size: 36pt;<br>    text-decoration: none;<br>}</p>
-<p>.content {<br>    margin-left: 40px;<br>}</p>
-<p>h1, h2, h3, h4 {<br>    font-family: 'Lobster', cursive;<br>}</p>
-<p>.date {<br>    color: #828282;<br>}</p>
-<p>.save {<br>    float: right;<br>}</p>
-<p>.post-form textarea, .post-form input {<br>    width: 100%;<br>}</p>
-<p>.top-menu, .top-menu:hover, .top-menu:visited {<br>    color: #ffffff;<br>    float: right;<br>    font-size: 26pt;<br>    margin-right: 20px;<br>}</p>
-<p>.post {<br>    margin-bottom: 70px;<br>}</p>
-<p>.post h1 a, .post h1 a:visited {<br>    color: #000000;<br>}<br>```</p>
+<p><strong>blog/static/css/blog.css:</strong></p>
+<pre>.page-header {
+    background-color: #ff9400;
+    margin-top: 0;
+    padding: 20px 20px 20px 40px;
+}
+
+.page-header h1, .page-header h1 a, .page-header h1 a:visited, .page-header h1 a:active {
+    color: #ffffff;
+    font-size: 36pt;
+    text-decoration: none;
+}
+
+.content {
+    margin-left: 40px;
+}
+
+h1, h2, h3, h4 {
+    font-family: 'Lobster', cursive;
+}
+
+.date {
+    color: #828282;
+}
+
+.save {
+    float: right;
+}
+
+.post-form textarea, .post-form input {
+    width: 100%;
+}
+
+.top-menu, .top-menu:hover, .top-menu:visited {
+    color: #ffffff;
+    float: right;
+    font-size: 26pt;
+    margin-right: 20px;
+}
+
+.post {
+    margin-bottom: 70px;
+}
+
+.post h1 a, .post h1 a:visited {
+    color: #000000;
+}</pre>
 <p>Далее переделаем код HTML, отображающий посты, используя классы. Замени:</p>
-<p>{% filename %}blog/templates/blog/post_list.html{% endfilename %}<br>``<code>html&lt;br&gt;{% for post in posts %}&lt;br&gt;    &lt;div class="post"&gt;&lt;br&gt;        &lt;p&gt;published: {{ post.published_date }}&lt;/p&gt;&lt;br&gt;        &lt;h1&gt;&lt;a href=""&gt;{{ post.title }}&lt;/a&gt;&lt;/h1&gt;&lt;br&gt;        &lt;p&gt;{{ post.text|linebreaksbr }}&lt;/p&gt;&lt;br&gt;    &lt;/div&gt;&lt;br&gt;{% endfor %}&lt;br&gt;</code>``</p>
+<p><strong>blog/templates/blog/post_list.html:</strong></p>
+<pre>{% for post in posts %}
+    &lt;div class="post"&gt;
+        &lt;p&gt;published: {{ post.published_date }}&lt;/p&gt;
+        &lt;h1&gt;&lt;a href=""&gt;{{ post.title }}&lt;/a&gt;&lt;/h1&gt;
+        &lt;p&gt;{{ post.text|linebreaksbr }}&lt;/p&gt;
+    &lt;/div&gt;
+{% endfor %}</pre>
 <p>в <code>blog/templates/blog/post_list.html</code> этим кодом:</p>
-<p>{% filename %}blog/templates/blog/post_list.html{% endfilename %}<br>``<code>html&lt;br&gt;&lt;div class="content container"&gt;&lt;br&gt;    &lt;div class="row"&gt;&lt;br&gt;        &lt;div class="col-md-8"&gt;&lt;br&gt;            {% for post in posts %}&lt;br&gt;                &lt;div class="post"&gt;&lt;br&gt;                    &lt;div class="date"&gt;&lt;br&gt;                        &lt;p&gt;Опубликовано: {{ post.published_date }}&lt;/p&gt;&lt;br&gt;                    &lt;/div&gt;&lt;br&gt;                    &lt;h1&gt;&lt;a href=""&gt;{{ post.title }}&lt;/a&gt;&lt;/h1&gt;&lt;br&gt;                    &lt;p&gt;{{ post.text|linebreaksbr }}&lt;/p&gt;&lt;br&gt;                &lt;/div&gt;&lt;br&gt;            {% endfor %}&lt;br&gt;        &lt;/div&gt;&lt;br&gt;    &lt;/div&gt;&lt;br&gt;&lt;/div&gt;&lt;br&gt;</code>``</p>
+<p><strong>blog/templates/blog/post_list.html:</strong></p>
+<pre>&lt;div class="content container"&gt;
+    &lt;div class="row"&gt;
+        &lt;div class="col-md-8"&gt;
+            {% for post in posts %}
+                &lt;div class="post"&gt;
+                    &lt;div class="date"&gt;
+                        &lt;p&gt;Опубликовано: {{ post.published_date }}&lt;/p&gt;
+                    &lt;/div&gt;
+                    &lt;h1&gt;&lt;a href=""&gt;{{ post.title }}&lt;/a&gt;&lt;/h1&gt;
+                    &lt;p&gt;{{ post.text|linebreaksbr }}&lt;/p&gt;
+                &lt;/div&gt;
+            {% endfor %}
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
 <p>Сохрани эти файлы и обнови свой веб-сайт.</p>
-<p>![Рисунок 14.4][8]</p>
-<p> [8]: images/final.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/css/images/final.png" alt="Рисунок 14.4"></p>
 <p>Юхууу! Выглядит прекрасно, не так ли? Код, который мы только что вставили, на самом деле не сложный для понимания, и ты, просто прочитав его, сможешь понять большую часть.</p>
 <p>Не бойся немного повозиться с этим CSS-файлом и попробуй поменять некоторые вещи. Если что-то сломается, не волнуйся, ты всегда можешь отменить предыдущее действие!</p>
 <p>В любом случае, мы настоятельно рекомендуем пройти бесплатный онлайн курс <a href="https://www.codecademy.com/tracks/web">Codeacademy HTML & CSS course</a> в виде домашней работы после воркшопа, чтобы изучить всё, что нужно знать об оформлении веб-сайтов с помощью CSS.</p>

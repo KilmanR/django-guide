@@ -47,10 +47,16 @@
 <pre>blog
    └── forms.py</pre>
 <p>Теперь открой его и набери следующее:</p>
-<p>{% filename %}blog/forms.py{% endfilename %}<br>```python<br>from django import forms</p>
-<p>from .models import Post</p>
-<p>class PostForm(forms.ModelForm):</p>
-<p>    class Meta:<br>        model = Post<br>        fields = ('title', 'text',)<br>```</p>
+<p><strong>blog/forms.py:</strong></p>
+<pre>from django import forms
+
+from .models import Post
+
+class PostForm(forms.ModelForm):
+
+    class Meta:
+        model = Post
+        fields = ('title', 'text',)</pre>
 <p>Для начала нам нужно импортировать формы Django (<code>from django import forms</code>) и, разумеется, нашу модель <code>Post</code> (<code>from .models import Post</code>).</p>
 <p><code>PostForm</code>, как ты, вероятно, подозреваешь, — это имя для нашей формы. Нам нужно также сообщить Django, что эта форма относится к <code>ModelForm</code> (чтобы он смог поколдовать для нас) — <code>forms.ModelForm</code> поможет с этим.</p>
 <p>Дальше у нас <code>class Meta</code>, где мы определяем, какая модель будет использоваться для создания формы (<code>model = Post</code>).</p>
@@ -59,117 +65,227 @@
 <p>Поэтому снова нам необходимо создать ссылку на страницу, URL-адрес, представление и шаблон.</p>
 <h2>Ссылка на страницу с формой</h2>
 <p>Пришло время открыть файл <code>blog/templates/blog/base.html</code>. Мы добавим ссылку в элемент <code>div</code> с именем <code>page-header</code>:</p>
-<p>{% filename %}blog/templates/blog/base.html{% endfilename %}<br>``<code>html&lt;br&gt;&lt;a href="{% url 'post_new' %}" class="top-menu"&gt;&lt;span class="glyphicon glyphicon-plus"&gt;&lt;/span&gt;&lt;/a&gt;&lt;br&gt;</code>``</p>
+<p><strong>blog/templates/blog/base.html:</strong></p>
+<pre>&lt;a href="{% url 'post_new' %}" class="top-menu"&gt;&lt;span class="glyphicon glyphicon-plus"&gt;&lt;/span&gt;&lt;/a&gt;</pre>
 <p>Обрати внимание, что мы назвали новое представление <code>post_new</code>. Класс <code>glyphicon glyphicon-plus</code> определён в используемой нами теме bootstrap — таким образом мы выведем значок плюса.</p>
 <p>После добавления строки твой html-файл должен выглядеть следующим образом:</p>
-<p>{% filename %}blog/templates/blog/base.html{% endfilename %}<br>``<code>html&lt;br&gt;{% load static %}&lt;br&gt;&lt;html&gt;&lt;br&gt;    &lt;head&gt;&lt;br&gt;        &lt;title&gt;Django Girls blog&lt;/title&gt;&lt;br&gt;        &lt;link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"&gt;&lt;br&gt;        &lt;link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"&gt;&lt;br&gt;        &lt;link href='//fonts.googleapis.com/css?family=Lobster&amp;subset=latin,latin-ext' rel='stylesheet' type='text/css'&gt;&lt;br&gt;        &lt;link rel="stylesheet" href="{% static 'css/blog.css' %}"&gt;&lt;br&gt;    &lt;/head&gt;&lt;br&gt;    &lt;body&gt;&lt;br&gt;        &lt;div class="page-header"&gt;&lt;br&gt;            &lt;a href="{% url 'post_new' %}" class="top-menu"&gt;&lt;span class="glyphicon glyphicon-plus"&gt;&lt;/span&gt;&lt;/a&gt;&lt;br&gt;            &lt;h1&gt;&lt;a href="/"&gt;Django Girls Blog&lt;/a&gt;&lt;/h1&gt;&lt;br&gt;        &lt;/div&gt;&lt;br&gt;        &lt;div class="content container"&gt;&lt;br&gt;            &lt;div class="row"&gt;&lt;br&gt;                &lt;div class="col-md-8"&gt;&lt;br&gt;                    {% block content %}&lt;br&gt;                    {% endblock %}&lt;br&gt;                &lt;/div&gt;&lt;br&gt;            &lt;/div&gt;&lt;br&gt;        &lt;/div&gt;&lt;br&gt;    &lt;/body&gt;&lt;br&gt;&lt;/html&gt;&lt;br&gt;</code>``</p>
+<p><strong>blog/templates/blog/base.html:</strong></p>
+<pre>{% load static %}
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Django Girls blog&lt;/title&gt;
+        &lt;link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"&gt;
+        &lt;link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"&gt;
+        &lt;link href='//fonts.googleapis.com/css?family=Lobster&amp;subset=latin,latin-ext' rel='stylesheet' type='text/css'&gt;
+        &lt;link rel="stylesheet" href="{% static 'css/blog.css' %}"&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div class="page-header"&gt;
+            &lt;a href="{% url 'post_new' %}" class="top-menu"&gt;&lt;span class="glyphicon glyphicon-plus"&gt;&lt;/span&gt;&lt;/a&gt;
+            &lt;h1&gt;&lt;a href="/"&gt;Django Girls Blog&lt;/a&gt;&lt;/h1&gt;
+        &lt;/div&gt;
+        &lt;div class="content container"&gt;
+            &lt;div class="row"&gt;
+                &lt;div class="col-md-8"&gt;
+                    {% block content %}
+                    {% endblock %}
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</pre>
 <p>После сохранения файла и перезагрузки страницы по адресу http://127.0.0.1:8000 ты, конечно, увидишь знакомую ошибку <code>NoReverseMatch</code>, верно?</p>
 <h2>URL</h2>
 <p>Нам нужно открыть файл <code>blog/urls.py</code> и добавить строку:</p>
-<p>{% filename %}blog/urls.py{% endfilename %}<br>``<code>python&lt;br&gt;path('post/new/', views.post_new, name='post_new'),&lt;br&gt;</code>``</p>
+<p><strong>blog/urls.py:</strong></p>
+<pre>path('post/new/', views.post_new, name='post_new'),</pre>
 <p>Окончательная версия файла будет выглядеть следующим образом:</p>
-<p>{% filename %}blog/urls.py{% endfilename %}<br>```python<br>from django.urls import path <br>from . import views</p>
-<p>urlpatterns = [<br>    path('', views.post_list, name='post_list'),<br>    path('post/<int:pk>/', views.post_detail, name='post_detail'),<br>    path('post/new/', views.post_new, name='post_new'),<br>]<br>```</p>
+<p><strong>blog/urls.py:</strong></p>
+<pre>from django.urls import path 
+from . import views
+
+urlpatterns = [
+    path('', views.post_list, name='post_list'),
+    path('post/&lt;int:pk&gt;/', views.post_detail, name='post_detail'),
+    path('post/new/', views.post_new, name='post_new'),
+]</pre>
 <p>После перезагрузки веб-сайта мы увидим ошибку <code>AttributeError</code>, поскольку представление <code>post_new</code> не реализовано. Давай добавим его прямо сейчас.</p>
 <h2>Представление post_new</h2>
 <p>Самое время открыть файл <code>blog/views.py</code> и добавить следующую строку к остальным, начинающимся с <code>from</code>:</p>
-<p>{% filename %}blog/views.py{% endfilename %}<br>``<code>python&lt;br&gt;from .forms import PostForm&lt;br&gt;</code>``</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>from .forms import PostForm</pre>
 <p>А затем наше <em>представление</em>:</p>
-<p>{% filename %}blog/views.py{% endfilename %}<br>``<code>python&lt;br&gt;def post_new(request):&lt;br&gt;    form = PostForm()&lt;br&gt;    return render(request, 'blog/post_edit.html', {'form': form})&lt;br&gt;</code>``</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>def post_new(request):
+    form = PostForm()
+    return render(request, 'blog/post_edit.html', {'form': form})</pre>
 <p>Чтобы создать новую форму <code>Post</code>, нам потребуется вызвать <code>PostForm()</code> и передать её шаблону. Мы ещё вернёмся к этому <em>представлению</em>, а пока давай быстро создадим шаблон под форму.</p>
 <h2>Шаблон</h2>
 <p>Нам нужно создать файл <code>post_edit.html</code> в директории <code>blog/templates/blog</code>. Чтобы заставить форму работать, нам потребуется несколько вещей:</p>
-<ul><li>  Нам нужно отобразить форму. Мы можем сделать это, к примеру, простым <code>{% raw %}{{ form.as_p }}{% endraw %}</code>.</li><li>  Строка выше должна быть обёрнута в HTML-теги <code>&lt;form method="POST"&gt;...&lt;/form&gt;</code></li><li>  Нам потребуется кнопка <code>Save</code>. Мы добавим её при помощи HTML-кнопки: <code>&lt;button type="submit"&gt;Save&lt;/button&gt;</code></li><li>  И, наконец, сразу после открытия тега <code>&lt; form... &gt;</code> мы должны добавить <code>{% raw %}{% csrf_token %}{% endraw %}</code>. Это очень важно, поскольку так мы делаем форму защищённой! Django будет ругаться, если ты забудешь добавить этот код:</li></ul>
-<p>![Страница CSFR Forbidden][1]</p>
-<p> [1]: images/csrf2.png</p>
+<ul><li>  Нам нужно отобразить форму. Мы можем сделать это, к примеру, простым <code>{{ form.as_p }}</code>.</li><li>  Строка выше должна быть обёрнута в HTML-теги <code>&lt;form method="POST"&gt;...&lt;/form&gt;</code></li><li>  Нам потребуется кнопка <code>Save</code>. Мы добавим её при помощи HTML-кнопки: <code>&lt;button type="submit"&gt;Save&lt;/button&gt;</code></li><li>  И, наконец, сразу после открытия тега <code>&lt; form... &gt;</code> мы должны добавить <code>{% csrf_token %}</code>. Это очень важно, поскольку так мы делаем форму защищённой! Django будет ругаться, если ты забудешь добавить этот код:</li></ul>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/django_forms/images/csrf2.png" alt="Страница CSFR Forbidden"></p>
 <p>Хорошо, давай посмотрим, как должен выглядеть HTML-код в файле <code>post_edit.html</code>:</p>
-<p>{% filename %}blog/templates/blog/post_edit.html{% endfilename %}<br>```html<br>{% extends 'blog/base.html' %}</p>
-<p>{% block content %}<br>    <h1>New post</h1><br>    <form method="POST" class="post-form">{% csrf_token %}<br>        {{ form.as_p }}<br>        <button type="submit" class="save btn btn-default">Save</button><br>    </form><br>{% endblock %}<br>```</p>
+<p><strong>blog/templates/blog/post_edit.html:</strong></p>
+<pre>{% extends 'blog/base.html' %}
+
+{% block content %}
+    &lt;h1&gt;New post&lt;/h1&gt;
+    &lt;form method="POST" class="post-form"&gt;{% csrf_token %}
+        {{ form.as_p }}
+        &lt;button type="submit" class="save btn btn-default"&gt;Save&lt;/button&gt;
+    &lt;/form&gt;
+{% endblock %}</pre>
 <p>Время обновить страницу! Ура! Форма отображается!</p>
-<p>![Новая форма][2]</p>
-<p> [2]: images/new_form2.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/django_forms/images/new_form2.png" alt="Новая форма"></p>
 <p>Но подожди минутку! Если ты наберёшь что-нибудь в полях <code>title</code> и <code>text</code> и попробуешь сохранить — что произойдёт?</p>
 <p>Ничего! Мы снова на той же странице и наш текст пропал... и новая запись не была добавлена. Так что же пошло не так?</p>
 <p>Ответ прост: ничего. Нам нужно сделать кое-что ещё, чтобы новое <em>представление</em> заработало.</p>
 <h2>Сохраняем данные из формы</h2>
 <p>Снова открой файл <code>blog/views.py</code>. Всё, что у нас есть в представлении <code>post_new</code>, выглядит пока следующим образом:</p>
-<p>{% filename %}blog/views.py{% endfilename %}<br>``<code>python&lt;br&gt;def post_new(request):&lt;br&gt;    form = PostForm()&lt;br&gt;    return render(request, 'blog/post_edit.html', {'form': form})&lt;br&gt;</code>``</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>def post_new(request):
+    form = PostForm()
+    return render(request, 'blog/post_edit.html', {'form': form})</pre>
 <p>После отправки формы мы возвращаемся к тому же представлению, но в этот раз с новыми данными в <code>request</code>, а точнее, в <code>request.POST</code> (имя POST не имеет ничего общего с "постом" в блоге, оно связано с тем, что мы "публикуем" данные). Помнишь, что в HTML-файле определение <code>&lt;form&gt;</code> имеет параметр <code>method="POST"</code>? Все поля формы теперь находятся в <code>request.POST</code>. Ты не должна переименовывать <code>POST</code> во что-то другое (другое доступное значение параметра <code>method</code> — <code>GET</code>, но у нас сейчас нет времени объяснять разницу).</p>
 <p>Получается, что в представлении <em>view</em> нам нужно обработать две разные ситуации. Первая: когда мы только зашли на страницу и хотим получить пустую форму. Вторая: когда мы возвращаемся к <em>представлению</em> со всей информацией, которую мы ввели в форму. Таким образом, нам потребуется ввести условие (для этого мы будем использовать условный оператор <code>if</code>):</p>
-<p>{% filename %}blog/views.py{% endfilename %}<br>``<code>python&lt;br&gt;if request.method == "POST":&lt;br&gt;    [...]&lt;br&gt;else:&lt;br&gt;    form = PostForm()&lt;br&gt;</code>``</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>if request.method == "POST":
+    [...]
+else:
+    form = PostForm()</pre>
 <p>Теперь заполним строку, занятую <code>[...]</code>. Если <code>method</code> — <code>POST</code>, тогда мы хотим построить <code>PostForm</code> с данными из формы, верно? Мы добьёмся этого следующим образом:</p>
-<p>{% filename %}blog/views.py{% endfilename %}<br>``<code>python&lt;br&gt;form = PostForm(request.POST)&lt;br&gt;</code>``</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>form = PostForm(request.POST)</pre>
 <p>Легко! Дальше мы проверим, корректна ли форма (все ли необходимые поля заполнены и не отправлено ли некорректных значений). Мы сделаем это при помощи <code>form.is_valid()</code>.</p>
 <p>Мы проверяем, допустимо ли содержимое формы, и, если всё в порядке, сохраняем её!</p>
-<p>{% filename %}blog/views.py{% endfilename %}<br>``<code>python&lt;br&gt;if form.is_valid():&lt;br&gt;    post = form.save(commit=False)&lt;br&gt;    post.author = request.user&lt;br&gt;    post.published_date = timezone.now()&lt;br&gt;    post.save()&lt;br&gt;</code>``</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>if form.is_valid():
+    post = form.save(commit=False)
+    post.author = request.user
+    post.published_date = timezone.now()
+    post.save()</pre>
 <p>Фактически мы выполняем две операции: сохраняем форму <code>form.save</code> и добавляем автора (поскольку обязательного поля <code>author</code> нет в <code>PostForm</code>!). <code>commit=False</code> означает, что мы пока не хотим сохранять модель <code>Post</code> — сначала нужно добавить автора. В основном ты будешь использовать <code>form.save()</code>, без <code>commit=False</code>, но в данном случае нам это пригодится. <code>post.save()</code> сохранит изменения (после добавления автора), и новая запись будет создана!</p>
 <p>Наконец, будет прекрасно, если мы сможем сразу переходить к странице <code>post_detail</code> после добавления новой записи, согласна? Для этого нам понадобится еще один импорт:</p>
-<p>{% filename %}blog/views.py{% endfilename %}<br>``<code>python&lt;br&gt;from django.shortcuts import redirect&lt;br&gt;</code>``</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>from django.shortcuts import redirect</pre>
 <p>Добавь эту строку в начало файла. Теперь мы можем сделать переадресацию на страницу <code>post_detail</code> для созданной записи:</p>
-<p>{% filename %}blog/views.py{% endfilename %}<br>``<code>python&lt;br&gt;return redirect('post_detail', pk=post.pk)&lt;br&gt;</code>``</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>return redirect('post_detail', pk=post.pk)</pre>
 <p><code>post_detail</code> — это имя представления, которое нам необходимо. Помнишь, что это <em>представление</em> требует переменную <code>pk</code>? Чтобы передать её представлению, мы используем аргумент <code>pk=post.pk</code>, где <code>post</code> — это новая запись в блоге!</p>
 <p>Хорошо, мы многое обсудили, пора взглянуть на <em>представление</em> полностью, верно?</p>
-<p>{% filename %}blog/views.py{% endfilename %}<br>``<code>python&lt;br&gt;def post_new(request):&lt;br&gt;    if request.method == "POST":&lt;br&gt;        form = PostForm(request.POST)&lt;br&gt;        if form.is_valid():&lt;br&gt;            post = form.save(commit=False)&lt;br&gt;            post.author = request.user&lt;br&gt;            post.published_date = timezone.now()&lt;br&gt;            post.save()&lt;br&gt;            return redirect('post_detail', pk=post.pk)&lt;br&gt;    else:&lt;br&gt;        form = PostForm()&lt;br&gt;    return render(request, 'blog/post_edit.html', {'form': form})&lt;br&gt;</code>``</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>def post_new(request):
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.published_date = timezone.now()
+            post.save()
+            return redirect('post_detail', pk=post.pk)
+    else:
+        form = PostForm()
+    return render(request, 'blog/post_edit.html', {'form': form})</pre>
 <p>Проверим, всё ли работает. Перейди по адресу http://127.0.0.1:8000/post/new/, добавь текст в поля <code>title</code> и <code>text</code>, затем сохрани… и вуаля! Новая запись создана, и мы перешли на страницу <code>post_detail</code>!</p>
 <p>Возможно, ты заметила, что мы устанавливаем дату публикации перед сохранением поста. В последствии мы сделаем _кнопку публикации_ в __Django Girls Tutorial: Extensions__.</p>
 <p>Это круто!</p>
 <p>> Поскольку мы недавно использовали панель администратора Django, система до сих пор думает, что мы авторизованы. Существует несколько случаев, когда мы можем случайно выйти из аккаунта (закрытие браузера, перезапуск базы данных и т.д.). Если ты получаешь ошибку при попытке сохранения записи, то потребуется перейти на страницу http://127.0.0.1:8000/admin и авторизоваться в системе снова. Это решит проблему. В главе <strong>Домашнее задание: добавляем безопасность нашему веб-сайту!</strong> после основного учебника описано окончательное решение этой проблемы.</p>
-<p>![Ошибка при выходе из аккаунта][4]</p>
-<p> [4]: images/post_create_error.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/django_forms/images/post_create_error.png" alt="Ошибка при выходе из аккаунта"></p>
 <h2>Валидация формы</h2>
 <p>Теперь мы покажем тебе, насколько круты формы в Django. Запись в блоге должна иметь поля <code>title</code> и <code>text</code>. В нашей модели <code>Post</code> мы не указываем, что эти поля необязательны (в отличие от <code>published_date</code>), так что Django по умолчанию будет ожидать, что пользователь их заполнит.</p>
 <p>Попробуй сохранить форму с незаполненными полями <code>title</code> и <code>text</code>. Угадай, что произойдёт!</p>
-<p>![Валидация формы][3]</p>
-<p> [3]: images/form_validation2.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/django_forms/images/form_validation2.png" alt="Валидация формы"></p>
 <p>Django заботится о проверке всех полей в нашей форме на корректность. Разве не шикарно?</p>
 <h2>Форма редактирования</h2>
 <p>Теперь мы знаем, как добавить новую форму. Но что, если мы хотим внести исправления в уже существующую запись? По сути это схожая с предыдущей задача. Давай быстро создадим пару важных вещей (если ты чего-то не понимаешь, спроси своего тренера или загляни в предыдущие главы, поскольку мы уже объясняли все необходимые шаги).</p>
 <p>Открой <code>blog/templates/blog/post_detail.html</code> и добавь следующую строку:</p>
-<p>{% filename %}blog/templates/blog/post_detail.html{% endfilename %}<br>``<code>html&lt;br&gt;&lt;a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"&gt;&lt;span class="glyphicon glyphicon-pencil"&gt;&lt;/span&gt;&lt;/a&gt;&lt;br&gt;</code>``</p>
+<p><strong>blog/templates/blog/post_detail.html:</strong></p>
+<pre>&lt;a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"&gt;&lt;span class="glyphicon glyphicon-pencil"&gt;&lt;/span&gt;&lt;/a&gt;</pre>
 <p>так, чтобы шаблон выглядел следующим образом:</p>
-<p>{% filename %}blog/templates/blog/post_detail.html{% endfilename %}<br>```html<br>{% extends 'blog/base.html' %}</p>
-<p>{% block content %}<br>    <div class="post"><br>        {% if post.published_date %}<br>            <div class="date"><br>                {{ post.published_date }}<br>            </div><br>        {% endif %}<br>        <a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"><span class="glyphicon glyphicon-pencil"></span></a><br>        <h1>{{ post.title }}</h1><br>        <p>{{ post.text|linebreaksbr }}</p><br>    </div><br>{% endblock %}<br>```</p>
+<p><strong>blog/templates/blog/post_detail.html:</strong></p>
+<pre>{% extends 'blog/base.html' %}
+
+{% block content %}
+    &lt;div class="post"&gt;
+        {% if post.published_date %}
+            &lt;div class="date"&gt;
+                {{ post.published_date }}
+            &lt;/div&gt;
+        {% endif %}
+        &lt;a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"&gt;&lt;span class="glyphicon glyphicon-pencil"&gt;&lt;/span&gt;&lt;/a&gt;
+        &lt;h1&gt;{{ post.title }}&lt;/h1&gt;
+        &lt;p&gt;{{ post.text|linebreaksbr }}&lt;/p&gt;
+    &lt;/div&gt;
+{% endblock %}</pre>
 <p>В файле <code>blog/urls.py</code> добавь:</p>
-<p>{% filename %}blog/urls.py{% endfilename %}<br>``<code>python&lt;br&gt;    path('post/&lt;int:pk&gt;/edit/', views.post_edit, name='post_edit'),&lt;br&gt;</code>``</p>
+<p><strong>blog/urls.py:</strong></p>
+<pre>    path('post/&lt;int:pk&gt;/edit/', views.post_edit, name='post_edit'),</pre>
 <p>Мы будем использовать повторно шаблон <code>blog/templates/blog/post_edit.html</code>, так что осталось лишь отсутствующее <em>представление</em>.</p>
 <p>Давай откроем файл <code>blog/views.py</code> и добавим в самый конец следующее:</p>
-<p>{% filename %}blog/views.py{% endfilename %}<br>``<code>python&lt;br&gt;def post_edit(request, pk):&lt;br&gt;    post = get_object_or_404(Post, pk=pk)&lt;br&gt;    if request.method == "POST":&lt;br&gt;        form = PostForm(request.POST, instance=post)&lt;br&gt;        if form.is_valid():&lt;br&gt;            post = form.save(commit=False)&lt;br&gt;            post.author = request.user&lt;br&gt;            post.published_date = timezone.now()&lt;br&gt;            post.save()&lt;br&gt;            return redirect('post_detail', pk=post.pk)&lt;br&gt;    else:&lt;br&gt;        form = PostForm(instance=post)&lt;br&gt;    return render(request, 'blog/post_edit.html', {'form': form})&lt;br&gt;</code>``</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>def post_edit(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.method == "POST":
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.published_date = timezone.now()
+            post.save()
+            return redirect('post_detail', pk=post.pk)
+    else:
+        form = PostForm(instance=post)
+    return render(request, 'blog/post_edit.html', {'form': form})</pre>
 <p>Выглядит практически идентично представлению <code>post_new</code>, верно? Но не совсем. Во-первых, мы передаём параметр <code>pk</code> из URL-адреса. Кроме того, мы получаем модель <code>Post</code> для редактирования при помощи <code>get_object_or_404(Post, pk=pk)</code> и передаём экземпляр post в качестве <code>instance</code> форме и при сохранении…</p>
-<p>{% filename %}blog/views.py{% endfilename %}<br>``<code>python&lt;br&gt;form = PostForm(request.POST, instance=post)&lt;br&gt;</code>``</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>form = PostForm(request.POST, instance=post)</pre>
 <p>… и когда мы открываем форму для редактирования:</p>
-<p>{% filename %}blog/views.py{% endfilename %}<br>``<code>python&lt;br&gt;form = PostForm(instance=post)&lt;br&gt;</code>``</p>
+<p><strong>blog/views.py:</strong></p>
+<pre>form = PostForm(instance=post)</pre>
 <p>Хорошо, давай удостоверимся, что всё работает! Перейди на страницу <code>post_detail</code>. Ты должна увидеть кнопку редактирования в правом верхнем углу:</p>
-<p>![Кнопка Редактировать (Edit)][5]</p>
-<p> [5]: images/edit_button2.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/django_forms/images/edit_button2.png" alt="Кнопка Редактировать (Edit)"></p>
 <p>Когда ты её нажмёшь, то увидишь форму с выбранной записью:</p>
-<p>![Форма редактирования][6]</p>
-<p> [6]: images/edit_form2.png</p>
+<p><img src="https://raw.githubusercontent.com/KilmanR/tutorial/master/ru/django_forms/images/edit_form2.png" alt="Форма редактирования"></p>
 <p>Поменяй заголовок и текст, а затем сохрани запись!</p>
 <p>Поздравляем! Твое приложение становится всё более сложным!</p>
 <p>Если тебе нужно больше информации о формах в Django, обратись к официальной документации: https://docs.djangoproject.com/en/2.0/topics/forms/</p>
 <h2>Безопасность</h2>
 <p>Круто иметь возможность создавать новые посты, просто перейдя по ссылке! Однако сейчас кто угодно из посетителей твоего сайта может создать новую запись в блоге, а это, скорее всего, совсем не то, чего бы тебе хотелось. Давай сделаем так, чтобы кнопка показывалась для нас, а не кого-либо ещё.</p>
 <p>В файле <code>blog/templates/blog/base.html</code> найди <code>page-header</code> <code>div</code> и тег <code>&lt;a&gt;</code>, который мы добавили ранее. Должно выглядеть примерно так:</p>
-<p>{% filename %}blog/templates/blog/base.html{% endfilename %}<br>``<code>html&lt;br&gt;&lt;a href="{% url 'post_new' %}" class="top-menu"&gt;&lt;span class="glyphicon glyphicon-plus"&gt;&lt;/span&gt;&lt;/a&gt;&lt;br&gt;</code>``</p>
+<p><strong>blog/templates/blog/base.html:</strong></p>
+<pre>&lt;a href="{% url 'post_new' %}" class="top-menu"&gt;&lt;span class="glyphicon glyphicon-plus"&gt;&lt;/span&gt;&lt;/a&gt;</pre>
 <p>Мы добавим сюда ещё один тег <code>{% if %}</code>, чтобы ссылка показывалась только пользователям, вошедшим в админку. То есть пока что — только тебе! Измени тег <code>&lt;a&gt;</code>, чтобы получилось так:</p>
-<p>{% filename %}blog/templates/blog/base.html{% endfilename %}<br>``<code>html&lt;br&gt;{% if user.is_authenticated %}&lt;br&gt;    &lt;a href="{% url 'post_new' %}" class="top-menu"&gt;&lt;span class="glyphicon glyphicon-plus"&gt;&lt;/span&gt;&lt;/a&gt;&lt;br&gt;{% endif %}&lt;br&gt;</code>``</p>
+<p><strong>blog/templates/blog/base.html:</strong></p>
+<pre>{% if user.is_authenticated %}
+    &lt;a href="{% url 'post_new' %}" class="top-menu"&gt;&lt;span class="glyphicon glyphicon-plus"&gt;&lt;/span&gt;&lt;/a&gt;
+{% endif %}</pre>
 <p>Из-за этого <code>{% if %}</code> ссылка будет отправлена в браузер, только если запрашивающий страницу пользователь вошёл в систему. Это не обезопасит создание новых постов полностью, но для начала и это неплохо. Мы подробнее рассмотрим вопросы безопасности в дополнении к учебнику.</p>
 <p>Помнишь иконку редактирования, которую мы добавили на страницу поста? Чтобы посторонние не смогли менять уже созданные посты, нам нужно изменить страничку похожим образом.</p>
 <p>Открой файл <code>blog/templates/blog/post_detail.html</code> и найди такую строку:</p>
-<p>{% filename %}blog/templates/blog/post_detail.html{% endfilename %}<br>``<code>html&lt;br&gt;&lt;a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"&gt;&lt;span class="glyphicon glyphicon-pencil"&gt;&lt;/span&gt;&lt;/a&gt;&lt;br&gt;</code>``</p>
+<p><strong>blog/templates/blog/post_detail.html:</strong></p>
+<pre>&lt;a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"&gt;&lt;span class="glyphicon glyphicon-pencil"&gt;&lt;/span&gt;&lt;/a&gt;</pre>
 <p>Замени её на следующее:</p>
-<p>{% filename %}blog/templates/blog/post_detail.html{% endfilename %}<br>``<code>html&lt;br&gt;{% if user.is_authenticated %}&lt;br&gt;     &lt;a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"&gt;&lt;span class="glyphicon glyphicon-pencil"&gt;&lt;/span&gt;&lt;/a&gt;&lt;br&gt;{% endif %}&lt;br&gt;</code>``</p>
+<p><strong>blog/templates/blog/post_detail.html:</strong></p>
+<pre>{% if user.is_authenticated %}
+     &lt;a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"&gt;&lt;span class="glyphicon glyphicon-pencil"&gt;&lt;/span&gt;&lt;/a&gt;
+{% endif %}</pre>
 <p>Поскольку ты авторизована, никаких изменений после обновления страницы ты не увидишь. Но попробуй загрузить страницу в другом браузере или в режиме инкогнито, и увидишь, что ссылка не отобразится!</p>
 <h2>И последнее: публикация!</h2>
 <p>Теперь давай посмотрим, как это будет работать на PythonAnywhere. Пришло время для очередного развёртывания!</p>
 <p>*   Сначала нам нужно сделать commit и push нового кода в репозиторий GitHub:</p>
-<p>{% filename %}command-line{% endfilename %}<br>``<code>&lt;br&gt;$ git status&lt;br&gt;$ git add --all .&lt;br&gt;$ git status&lt;br&gt;$ git commit -m "Added views to create/edit blog post inside the site."&lt;br&gt;$ git push&lt;br&gt;</code>``</p>
-<p>*   Затем набери в [Bash-консоли PythonAnywhere][7]:</p>
-<p> [7]: https://www.pythonanywhere.com/consoles/</p>
-<p>{% filename %}PythonAnywhere command-line{% endfilename %}<br>``<code>&lt;br&gt;$ cd ~/&lt;your-pythonanywhere-domain&gt;.pythonanywhere.com&lt;br&gt;$ git pull&lt;br&gt;[...]&lt;br&gt;</code>``</p>
-<p>(Не забудь подставить вместо <your-pythonanywhere-domain> свой поддомен на PythonAnywhere без угловых скобок.)</p>
-<p>*   Наконец, зайди на страницу ["Web" page][8] (используй кнопку меню в правом верхнем углу консоли) и нажми <strong>Reload</strong>. Обнови страницу блога http://subdomain.pythonanywhere.com/, чтобы увидеть изменения.</p>
-<p> [8]: https://www.pythonanywhere.com/web_app_setup/</p>
+<p><strong>command-line:</strong></p>
+<pre>$ git status
+$ git add --all .
+$ git status
+$ git commit -m "Added views to create/edit blog post inside the site."
+$ git push</pre>
+<p>*   Затем набери в <a href="https://www.pythonanywhere.com/consoles/">Bash-консоли PythonAnywhere</a>:</p>
+<p><strong>PythonAnywhere command-line:</strong></p>
+<pre>$ cd ~/&lt;your-pythonanywhere-domain&gt;.pythonanywhere.com
+$ git pull
+[...]</pre>
+<p>(Не забудь подставить вместо &lt;your-pythonanywhere-domain&gt; свой поддомен на PythonAnywhere без угловых скобок.)</p>
+<p>*   Наконец, зайди на страницу <a href="https://www.pythonanywhere.com/web_app_setup/">"Web" page</a> (используй кнопку меню в правом верхнем углу консоли) и нажми <strong>Reload</strong>. Обнови страницу блога http://subdomain.pythonanywhere.com/, чтобы увидеть изменения.</p>
 <p>Вот и всё! Поздравляем :)</p>
 <footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
 </main>

@@ -40,13 +40,37 @@
 <h1>Часть 3: Представления и шаблоны</h1>
 <p>Теперь вернём данные из БД в HTML через шаблон.</p>
 <h2>Создаём шаблон</h2>
-<p>Файл <code>polls/templates/polls/index.html</code>:<br>``<code>html&lt;br&gt;{% if latest_question_list %}&lt;br&gt;    &lt;ul&gt;&lt;br&gt;    {% for question in latest_question_list %}&lt;br&gt;        &lt;li&gt;&lt;a href="/polls/{{ question.id }}/"&gt;{{ question.question_text }}&lt;/a&gt;&lt;/li&gt;&lt;br&gt;    {% endfor %}&lt;br&gt;    &lt;/ul&gt;&lt;br&gt;{% else %}&lt;br&gt;    &lt;p&gt;Нет голосований.&lt;/p&gt;&lt;br&gt;{% endif %}&lt;br&gt;</code>``</p>
+<p>Файл <code>polls/templates/polls/index.html</code>:</p>
+<pre>{% if latest_question_list %}
+    &lt;ul&gt;
+    {% for question in latest_question_list %}
+        &lt;li&gt;&lt;a href="/polls/{{ question.id }}/"&gt;{{ question.question_text }}&lt;/a&gt;&lt;/li&gt;
+    {% endfor %}
+    &lt;/ul&gt;
+{% else %}
+    &lt;p&gt;Нет голосований.&lt;/p&gt;
+{% endif %}</pre>
 <h2>Обновляем view</h2>
-<p><code>polls/views.py</code>:<br>```python<br>from django.shortcuts import render<br>from .models import Question</p>
-<p>def index(request):<br>    latest_question_list = Question.objects.order_by("-pub_date")[:5]<br>    context = {"latest_question_list": latest_question_list}<br>    return render(request, "polls/index.html", context)<br>```</p>
+<p><code>polls/views.py</code>:</p>
+<pre>from django.shortcuts import render
+from .models import Question
+
+def index(request):
+    latest_question_list = Question.objects.order_by("-pub_date")[:5]
+    context = {"latest_question_list": latest_question_list}
+    return render(request, "polls/index.html", context)</pre>
 <h2>Подключаем детальную страницу</h2>
-<p>Добавьте в <code>polls/urls.py</code>:<br>``<code>python&lt;br&gt;path("&lt;int:question_id&gt;/", views.detail, name="detail"),&lt;br&gt;</code>`<code>&lt;br&gt;и в </code>views.py<code>:&lt;br&gt;</code>``python<br>from django.http import Http404</p>
-<p>def detail(request, question_id):<br>    try:<br>        question = Question.objects.get(pk=question_id)<br>    except Question.DoesNotExist:<br>        raise Http404("Вопрос не существует")<br>    return render(request, "polls/detail.html", {"question": question})<br>```</p>
+<p>Добавьте в <code>polls/urls.py</code>:</p>
+<pre>path("&lt;int:question_id&gt;/", views.detail, name="detail"),</pre>
+<p>и в <code>views.py</code>:</p>
+<pre>from django.http import Http404
+
+def detail(request, question_id):
+    try:
+        question = Question.objects.get(pk=question_id)
+    except Question.DoesNotExist:
+        raise Http404("Вопрос не существует")
+    return render(request, "polls/detail.html", {"question": question})</pre>
 <footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
 </main>
 

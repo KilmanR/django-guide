@@ -37,8 +37,7 @@
   </div>
 </header>
 <main class="wrap">
-<h1>Часть 6: Часть 4: Административная панель</h1>
-<p>{{LearnSidebar}}{{PreviousMenuNext("Learn_web_development/Extensions/Server-side/Django/Models", "Learn_web_development/Extensions/Server-side/Django/Home_page", "Learn_web_development/Extensions/Server-side/Django")}}</p>
+<h1>Часть 6: Административная панель</h1>
 <p>Теперь, когда модели для сайта  созданы, добавим некоторые "настоящие" данные о книгах, используя административную панель Django Admin. Для начала мы покажем, как зарегистрировать в ней модели, потом как войти и создать какие-нибудь данные. В конце статьи мы покажем некоторые способы дальнейшего улучшения вида админ-панели.</p>
 <table><tr><th>Предусловия:</th><th>Сначала завершите:  использование моделей.</th></tr><tr><td>------------</td><td>-------------------------------------------------------------------------------------------------------------------------------------</td></tr><tr><td>Цель:</td><td>Уяснить преимущества и ограничения админ-панели Django, научиться использовать её для создания записей для наших моделей.</td></tr></table>
 <h2>Обзор</h2>
@@ -68,19 +67,19 @@ admin.site.register(BookInstance)</pre>
 <h2>Вход в админ-панель и её использование</h2>
 <p>Для входа в админ-панель откройте ссылку _/admin_ (например <a href="http://127.0.0.1:8000/admin/">http://127.0.0.1:8000/admin</a>) и введите логин и пароль вашего нового суперпользователя (вас перенаправят на login-страницу и потом обратно на /admin после ввода всех деталей).</p>
 <p>В этой части сайта отображаются все наши модели, сгруппированные по установленному приложению. Вы можете кликнуть на названии модели, чтобы получить список всех связанных записей, далее можете кликнуть на этих записях, для их редактирования . Также можно непосредственно кликнуть на ссылку <strong>Add</strong>, расположенную рядом с каждой моделью, чтобы начать создание записи этого типа.</p>
-<p>!<a href="admin_home.png">Admin Site - Home page</a></p>
+<p><img src="https://raw.githubusercontent.com/mdn/translated-content/main/files/ru/learn_web_development/extensions/server-side/django/admin_site/admin_home.png" alt="Admin Site - Home page"></p>
 <p>Кликните на ссылке <strong>Add</strong> справа от _Books_, чтобы создать новую книгу (появится диалоговое окно как на картинке внизу). Заметьте, что заголовок каждого поля - это тип используемого виджета, и <code>help_text</code> (если есть) совпадает со значением, которое вы указали в модели.</p>
 <p>Введите значение для полей. Вы можете создавать новых авторов или жанры, нажимая на значок "+ ", расположенный рядом с соответствующим полем (или выберите существующее значение из списков, если вы уже создали их). Когда вы закончили, нажмите на <strong>SAVE,</strong> <strong>Save and add another</strong>, или <strong>Save and continue editing,</strong> чтобы сохранить записи.</p>
-<p>!<a href="admin_book_add.png">Admin Site - Book Add</a></p>
+<p><img src="https://raw.githubusercontent.com/mdn/translated-content/main/files/ru/learn_web_development/extensions/server-side/django/admin_site/admin_book_add.png" alt="Admin Site - Book Add"></p>
 <p>> [!NOTE]<br>> А сейчас, хотелось бы, чтобы вы добавили несколько книг, авторов и жанров (например, Фэнтези) в ваше приложение. Удостоверьтесь, что каждый автор и жанр включает пару различных книг (позже, когда мы реализуем представления "list" и "detail", это сделает их более интересными).</p>
 <p>После того, когда книги добавлены, для перехода на главную страницу админ-панели кликните на ссылке <strong>Home</strong> в верхней части страницы. Потом кликните на ссылке <strong>Books</strong> для отображения текущего списка книг (или на одной из других ссылок, чтобы увидеть список соответствующей модели). После добавления нескольких книг список может выглядеть наподобие скриншота ниже. Отображается название каждой из книг. Его возвращает метод <code>__str__()</code> в модели Book, созданной в предыдущей статье.</p>
-<p>!<a href="admin_book_list.png">Admin Site - List of book objects</a></p>
+<p><img src="https://raw.githubusercontent.com/mdn/translated-content/main/files/ru/learn_web_development/extensions/server-side/django/admin_site/admin_book_list.png" alt="Admin Site - List of book objects"></p>
 <p>Для удаления книги из этого списка выберите чекбокс рядом с ней и действие _delete..._ из выпадающего списка _Action_, а затем нажмите кнопку <strong>Go</strong>. Также можно добавить новую книгу, нажав на кнопку <strong>ADD BOOK</strong>.</p>
 <p>Вы можете редактировать книгу, кликнув по ссылке с её названием. Страница редактирования книги, приведённая ниже, практически идентична странице добавления новой книги. Основные отличия - это заголовок страницы (_Change book_) и наличие кнопок <strong>Delete</strong>, <strong>HISTORY</strong> и <strong>VIEW ON SITE.</strong> Последняя присутствует, так как мы определили метод <code>get_absolute_url()</code> в нашей модели.</p>
-<p>!<a href="admin_book_modify.png">Admin Site - Book Edit</a></p>
+<p><img src="https://raw.githubusercontent.com/mdn/translated-content/main/files/ru/learn_web_development/extensions/server-side/django/admin_site/admin_book_modify.png" alt="Admin Site - Book Edit"></p>
 <p>Теперь перейдите назад на страницу <strong>Home</strong> (используя ссылку _Home_ в навигационной цепочке вверху страницы) и просмотрите списки <strong>Author</strong> и <strong>Genre</strong>. В них уже должно быть несколько элементов, созданных при добавлении новых книг. Если хотите, добавьте ещё.</p>
 <p>Однако у вас не будет ни одного экземпляра книги, потому что они не создаются из модели <code>Book</code> (хотя можно создать книгу из модели <code>BookInstance</code> — такова природа поля <code>ForeignKey</code>). Для отображения страницы _Add book instance_ (см. рисунок ниже) вернитесь на страницу _Home_ и нажмите кнопку <strong>Add</strong>. Обратите внимание на длинный уникальный Id для идентификации конкретного экземпляра книги в библиотеке.</p>
-<p>!<a href="admin_bookinstance_add.png">Admin Site - BookInstance Add</a></p>
+<p><img src="https://raw.githubusercontent.com/mdn/translated-content/main/files/ru/learn_web_development/extensions/server-side/django/admin_site/admin_bookinstance_add.png" alt="Admin Site - BookInstance Add"></p>
 <p>Создайте несколько экземпляров для каждой из ваших книг. Установите статус _Available (доступен)_ для некоторых экземпляров и _On loan (выдан)_ для остальных. Если статус экземпляра <strong>not</strong> _Available (недоступен)_, то также установите дату возврата (_Due back)_.</p>
 <p>Вот и все! Вы изучили как запустить и использовать админ-панель. Также были созданы записи для <code>Book</code>, <code>BookInstance</code>, <code>Genre</code> и <code>Author</code>, которые можно будет использовать после создания наших собственных представлений и шаблонов.</p>
 <h2>"Продвинутая" конфигурация</h2>
@@ -126,7 +125,7 @@ class BookInstanceAdmin(admin.ModelAdmin):
 <pre>class AuthorAdmin(admin.ModelAdmin):
     list_display = ('last_name', 'first_name', 'date_of_birth', 'date_of_death')</pre>
 <p>Перезапустите сайт и перейдите к списку авторов. Указанные поля должны отображаться следующим образом:</p>
-<p>!<a href="admin_improved_author_list.png">Admin Site - Improved Author List</a></p>
+<p><img src="https://raw.githubusercontent.com/mdn/translated-content/main/files/ru/learn_web_development/extensions/server-side/django/admin_site/admin_improved_author_list.png" alt="Admin Site - Improved Author List"></p>
 <p>Для нашей модели <code>Book</code> добавим отображение полей <code>author</code> и <code>genre</code>. Поле <code>author</code> - это внешний ключ (<code>ForeignKey</code> ) связи один к одному, поэтому оно будет представлено значением <code>__str()__</code> для связанной записи. Замените класс <code>BookAdmin</code> на версию, приведённую ниже.</p>
 <pre>class BookAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'display_genre')</pre>
@@ -140,7 +139,7 @@ class BookInstanceAdmin(admin.ModelAdmin):
         return ', '.join([ genre.name for genre in self.genre.all()[:3] ])
     display_genre.short_description = 'Genre'</pre>
 <p>После сохранения модели и обновления админ-панели, перезапустите её и перейдите на страницу списка _Books_. Вы должны увидеть список книг, наподобие приведённого ниже:</p>
-<p>!<a href="admin_improved_book_list.png">Admin Site - Improved Book List</a></p>
+<p><img src="https://raw.githubusercontent.com/mdn/translated-content/main/files/ru/learn_web_development/extensions/server-side/django/admin_site/admin_improved_book_list.png" alt="Admin Site - Improved Book List"></p>
 <p>Модель <code>Genre</code> (и модель <code>Language</code>, если вы её определили) имеет единственное поле. Поэтому нет необходимости создания для них дополнительных моделей с целью отображения дополнительных полей.</p>
 <p>> [!NOTE]<br>> Целесообразно, чтобы в списке модели <code>BookInstance</code> отображались хотя бы статус и ожидаемая дата возврата. Мы добавили это в качестве "испытания" в конце этой статьи!</p>
 <h3>Добавление фильтров списка</h3>
@@ -148,7 +147,7 @@ class BookInstanceAdmin(admin.ModelAdmin):
 <pre>class BookInstanceAdmin(admin.ModelAdmin):
     list_filter = ('status', 'due_back')</pre>
 <p>Представление списка теперь будет содержать панель фильтрации справа. Обратите внимание, как выбирать даты и статус для фильтрации:</p>
-<p>!<a href="admin_improved_bookinstance_list_filters.png">Admin Site - BookInstance List Filters</a></p>
+<p><img src="https://raw.githubusercontent.com/mdn/translated-content/main/files/ru/learn_web_development/extensions/server-side/django/admin_site/admin_improved_bookinstance_list_filters.png" alt="Admin Site - BookInstance List Filters"></p>
 <h3>Формирование макета с подробным представлением</h3>
 <p>По умолчанию в представлениях деталей отображаются все поля по вертикали в порядке их объявления в модели. Вы можете изменить порядок декларации, какие поля отображаются (или исключены), используются ли разделы для организации информации, отображаются ли поля горизонтально или вертикально, и даже какие виджеты редактирования используются в админ-формах.</p>
 <p>> [!NOTE]<br>> Модели LocalLibrary относительно просты, поэтому нам не нужно менять макет, но мы всё равно внесём некоторые изменения, просто чтобы показать вам, как это сделать.</p>
@@ -159,7 +158,7 @@ class BookInstanceAdmin(admin.ModelAdmin):
     fields = ['first_name', 'last_name', ('date_of_birth', 'date_of_death')]</pre>
 <p>Атрибут полей перечисляет только те поля, которые должны отображаться в форме, по порядку. Поля отображаются по вертикали по умолчанию, но будут отображаться горизонтально, если вы дополнительно группируете их в кортеже (как показано в полях «date» выше).</p>
 <p>Перезагрузите приложение и перейдите к подробному представлению автора - он должен теперь отображаться, как показано ниже:</p>
-<p>!<a href="admin_improved_author_detail.png">Admin Site - Improved Author Detail</a></p>
+<p><img src="https://raw.githubusercontent.com/mdn/translated-content/main/files/ru/learn_web_development/extensions/server-side/django/admin_site/admin_improved_author_detail.png" alt="Admin Site - Improved Author Detail"></p>
 <p>> [!NOTE]<br>> Так же, вы можете использовать <code>exclude</code> атрибут для объявления списка атрибутов, которые будут исключены из формы (все остальные атрибуты в модели, будут отображаться).</p>
 <h4>Разделение на секции/Выделение подробного представления</h4>
 <p>Вы можете добавлять "разделы" (sections) для группировки связанной информации в модели в форме детализации, используя атрибут <a href="https://docs.djangoproject.com/en/dev/ref/contrib/admin/#django.contrib.admin.ModelAdmin.fieldsets">fieldsets</a> .</p>
@@ -178,7 +177,7 @@ class BookInstanceAdmin(admin.ModelAdmin):
     )</pre>
 <p>Каждая секция имеет свой заголовок (или <code>None</code>, если заголовок не нужен) и ассоциированный кортеж полей в словаре - формат сложный для описания, но относительно простой для понимания, если вы посмотрите на фрагмент кода, представленный выше.</p>
 <p>Перезапустите сайт и перейдите к списку экземпляров; форма должна отображаться следующим образом:</p>
-<p>!<a href="admin_improved_bookinstance_detail_sections.png">Admin Site - Improved BookInstance Detail with sections</a></p>
+<p><img src="https://raw.githubusercontent.com/mdn/translated-content/main/files/ru/learn_web_development/extensions/server-side/django/admin_site/admin_improved_bookinstance_detail_sections.png" alt="Admin Site - Improved BookInstance Detail with sections"></p>
 <h3>Встроенное редактирование связанных записей</h3>
 <p>Иногда бывает полезно иметь возможность добавлять связанные записи одновременно. Например, имеет смысл иметь как информацию о книге, так и информацию о конкретных копиях, которые вы получили на той же странице подробностей. К примеру, вполне логично получить и информацию о книге, и информацию о конкретных копиях, зайдя на страницу детализации.</p>
 <p>Вы можете это сделать, объявив <a href="https://docs.djangoproject.com/en/dev/ref/contrib/admin/#django.contrib.admin.ModelAdmin.inlines">inlines</a>, и указав тип <a href="https://docs.djangoproject.com/en/dev/ref/contrib/admin/#django.contrib.admin.TabularInline">TabularInline</a> (горизонтальное расположение) или <a href="https://docs.djangoproject.com/en/dev/ref/contrib/admin/#django.contrib.admin.StackedInline">StackedInline</a> (вертикальное расположение, так же как и в модели по умолчанию). Вы можете добавить <code>BookInstance</code> информацию в подробное описание <code>Book</code> , добавив строки, представленные ниже и располагающиеся рядом с <code>BookAdmin</code>:</p>
@@ -190,7 +189,7 @@ class BookAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'display_genre')
     inlines = [BooksInstanceInline]</pre>
 <p>Попробуйте перезапустить приложение, а затем взгляните на представление книги — внизу вы должны увидеть экземпляры книги, относящиеся к этой книге:</p>
-<p>!<a href="admin_improved_book_detail_inlines.png">Admin Site - Book with Inlines</a></p>
+<p><img src="https://raw.githubusercontent.com/mdn/translated-content/main/files/ru/learn_web_development/extensions/server-side/django/admin_site/admin_improved_book_detail_inlines.png" alt="Admin Site - Book with Inlines"></p>
 <p>В этом случае, всё, что мы сделали - объявили наш встроенный класс tablular, который просто добавляет все поля из _встроенной_ модели. Вы можете указать все виды дополнительной информации для макета, включая отображаемые поля, их порядок, независимо от того, являются ли они только для чтения или нет, и т. д. (См. <a href="https://docs.djangoproject.com/en/dev/ref/contrib/admin/#django.contrib.admin.TabularInline">TabularInline</a> для получения дополнительной информации).</p>
 <p>> [!NOTE]<br>> В этой функции есть некоторые неприятные ограничения! На скриншоте выше у нас есть три существующих экземпляра книги, за которыми следуют три поля для новых экземпляров книги (которые очень похожи!). Было бы лучше НЕ иметь лишних экземпляров книг по умолчанию и просто добавить их с помощью ссылки <strong>Add another Book instance</strong> или иметь возможность просто перечислять <code>BookInstance</code>s как нечитаемые здесь ссылки. Первый вариант можно сделать, установив <code>extra</code> атрибут в 0 в модели <code>BookInstanceInline</code>, попробуйте сами.</p>
 <h2>Проверьте себя</h2>
@@ -200,7 +199,6 @@ class BookAdmin(admin.ModelAdmin):
 <p>Вот и всё! Теперь вы узнали, как настроить сайт администрирования как в самой простой, так и в улучшенной форме, о создании суперпользователя и о том, как перемещаться по сайту администратора, просматривать, удалять и обновлять записи. По пути вы создали множество книг, экземпляров, жанров и авторов, которые мы сможем перечислить и отобразить, как только мы создадим собственный вид и шаблоны.</p>
 <h2>Дополнительные материалы</h2>
 <ul><li><a href="https://docs.djangoproject.com/en/1.10/intro/tutorial02/#introducing-the-django-admin">Writing your first Django app, part 2: Introducing the Django Admin</a> (Django docs)</li><li><a href="https://docs.djangoproject.com/en/1.10/ref/contrib/admin/">The Django Admin site</a> (Django Docs)</li></ul>
-<p>{{PreviousMenuNext("Learn_web_development/Extensions/Server-side/Django/Models", "Learn_web_development/Extensions/Server-side/Django/Home_page", "Learn_web_development/Extensions/Server-side/Django")}}</p>
 <footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
 </main>
 

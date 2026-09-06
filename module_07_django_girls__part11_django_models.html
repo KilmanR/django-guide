@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Часть 11: Модели Django — django-guide</title>
+<meta name="description" content="django-guide · Часть 11: Модели Django — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Часть 11: Модели Django, on русском, github pages">
+<meta name="author" content="Big Pickle from OpenCode Zen">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Часть 11: Модели Django — django-guide">
+<meta property="og:description" content="django-guide · Часть 11: Модели Django — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<h1>Часть 11: Модели Django</h1>
+<h1>Модели Django</h1>
+<p>Нам нужно что-то, что будет хранить все записи нашего блога. Но прежде давай поговорим о вещах, называемых <code>объектами</code>.</p>
+<h2>Объекты</h2>
+<p>В программировании существует особая концепция, она называется <code>объектно-ориентированным программированием</code>. Идея заключается в том, что вместо скучной последовательности инструкций мы моделируем вещи и описываем, как они взаимодействуют друг с другом.</p>
+<p>Так что же такое объект? Это совокупность поведения и свойств. Звучит странно, но мы приведем пример.</p>
+<p>Если мы хотим смоделировать кошку, то создадим объект <code>Cat</code>, который обладает определенными свойствами, например, <code>color</code> (цвет), <code>age</code> (возраст), <code>mood</code> (настроение: плохое, хорошее, сонное ;)), <code>owner</code> (хозяин, например, другой объект — <code>Person</code> — или, если кошка дикая, это свойство будет пустым).</p>
+<p>Объект <code>Cat</code> будет иметь набор определённых действий: <code>purr</code> (мурчать), <code>scratch</code> (царапаться) или <code>feed</code> (кормить, где мы дадим кошке немного <code>CatFood</code> — кошачьей еды, которая так же может быть отдельным объектом со своими свойствами, например, <code>taste</code> — вкусом).</p>
+<pre>Cat
+--------
+color
+age
+mood
+owner
+purr()
+scratch()
+feed(cat_food)</pre>
+<pre>CatFood
+--------
+taste</pre>
+<p>Основная идея, таким образом, заключается в описании объекта в коде, используя его параметры (<code>свойства объекта</code>) и доступные ему действия (<code>методы</code>).</p>
+<p>Так как же мы смоделируем запись в блоге? Нам же нужен блог, верно?</p>
+<p>Для начала стоит ответить на вопрос: что такое запись в блоге? Какие свойства она имеет?</p>
+<p>Ну, запись наверняка содержит какой-то текст и заголовок, верно? Было бы неплохо также знать, кто её написал — так что нам нужен автор. Ну и в заключение, нам нужно знать, когда запись создана и когда опубликована.</p>
+<pre>Post
+--------
+title
+text
+author
+created_date
+published_date</pre>
+<p>Какие вещи можно сделать с записью в блоге? Было бы неплохо иметь <code>метод</code> для её публикации, согласна?</p>
+<p>Так что нам пригодится метод <code>publish</code>.</p>
+<p>Ну и раз уж мы определились с тем, что хотим получить, давай начнем моделирование в Django!</p>
+<h2>Модель в Django</h2>
+<p>Зная, что представляет из себя объект, мы можем создать модель Django для записи в блоге.</p>
+<p>Модель в Django — это объект определённого свойства: он хранится в <code>базе данных</code>. База данных представляет собой совокупность различных данных. Это то место, где ты будешь хранить информацию о своих пользователях, записях в блоге и т.д. Мы будем использовать базу данных SQLite для хранения информации. Это стандартная база данных в Django — её сейчас вполне хватит для наших нужд.</p>
+<p>Ты можешь представить модель в базе данных как электронную таблицу с колонками (полями) и строками (данными).</p>
+<h3>Создание приложения</h3>
+<p>Для аккуратности мы создадим отдельное приложение в нашем проекте. Очень удобно иметь хорошо организованное рабочее место с самого начала. Для создания приложения нам понадобится набрать следующую инструкцию в командной строке (из директории <code>djangogirls</code>, где находится файл <code>manage.py</code>):</p>
+<p><strong>macOS и Linux::</strong></p>
+<pre>(myvenv) ~/djangogirls$ python manage.py startapp blog</pre>
+<p><strong>Windows::</strong></p>
+<pre>(myvenv) C:\Users\Name\djangogirls&gt; python manage.py startapp blog</pre>
+<p>Обрати внимание, что в нашем проекте появилась новая папка <code>blog</code>, которая содержит некоторые файлы. Таким образом, структура нашего проекта будет выглядеть так:</p>
+<pre>djangogirls
+├── blog
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── migrations
+│   │   └── __init__.py
+│   ├── models.py
+│   ├── tests.py
+│   └── views.py
+├── db.sqlite3
+├── manage.py
+└── mysite
+    ├── __init__.py
+    ├── settings.py
+    ├── urls.py
+    └── wsgi.py</pre>
+<p>После того, как приложение создано, нам нужно сообщить Django, что теперь он должен его использовать. Мы сделаем это с помощью файла <code>mysite/settings.py</code>. Нам нужно найти <code>INSTALLED_APPS</code> и добавить к списку <code>'blog',</code> прямо перед <code>]</code>. Конечный результат должен выглядеть следующим образом:</p>
+<p><strong>mysite/settings.py:</strong></p>
+<pre>INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'blog',
+]</pre>
+<h3>Создание модели записи в блоге</h3>
+<p>В файле <code>blog/models.py</code> мы определяем все <code>Модели</code> — модель записи для блога также пойдёт сюда.</p>
+<p>Открой файл <code>blog/models.py</code>, удали весь текст и вставь на его место следующий код:</p>
+<p><strong>blog/models.py:</strong></p>
+<pre>from django.conf import settings
+from django.db import models
+from django.utils import timezone
+
+
+class Post(models.Model):
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    text = models.TextField()
+    created_date = models.DateTimeField(default=timezone.now)
+    published_date = models.DateTimeField(blank=True, null=True)
+
+    def publish(self):
+        self.published_date = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return self.title</pre>
+<p>> Убедись, что использовала два символа нижнего подчёркивания (<code>_</code>) с обеих сторон от метода <code>str</code>. Это соглашение часто используется при программировании на Python, и иногда его называют "dunder" (сокращение от англ. "double-underscore").</p>
+<p>Смотрится страшно, да? Но не волнуйся, мы объясним, что значит каждая строка кода!</p>
+<p>Строки, начинающиеся с <code>from</code> или <code>import</code>, открывают доступ к коду из других файлов. Так что вместо того, чтобы копировать и вставлять один и тот же код во все файлы, ты можешь сослаться на него при помощи <code>from ... import ...</code>.</p>
+<p><code>class Post(models.Model):</code> — эта строка определяет нашу модель (<code>объект</code>).</p>
+<ul><li>  <code>class</code> — это специальное ключевое слово для определения объектов.</li><li>  <code>Post</code> — это имя нашей модели, мы можем поменять его при желании (специальные знаки и пробелы использовать нельзя). Всегда начинай имена классов с прописной буквы.</li><li>  <code>models.Model</code> означает, что объект Post является моделью Django, так Django поймет, что он должен сохранить его в базу данных.</li></ul>
+<p>Дальше мы задаем свойства, о которых уже говорили: <code>title</code>, <code>text</code>, <code>created_date</code>, <code>published_date</code> и <code>author</code>. Чтобы это сделать, нам нужно определиться с типом полей (это текст? число? дата? ссылка на другой объект? например, на пользователя?).</p>
+<ul><li>  <code>models.CharField</code> — так мы определяем текстовое поле с ограничением на количество символов.</li><li>  <code>models.TextField</code> — так определяется поле для неограниченно длинного текста. Выглядит подходящим для содержимого поста, верно?</li><li>  <code>models.DateTimeField</code> — дата и время.</li><li>  <code>models.ForeignKey</code> — ссылка на другую модель.</li></ul>
+<p>Мы не будем объяснять каждую запятую, поскольку на это уйдет слишком много времени. Ознакомься с официальной документаций Django: если хочешь узнать больше о полях моделей и о том, как определять разные объекты, то эта ссылка может помочь: https://docs.djangoproject.com/en/1.11/ref/models/fields/#field-types.</p>
+<p>Что насчёт <code>def publish(self):</code>? Это как раз метод <code>публикации</code> для записи, о котором мы говорили. <code>def</code> означает, что создаётся функция/метод, а <code>publish</code> — это название этого метода. Можно изменить имя метода, если хочешь. Существует правило для имён функций: нужно использовать строчные буквы, а пробелы заменять на подчёркивания. Например, метод, вычисляющий среднюю цену, может называться <code>calculate_average_price</code>.</p>
+<p>Методы часто <code>возвращают</code> что-то. Например, метод <code>__str__</code>. В нашем случае после вызова метода <code>__str__()</code> мы получим текст (<strong>строку</strong>) с заголовком записи.</p>
+<p>Также обрати внимание, что оба метода <code>def publish(self):</code> и <code>def __str__(self):</code> внутри класса имеют дополнительный отступ. Поскольку в Python важны отступы, нам необходимо использовать их для методов внутри класса — иначе методы не будут принадлежать к классу, и при запуске программы может получиться что-то неожиданное.</p>
+<p>Если тема моделей тебе до сих пор непонятна — не стесняйся обратиться к тренеру! Мы знаем, что она действительно сложна, особенно когда ты изучаешь параллельно объекты и функции. Но мы надеемся, что всё это больше не кажется тебе магией!</p>
+<h3>Создаём таблицы моделей в базе данных</h3>
+<p>Последним шагом будет добавление нашей модели в базу данных. Сначала мы должны дать Django знать, что сделали изменения в нашей модели (мы её только что создали!). Набери <code>python manage.py makemigrations blog</code>. Должно получиться примерно так:</p>
+<p><strong>command-line:</strong></p>
+<pre>(myvenv) ~/djangogirls$ python manage.py makemigrations blog
+Migrations for 'blog':
+  blog/migrations/0001_initial.py:
+  - Create model Post</pre>
+<p><strong>Примечание:</strong> не забудь сохранить отредактированные файлы. Иначе твой компьютер выполнит команду с их предыдущей версией, и могут появиться неожиданные ошибки.</p>
+<p>Django создал для нас файл с миграцией для базы данных. Набери <code>python manage.py migrate blog</code>, результат должен быть следующим:</p>
+<p><strong>command-line:</strong></p>
+<pre>(myvenv) ~/djangogirls$ python manage.py migrate blog
+Operations to perform:
+  Apply all migrations: blog
+Running migrations:
+  Rendering model states... DONE
+  Applying blog.0001_initial... OK</pre>
+<p>Ура! Модель записи для блога теперь в базе данных, и было бы неплохо посмотреть на неё, верно? Тогда переходи к следующей главе!</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com</footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>
