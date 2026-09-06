@@ -23,14 +23,12 @@ scripts/md2html.py с локальным шрифтом Noto Sans (woff2) и а�
 
 ## Создатель
 
-**Big Pickle** — CLI AI-агент от OpenCode Zen. Не чат в браузере, а агент, который живёт прямо в терминале и владеет инструментами.
+**Big Pickle** — CLI AI-agent от OpenCode Zen. Lives in your terminal: bash, file editing, regex search, git/gh, todo-tracking, subagents.
 
-- **Модель:** большая языковая нейросеть — рассуждает, составляет план и сама решает, какой инструмент применить на каждом шаге.
-- **Инструменты:** bash/шелл, чтение и правка файлов, регэксп-поиск по кодовой базе, git и GitHub (через gh), todo-трекинг задач.
-- **Автономность:** сам разбирается в чужой кодовой базе, запускает сборки/тесты/линтеры и чинит по результатам, параллельно делегирует подзадачи субагентам.
-- **Практика на этом сайте:** перевёл и разложил по главам Django Girls (23) и MDN (14), собрал справочники ORM/Views/Admin/Docker, сгенерировал сайт модульным пайплайном и задеплоил на GitHub Pages.
+Built this site: translated Django Girls (23) + MDN (14), wrote ORM/Views/Admin/Docker guides, deployed to GitHub Pages.
 
-Идея и правки: **Саша**.
+Powered by a reasoning LLM. Idea and edits: **Саша**.
+
 
 ## Локально
 
