@@ -6,7 +6,7 @@
 <title>Шпаргалка команд Django — django-guide</title>
 <meta name="description" content="django-guide · Шпаргалка команд Django — шпаргалка команд, документация и туториалы по Django на русском.">
 <meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Шпаргалка команд Django, on русском, github pages">
-<meta name="author" content="Big Pickle from OpenCode Zen">
+<meta name="author" content="Big Pickle и Саша">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="django-guide">
 <meta property="og:title" content="Шпаргалка команд Django — django-guide">
@@ -52,7 +52,7 @@ cd mysite</pre>
 <pre>python manage.py startapp polls</pre>
 <p>Приложение нужно «зарегистрировать» в <code>settings.py</code> → INSTALLED_APPS.</p>
 <h2>Команды manage.py (часто используемые)</h2>
-<table><tr><th>Команда</th><th>Что делает</th></tr><tr><td>---------</td><td>-----------</td></tr><tr><td><code>runserver</code></td><td>dev-сервер (автоперезагрузка при изменениях)</td></tr><tr><td><code>startapp</code></td><td>создать новое приложение</td></tr><tr><td><code>makemigrations</code></td><td>создать миграции из изменений моделей</td></tr><tr><td><code>migrate</code></td><td>применить миграции к базе</td></tr><tr><td><code>sqlmigrate</code></td><td>показать SQL для миграции</td></tr><tr><td><code>check</code></td><td>проверка проекта на ошибки</td></tr><tr><td><code>shell</code></td><td>интерактивная оболочка Python с Django</td></tr><tr><td><code>createsuperuser</code></td><td>создать суперпользователя (для админки)</td></tr><tr><td><code>runserver</code></td><td>старт сервера</td></tr><tr><td><code>test</code></td><td>запуск тестов</td></tr><tr><td><code>collectstatic</code></td><td>собрать статику в одну папку</td></tr></table>
+<table><tr><th>Команда</th><th>Что делает</th></tr><tr><td><code>runserver</code></td><td>dev-сервер (автоперезагрузка при изменениях)</td></tr><tr><td><code>startapp</code></td><td>создать новое приложение</td></tr><tr><td><code>makemigrations</code></td><td>создать миграции из изменений моделей</td></tr><tr><td><code>migrate</code></td><td>применить миграции к базе</td></tr><tr><td><code>sqlmigrate</code></td><td>показать SQL для миграции</td></tr><tr><td><code>check</code></td><td>проверка проекта на ошибки</td></tr><tr><td><code>shell</code></td><td>интерактивная оболочка Python с Django</td></tr><tr><td><code>createsuperuser</code></td><td>создать суперпользователя (для админки)</td></tr><tr><td><code>runserver</code></td><td>старт сервера</td></tr><tr><td><code>test</code></td><td>запуск тестов</td></tr><tr><td><code>collectstatic</code></td><td>собрать статику в одну папку</td></tr></table>
 <h2>Миграции</h2>
 <pre># 1. Создать миграции после изменения models.py
 python manage.py makemigrations polls

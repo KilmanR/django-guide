@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Продакшен: выводим Django-проект «в бой» — django-guide</title>
+<meta name="description" content="django-guide · Продакшен: выводим Django-проект «в бой» — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Продакшен: выводим Django-проект «в бой», on русском, github pages">
+<meta name="author" content="Big Pickle и Саша">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Продакшен: выводим Django-проект «в бой» — django-guide">
+<meta property="og:description" content="django-guide · Продакшен: выводим Django-проект «в бой» — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a> <span class="sep">/</span> <a href="index.html#prodakshen">Продакшен</a> <span class="sep">/</span> <span class="here">Продакшен: выводим Django-проект «в бой»</span></nav><h1>Продакшен: выводим Django-проект «в бой»</h1>
+<p>В туториалах сайт живёт на <code>runserver</code> — это <strong>отладочный</strong> сервер разработки: медленный,<br>один процесс, не рассчитан на реальных пользователей и не защищает от внешних угроз.<br>Прод — это когда сайт работает в интернете, под своим доменом, через FastCGI/WSGI-сервер<br>и настоящую базу данных. Здесь — по шагам: от выбора окружения до автодеплоя в CI.</p>
+<pre># Быстрый чек, что у вас есть
+python3 --version   # 3.x (Django 6.x требует 3.12+)</pre>
+<hr>
+<h2>Где вообще живёт Django в проде</h2>
+<p>В проде Django <strong>никогда не слушает HTTP сам</strong>. Запрос приходит так:</p>
+<p>1. <strong>Веб-сервер</strong> (Nginx) принимает соединение снаружи, отдаёт статику (CSS, JS, картинки)<br>   и проксирует остальные запросы дальше.<br>2. <strong>WSGI/ASGI-сервер</strong> (Gunicorn, uvicorn − для асинхронности) запускает <em>несколько</em><br>   готовых процессов Django и распределяет между ними запросы.<br>3. <strong>База данных</strong> — отдельный сервис (у нас PostgreSQL), к которому Django обращается<br>   по сети, а не файлом.</p>
+<table><tr><th>Python-сервер</th><th>Веб-сервер перед ним</th></tr><tr><td>Роль</td><td>исполняет код Django</td><td>принимает HTTP снаружи</td></tr><tr><td>Примеры</td><td>Gunicorn, uvicorn, Daphne</td><td>Nginx, Caddy, Apache</td></tr><tr><td>Статика</td><td>НЕ умеет отдавать хорошо</td><td>отдаёт мгновенно + кэш</td></tr><tr><td>HTTPS</td><td>только через терминирование на Nginx</td><td>терминирует TLS сам</td></tr></table>
+<p>Django Girls: после «деплоя» на Heroku-подобном хостинге такое разделение за вас делает<br>платформа. Мы же делаем всё сами — это тоже прокачка.</p>
+<hr>
+<h2>PostgreSQL вместо SQLite</h2>
+<p>SQLite — база «на диске», работает для одного процесса и не любит одновременных записей.<br>В проде выбираем полноценный сервер БД. Стандарт — <strong>PostgreSQL</strong>.</p>
+<h3>Ставим драйвер и подключаем</h3>
+<pre>pip install psycopg          # официальный драйвер PostgreSQL для Python</pre>
+<p>В <code>settings.py</code> (<code>DATABASES</code>) заменяем SQLite на PostgreSQL:</p>
+<pre>DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "mydb",
+        "USER": "django",
+        "PASSWORD": "секрет",         # см. раздел «Безопасность» (.env)
+        "HOST": "127.0.0.1",          # или имя контейнера "db" в docker compose
+        "PORT": "5432",
+    }
+}</pre>
+<h3>Отличия от SQLite (важные)</h3>
+<ul><li>Слушает порт <code>5432</code>, подключение по сети, а не файлу.</li><li>Миграции те же команды: <code>python manage.py migrate</code>.</li><li><strong>Пароль, HOST и PORT</strong> не должны лежать в репозитории (см. <code>.env</code> ниже).</li><li>Резервная копия делается утилитой <code>pg_dump</code>, а не копированием <code>.db</code> файла.</li></ul>
+<pre># Создать БД и пользователя (пример для Ubuntu-сервера с PostgreSQL 16)
+sudo -u postgres psql -c "CREATE USER django WITH PASSWORD 'секрет';"
+sudo -u postgres psql -c "CREATE DATABASE mydb OWNER django;"
+
+# Проверить подключение Django
+python manage.py migrate</pre>
+<p>Если база и Django «глушат» друг друга — сначала проверьте, что сервис поднят<br>(<code>systemctl status postgresql</code>) и разрешён порт/пароль. Ошибки подключения почти всегда<br>про левый <code>HOST</code>, несовпадение пароля или выключенную службу.</p>
+<hr>
+<h2>Статика и медиа в проде</h2>
+<p>Скорее всего, у вас уже есть <code>static/</code> (CSS, JS) и, возможно, картинки пользователей<br>(<code>media/</code>). На <code>runserver</code> Django отдаёт их сам — в проде НЕ должен. Всю статику отдаёт Nginx.</p>
+<pre>python manage.py collectstatic --noinput   # собрать статику в STATIC_ROOT</pre>
+<pre># settings.py
+import os
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")   # куда collectstatic кладёт файлы
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")          # загруженные фото/файлы</pre>
+<p>А Nginx уже отдаёт эти папки напрямую (пример конфига — ниже, секция «Деплой классика»).</p>
+<hr>
+<h2>WSGI и ASGI: в чём разница</h2>
+<p><strong>WSGI</strong> — синхронный стандарт: на каждый запрос один процесс/поток. Этого достаточно для<br>подавляющего большинства сайтов.</p>
+<p><strong>ASGI</strong> — асинхронный: один процесс обрабатывает много запросов одновременно. Нужен для<br>WebSockets (чат, уведомления) и для <code>async def</code>-представлений.</p>
+<p>Выбираем так:</p>
+<table><tr><th>Задача</th><th>WSGI (Gunicorn)</th><th>ASGI (uvicorn / Daphne)</th></tr><tr><td>Обычный сайт, формы, база</td><td>✔ стандарт</td><td>тоже можно</td></tr><tr><td>WebSockets, SSE, чат</td><td>✘ не умеет</td><td>✔ нужен именно он</td></tr><tr><td><code>async def</code>-страницы</td><td>✘</td><td>✔</td></tr></table>
+<p>Django умеет и то и другое. Если большинство представлений обычные <code>def</code> — берите WSGI.<br>Потребовались WebSockets/async — переходите на ASGI, код моделей и шаблонов почти не меняется.</p>
+<p>Пример <code>async def</code>-представления (работает только при ASGI-сервере):</p>
+<pre># app/views.py
+async def counter(request):
+    # длинный запрос к внешнему API условно ждёт без блокировки других воркеров
+    import asyncio
+    await asyncio.sleep(0.01)
+    return render(request, "app/counter.html", {"n": 1})</pre>
+<p>На WSGI такой код упадёт или заблокирует процесс — запомните маркер: <strong>если в коде<br><code>async def</code> и <code>await</code> во view-слое — нужен ASGI-сервер</strong>.</p>
+<p>Gunicorn умеет работать в ASGI-режиме через <code>--worker-class uvicorn.workers.UvicornWorker</code>,<br>так что менеджер процессов один и тот же, отличаются только воркеры.</p>
+<pre>pip install gunicorn uvicorn
+# WSGI
+gunicorn config.wsgi --bind 127.0.0.1:8000 --workers 3
+# ASGI (те же команды рестарта/логов, другой worker-class)
+gunicorn config.asgi --worker-class uvicorn.workers.UvicornWorker --bind 127.0.0.1:8000</pre>
+<hr>
+<h2>Деплой «классика»: VPS + Gunicorn + Nginx</h2>
+<p>Полное разделение сервисов, полностью под вашим контролем. Схема:</p>
+<pre> Браузер  →  Nginx :80/:443 (HTTPS, статика)
+                      │
+                      └── прокси → 127.0.0.1:8000 → Gunicorn (3 воркера) → Django
+ База PostgreSQL слушает 127.0.0.1:5432 (только локально!)</pre>
+<h3>1. Gunicorn слушает локальный адрес</h3>
+<p>Обратите внимание: Gunicorn НЕ должен быть виден снаружи — <code>--bind 127.0.0.1:8000</code>,<br>а не <code>0.0.0.0</code>. Снаружи его «прикрывает» Nginx.</p>
+<pre>pip install gunicorn
+# 3 воркера — разумный дефолт для небольшого проекта
+gunicorn --bind 127.0.0.1:8000 --workers 3 myproject.wsgi:application</pre>
+<h3>2. systemd-служба: сайт живёт после перезагрузки сервера</h3>
+<p>Файл <code>/etc/systemd/system/gunicorn.service</code>:</p>
+<pre>[Unit]
+Description=Gunicorn instance — my django site
+After=network.target
+
+[Service]
+User=django
+Group=django
+WorkingDirectory=/home/django/myproject
+Environment="PATH=/home/django/myproject/venv/bin"
+ExecStart=/home/django/myproject/venv/bin/gunicorn --bind 127.0.0.1:8000 --workers 3 config.wsgi:application
+
+[Install]
+WantedBy=multi-user.target</pre>
+<pre>sudo systemctl daemon-reload
+sudo systemctl enable --now gunicorn      # автозапуск при загрузке сервера
+sudo systemctl status gunicorn            # смотреть статус
+sudo journalctl -u gunicorn -f            # смотреть логи в реальном времени</pre>
+<h3>3. Nginx: HTTPS и статика</h3>
+<p>Конфиг <code>/etc/nginx/sites-available/mysite</code>:</p>
+<pre>server {
+    listen 80;
+    server_name mydomain.ru www.mydomain.ru;
+
+    # Статика и медиа отдаём напрямую, минуя Django
+    location /static/ { alias /home/django/myproject/staticfiles/; }
+    location /media/  { alias /home/django/myproject/media/; }
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}</pre>
+<pre>sudo ln -s /etc/nginx/sites-available/mysite /etc/nginx/sites-enabled/
+sudo nginx -t &amp;&amp; sudo systemctl reload nginx</pre>
+<p><strong>Важно про заголовки</strong> (они пригодится и в безопасности): Django считает, что запрос<br>идёт напрямую к нему. Через эти <code>proxy_set_header</code> мы честно передаём реального посетителя.</p>
+<pre># settings.py — включить, когда сайт за Nginx/HTTPS
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True</pre>
+<p>Без этих настроек Django не узнает о HTTPS и построит неверные ссылки.</p>
+<h3>4. HTTPS (Let's Encrypt)</h3>
+<p>Бесплатные сертификаты на русском просто: утилита <code>certbot</code> сама правит конфиг Nginx<br>и продлевает сертификаты. После первого выпуска добавляет редирект с HTTP на HTTPS.</p>
+<pre>sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d mydomain.ru -d www.mydomain.ru
+# продление автоматическое через systemd-таймер certbot</pre>
+<hr>
+<h2>Docker Compose: весь прод одной командой</h2>
+<p>Альтернатива «классике» — всё в контейнерах: приложение, PostgreSQL, Nginx.<br>Плюс: одинаковое окружение на любой машине и на сервере. Минус: чуть больше понятий.</p>
+<h3>Структура</h3>
+<pre>myproject/
+├── config/            # settings.py, urls.py (там же wsgi.py / asgi.py)
+├── app/               # ваше приложение Django
+├── requirements.txt
+├── Dockerfile
+└── docker-compose.yml</pre>
+<h3>Dockerfile</h3>
+<pre>FROM python:3.13-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Сначала только зависимости (кэш слоя: код меняется чаще, чем requirements.txt)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 8000
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]</pre>
+<h3>docker-compose.yml</h3>
+<pre>services:
+  django:
+    build: .
+    volumes:
+      - static_data:/app/staticfiles
+    expose:
+      - "8000"            # только внутри сети compose
+    environment:
+      - DJANGO_DEBUG=0
+      - POSTGRES_HOST=db  # имя сервиса, НЕ localhost!
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=django
+      - POSTGRES_PASSWORD=секрет
+      - POSTGRES_DB=mydb
+    volumes:
+      - pgdata:/var/lib/postgresql/data   # данные переживают пересоздание контейнера
+
+  nginx:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_data:/static:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - django
+
+volumes:
+  pgdata:
+  static_data:</pre>
+<p>Nginx в compose отдаёт статику из общего <code>static_data</code>-тома и проксирует всё остальное<br>на сервис <code>django</code> (имя = адрес в compose-сети):</p>
+<pre>server {
+    listen 80;
+
+    location /static/ { alias /static/; }
+
+    location / {
+        proxy_pass http://django:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}</pre>
+<h3>Команды</h3>
+<pre>docker compose up -d                 # собрать и запустить всё
+docker compose exec django python manage.py migrate
+docker compose exec django python manage.py collectstatic --noinput
+docker compose logs -f               # логи всех сервисов
+docker compose down                  # остановить (данные pgdata сохраняются)
+docker compose build django          # пересобрать после правок кода</pre>
+<p>Мини-шпаргалка по compose — в разделе «Документация» (Docker для Django); здесь показан<br>именно прод-вариант с Nginx и томами для данных.</p>
+<hr>
+<h2>Деплой за вас: PaaS</h2>
+<p>Иногда хочется без администрирования одного сервера. Тогда сервисы <strong>Platform as a Service</strong><br>сами собирают и запускают ваше приложение, дают HTTPS и БД:</p>
+<table><tr><th>Сервис</th><th>Что даёт «бесплатно»</th></tr><tr><td>Render</td><td>GitHub-деплой, PostgreSQL, temp free-тир</td></tr><tr><td>Railway</td><td>простой App + БД, деплой из репозитория</td></tr><tr><td>Fly.io</td><td>глобальный деплой Docker, платный минуты</td></tr><tr><td>Yandex Cloud / Timeweb Cloud</td><td>российские площадки, VPS или PaaS-контейнеры</td></tr></table>
+<p>Общая идея: кладёте проект в GitHub, подключаете сервис к репозиторию, и он <strong>сам</strong> ставит<br>зависимости, мигрирует БД и обновляет сайт после каждого <code>git push</code>. Dockerfile выше —<br>это и есть типовой «контракт», который понимают такие платформы.</p>
+<hr>
+<h2>CI/CD: чтобы <code>git push</code> = деплой</h2>
+<p><strong>CI/CD</strong> (Continuous Integration / Continuous Delivery) — автоматизация: после каждого пуша<br>сервер действий прогоняет тесты и, если всё зелёное, выкатывает сайт. Самый популярный —<br><strong>GitHub Actions</strong> (бесплатный для opensource).</p>
+<p>Файл <code>.github/workflows/deploy.yml</code>:</p>
+<pre>name: deploy
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt
+      - run: python manage.py test        # тесты — «зелёный свет» на деплой
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt
+      - run: python manage.py collectstatic --noinput
+      # Здесь: загрузка на ваш сервер (ssh + rsync) или push в PaaS.
+      # Для GitHub Pages, как у этого сайта, хватает шагов выше.
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site</pre>
+<p>Секреты (пароли, токены SSH) хранятся в настройках репозитория → <em>Settings → Secrets</em>,<br>в коде их не должно быть. GitHub сам подставляет их при запуске пайплайна.</p>
+<p>Минимум для старта: <strong>тесты обязательны</strong> — деплоить непроверенный код на прод — боль.</p>
+<hr>
+<h2>Безопасность: обязательный минимум</h2>
+<h3>1. Пароли и настройки не в коде (.env)</h3>
+<p>Файл <code>.env</code> — локальный, в <code>.gitignore</code>. В нём секреты, которые различаются между<br>окружениями:</p>
+<pre># .env (НЕ отправлять в git!)
+DJANGO_SECRET_KEY=...
+DJANGO_DEBUG=0
+POSTGRES_PASSWORD=секрет</pre>
+<pre># settings.py
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+DEBUG = os.getenv("DJANGO_DEBUG", "0") == "1"
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("POSTGRES_DB", "mydb"),
+        "USER": os.getenv("POSTGRES_USER", "django"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+        "HOST": os.getenv("POSTGRES_HOST", "127.0.0.1"),
+        "PORT": "5432",
+    }
+}</pre>
+<pre>pip install python-dotenv</pre>
+<p>Если секрет всё же попал в git — считайте его скомпрометированным: поменяйте и<br>перепишите историю (или просто меняйте секрет как минимум).</p>
+<h3>2. <code>DEBUG = False</code> — всегда на проде</h3>
+<p><code>DEBUG=1</code> на проде — катастрофа: на любой ошибке кто угодно увидит <strong>полный трейсбек,<br>строки кода, переменные, пароли</strong> и непокрытые URL. Секрет, <code>ALLOWED_HOSTS</code>, отладчик —<br>всё наружу.</p>
+<pre># обязательная настройка при DEBUG=False
+ALLOWED_HOSTS = ["mydomain.ru", "www.mydomain.ru"]</pre>
+<p>Пустой или заблокированный host приведёт к отказу (это и есть защита от fake Host-заголовка).</p>
+<h3>3. Безопасные HTTP-заголовки (middleware)</h3>
+<p>В финальных версиях Django безопасные заголовки включены по умолчанию в<br><code>MIDDLEWARE</code> (в свежем проекте они уже там). Проверьте в <code>settings.py</code>:</p>
+<pre>MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",   # HSTS, X-Content-Type-Options
+    # ... остальные
+]</pre>
+<p>Важные настройки под ними:</p>
+<pre>SECURE_SSL_REDIRECT = True               # редирект на HTTPS
+SESSION_COOKIE_SECURE = True             # cookie только по HTTPS
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 31536000           # заставить браузер ходить только по HTTPS</pre>
+<h3>4. Файервол и доступы</h3>
+<pre># Пропускаем только 80, 443 и SSH (пример для ufw) — никакой 8000 наружу!
+sudo ufw allow 22/tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw enable</pre>
+<p><code>8000</code> должен быть доступен только локально/в compose-сети. Открытый наружу<br>Gunicorn/Django — типичная дыра (нет HTTPS, уязвим к spoofing-заголовкам).</p>
+<h3>5. Чек-лист перед деплоем</h3>
+<pre>python manage.py check --deploy    # встроенный аудит (выведет список рекомендаций)
+python manage.py test              # все тесты зелёные
+python manage.py migrate           # последние миграции на прод-базе
+python manage.py collectstatic --noinput</pre>
+<p><code>check --deploy</code> не решает проблемы за вас, но перечисляет незакрытые места<br>(HTTP, cookies без Secure, слабый SECRET_KEY и т.п.) по пунктам.</p>
+<hr>
+<h2>Практический план «с нуля до проды»</h2>
+<p>1. <strong>Локально</strong>: переключили БД на PostgreSQL, вынесли секреты в <code>.env</code>,<br>   включили <code>ALLOWED_HOSTS</code>, выключили <code>DEBUG</code>.<br>2. <strong>Статика</strong>: <code>collectstatic</code> работает, папка в <code>.gitignore</code> (генерируется заново).<br>3. <strong>Сервер</strong>: купили VPS, настроили SSH-ключ, поставили Python, PostgreSQL, Nginx.<br>4. <strong>Приложение</strong>: склонировали репозиторий, создали venv, поставили зависимости,<br>   настроили <code>.env</code>, запустили <code>migrate</code>, <code>collectstatic</code>.<br>5. <strong>Запуск</strong>: Gunicorn как systemd-служба + Nginx как веб-сервер + HTTPS через certbot.<br>6. <strong>CI/CD</strong>: добавили GitHub Actions: тесты → автодеплой при каждом пуше.<br>7. <strong>Мониторинг</strong>: <code>journalctl -u gunicorn -f</code> (логи), <code>systemctl status</code>, бэкапы<br>   <code>pg_dump</code> по расписанию.</p>
+<p>Каждый шаг проверяем отдельно. Начинающий с этим справится за один день от заказа<br>сервера до доступного сразу в браузере сайта: исчезающе маленькая часть синтаксиса Django —<br>вся сложность в связке сервисов, а её можно переиспользовать для любого проекта.</p>
+<hr>
+<h2>Источники и как углубиться</h2>
+<ul><li>Django: развёртывание (deployment) — docs.djangoproject.com/en/stable/howto/deployment/</li><li>Gunicorn docs — docs.gunicorn.org</li><li>Nginx — nginx.org; официальное руководство по обратному прокси</li><li>Docker Compose — docs.docker.com/compose</li><li>GitHub Actions — docs.github.com/actions</li><li>Актуальная таблица поддерживаемых версий Django — djangoproject.com/download/</li><li>Решение типичных проблем — «Getting Help FAQ» на djangoproject.com</li></ul>
+<p>Помните главное: <code>runserver</code> остаётся для разработки, Gunicorn+Nginx для прода.<br>И перед каждым деплоем — тесты и <code>check --deploy</code>.</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com ·
+ <a href="https://github.com/KilmanR/django-guide/issues">Сообщить об ошибке</a></footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>
