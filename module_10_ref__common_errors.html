@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Частые ошибки в Django: топ-10 и их расшифровка — django-guide</title>
+<meta name="description" content="django-guide · Частые ошибки в Django: топ-10 и их расшифровка — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Частые ошибки в Django: топ-10 и их расшифровка, on русском, github pages">
+<meta name="author" content="Big Pickle и Саша">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Частые ошибки в Django: топ-10 и их расшифровка — django-guide">
+<meta property="og:description" content="django-guide · Частые ошибки в Django: топ-10 и их расшифровка — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a> <span class="sep">/</span> <a href="index.html#dokumentaciya">Документация</a> <span class="sep">/</span> <span class="here">Частые ошибки в Django: топ-10 и их расшифровка</span></nav><nav class="chapter-nav" aria-label="Навигация по главам"><a class="prev" href="module_10_ref__custom_user.html">← Custom User Model: свой AbstractUser с первого дня</a><span class="nav-spacer"></span><a class="next" href="module_10_ref__upgrade.html">Что изменилось с Django 2.x: шпаргалка обновления →</a></nav><h1>Частые ошибки в Django: топ-10 и их расшифровка</h1>
+<p>Ошибки Django бывают пугающими по форме, но почти всегда — привычными по сути.<br>Здесь — «частотная десятка»: как выглядит traceback, что реально происходит<br>и что делать. Ищите свою ошибку по названию исключения.</p>
+<h2>1. TemplateDoesNotExist</h2>
+<pre>django.template.exceptions.TemplateDoesNotExist: blog/post_detail.html</pre>
+<p><strong>Что произошло:</strong> Django не нашёл шаблон по переданному имени.</p>
+<p><strong>Почему бывает:</strong><br>- опечатка в имени файла или пути;<br>- шаблон создан не там, где Django ищет (не в папке <code>templates</code> приложения, а рядом);<br>- не отрестартовал develop-сервер после создания файла;<br>- в <code>render(request, "...")</code> передан путь без ведущего <code>app/</code>.</p>
+<p><strong>Что делать:</strong></p>
+<pre>python manage.py check   # проверит структуру</pre>
+<p>Убедитесь, что файл лежит в <code>app/templates/app/post_detail.html</code> и имена совпадают<br>с точностью до символа.</p>
+<h2>2. NoReverseMatch</h2>
+<pre>django.urls.exceptions.NoReverseMatch: Reverse for 'post_detail' not found.
+'post_detail' is not a valid view function or pattern name.</pre>
+<p><strong>Что произошло:</strong> вы написали <code>{% url 'post_detail' ... %}</code> (или <code>reverse(...)</code>) —<br>а URL с таким именем не существует.</p>
+<p><strong>Почему бывает:</strong><br>- <code>name=</code> не указан в <code>path()</code> — urlpattern не зарегистрирован под именем;<br>- опечатка в имени;<br>- URL живёт в другом приложении, и вы забыли <code>app_name</code> / пространство имён;<br>- в <code>{% url %}</code> переданы неправильные аргументы (не хватает <code>pk</code> и т.д.).</p>
+<p><strong>Что делать:</strong> открыть <code>urls.py</code>, найти <code>path(... name='...')</code>. Имя в шаблоне должно<br>совпадать. Ошибка почти всегда «имя или аргументы не те».</p>
+<h2>3. OperationalError: no such table</h2>
+<pre>sqlite3.OperationalError: no such table: blog_post</pre>
+<p><strong>Что произошло:</strong> Django обращается к таблице, которой нет в базе.</p>
+<p><strong>Почему бывает:</strong><br>- миграции не применены: <code>python manage.py makemigrations</code> и <code>migrate</code>;<br>- создали модель после того как сайт запущен — таблица появится только после migrate;<br>- начинали проект на другой базе (напр., тестовая) и переключились.</p>
+<p><strong>Что делать:</strong></p>
+<pre>python manage.py makemigrations
+python manage.py migrate
+python manage.py showmigrations   # посмотреть, что не применено</pre>
+<h2>4. DisallowedHost</h2>
+<pre>DisallowedHost: Invalid HTTP_HOST header: 'myapp.herokuapp.com'.
+You may need to add 'myapp.herokuapp.com' to ALLOWED_HOSTS.</pre>
+<p><strong>Что произошло:</strong> Django отклоняет запрос — <code>Host</code>-заголовок не в <code>ALLOWED_HOSTS</code>.</p>
+<p><strong>Почему бывает:</strong> на новом домене/порту забыли список. Баг-фича: это защита от подделки<br>Host-заголовка.</p>
+<p><strong>Что делать:</strong> добавить свой домен в <code>ALLOWED_HOSTS = ["mydomain.ru"]</code> (не заводите туда<br><code>*</code> на проде). В разработке можно <code>["localhost", "127.0.0.1"]</code>.</p>
+<h2>5. KeyError при обращении к <code>request.POST</code></h2>
+<pre>KeyError: 'title'</pre>
+<p><strong>Что произошло:</strong> обращаетесь к полю формы как <code>request.POST['title']</code>, а его нет.</p>
+<p><strong>Что делать:</strong> почти всегда лучше работать через форму: <code>form = MyForm(request.POST)</code>,<br><code>form.is_valid()</code>, <code>form.cleaned_data['title']</code>. <code>request.POST</code> даёт <code>KeyError</code> для<br>отсутствующего ключа — несовпадение имён в HTML и view.</p>
+<h2>6. AttributeError: 'NoneType' object has no attribute ...</h2>
+<pre>AttributeError: 'NoneType' object has no attribute 'title'</pre>
+<p><strong>Что произошло:</strong> переменная <code>None</code>, а вы пытаетесь взять у неё поле.</p>
+<p><strong>Почему бывает:</strong><br>- <code>get()</code> вернул ничего → <code>post = Post.objects.get(...)</code> упал на <code>DoesNotExist</code>, если<br>  запись отсутствует — но если повезло один раз и записи нет, код идёт дальше как будто<br>  объект есть;<br>- <code>request.user</code> не авторизован и <code>is_authenticated</code> в коде не проверен.</p>
+<p><strong>Что делать:</strong></p>
+<pre>post = Post.objects.filter(pk=pk).first()   # None вместо исключения
+if post is None:
+    raise Http404("Пост не найден")</pre>
+<p>Для <code>request.user</code> используйте <code>request.user.is_authenticated</code> до обращения к полям.</p>
+<h2>7. RelatedObjectDoesNotExist / DoesNotExist</h2>
+<pre>RelatedObjectDoesNotExist: User has no profile.</pre>
+<p><strong>Что произошло:</strong> OneToOne обращение к несуществующей записи: <code>user.profile.avatar</code><br>без проверки, есть ли профиль.</p>
+<p><strong>Что делать:</strong></p>
+<pre>profile = getattr(user, "profile", None)
+# или
+try:
+    profile = user.profile
+except Profile.DoesNotExist:
+    profile = None</pre>
+<h2>8. ValueError: Cannot query "..." Must be an instance of ...</h2>
+<pre>ValueError: Cannot query "Blog": Must be "Blog" instance.</pre>
+<p><strong>Что произошло:</strong> фильтруете по полю, передав не объект модели, а его имя/строку/id<br>неправильно: <code>Post.objects.filter(blog=blog_id)</code> вместо <code>blog=blog_instance</code>.</p>
+<p><strong>Что делать:</strong> передавайте объект:</p>
+<pre>blog = Blog.objects.get(pk=blog_id)
+Post.objects.filter(blog=blog)</pre>
+<h2>9. FieldError: Cannot resolve keyword</h2>
+<pre>FieldError: Cannot resolve keyword 'creteated' into field. Choices are: ...</pre>
+<p><strong>Что произошло:</strong> опечатка в имени поля в <code>filter/values/order_by</code>.</p>
+<p><strong>Что делать:</strong> сообщение перечисляет доступные поля — сверьтесь с моделью.</p>
+<h2>10. CSRF verification failed</h2>
+<pre>CSRF verification failed. Request aborted.</pre>
+<p><strong>Что произошло:</strong> POST без корректного CSRF-токена.</p>
+<p><strong>Почему бывает:</strong><br>- в HTML <code>&lt;form&gt;</code> нет <code>{% csrf_token %}</code>;<br>- AJAX-запрос без токена;<br>- (не частый случай) включён <code>CSRF_USE_SESSIONS</code> и <code>SessionMiddleware</code> не в списке.</p>
+<p><strong>Что делать:</strong> вставить <code>{% csrf_token %}</code> внутрь формы. Для AJAX — передавать токен<br>в заголовке <code>X-CSRFToken</code> (подробно — «Формы и безопасность» в документации).<br><code>@csrf_exempt</code> на view — почти всегда признак того, что вы обходите защиту, а не красиво её<br>решаете.</p>
+<h2>Ещё быстрые подсказки</h2>
+<table><tr><th>Ошибка</th><th>Смысл</th></tr><tr><td><code>ImproperlyConfigured</code></td><td>что-то с настройками — читаем текст до двоеточия</td></tr><tr><td><code>MigrationSchemaMissing</code></td><td>«миграции не синхронизированы» → <code>migrate</code></td></tr><tr><td><code>StaticFilesStorage Warning</code></td><td>не собран <code>collectstatic</code></td></tr><tr><td><code>MEDIA_URL</code> в шаблоне на пустом месте</td><td>не подали <code>request</code> через <code>render</code> с запросом</td></tr><tr><td><code>RuntimeWarning: received signal SIGINT</code></td><td>не ошибка кода, а пойманный Ctrl+C</td></tr></table>
+<p>Почти все ошибки решаются по одному паттерну: <strong>прочитайте имя исключения как подсказку</strong>,<br>проверьте миграции (<code>migrate</code>), имя шаблона, имя URL и передаваемые аргументы формы.<br>Если непонятно — <code>python manage.py shell</code> и пощёлкайте там шаг за шагом: видно на своих<br>данных.</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com ·
+ <a href="https://github.com/KilmanR/django-guide/issues">Сообщить об ошибке</a></footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -38,7 +38,7 @@
   </div>
 </header>
 <main class="wrap">
-<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a> <span class="sep">/</span> <a href="index.html#dokumentaciya">Документация</a> <span class="sep">/</span> <span class="here">Docker для Django (основные понятия и команды)</span></nav><h1>Docker для Django (основные понятия и команды)</h1>
+<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a> <span class="sep">/</span> <a href="index.html#deploy">Деплой</a> <span class="sep">/</span> <span class="here">Docker для Django (основные понятия и команды)</span></nav><h1>Docker для Django (основные понятия и команды)</h1>
 <p>Docker обёртывает приложение в <strong>контейнер</strong> — изолированное окружение, где уже есть<br>Python, библиотеки и запуск команд. Так проект живёт одинаково на любом компьютере.</p>
 <h2>Ключевые понятия (коротко)</h2>
 <table><tr><th>Термин</th><th>Что это</th></tr><tr><td><strong>Образ (image)</strong></td><td>«чертёж»/пакет со всем нужным (Python + Django + код). Неизменяем.</td></tr><tr><td><strong>Контейнер (container)</strong></td><td>запущенный образ — живой процесс (сами запускаете/останавливаете).</td></tr><tr><td><strong>Dockerfile</strong></td><td>файл-инструкция, из которого строится образ.</td></tr><tr><td><strong>docker-compose</strong></td><td>много контейнеров сразу (у нас web + база postgres) одной командой.</td></tr><tr><td><strong>Docker Hub / registry</strong></td><td>онлайн-хранилище готовых образов (<code>postgres:16</code>, <code>python:3.12</code>).</td></tr></table>

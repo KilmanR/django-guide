@@ -52,4 +52,7 @@
   <url><loc>https://kilmanr.github.io/django-guide/module_08_mdn_django__part13_mdn.html</loc></url>
   <url><loc>https://kilmanr.github.io/django-guide/module_08_mdn_django__part14_mdn.html</loc></url>
   <url><loc>https://kilmanr.github.io/django-guide/module_09_prod__prod.html</loc></url>
+  <url><loc>https://kilmanr.github.io/django-guide/module_10_ref__custom_user.html</loc></url>
+  <url><loc>https://kilmanr.github.io/django-guide/module_10_ref__common_errors.html</loc></url>
+  <url><loc>https://kilmanr.github.io/django-guide/module_10_ref__upgrade.html</loc></url>
 </urlset>

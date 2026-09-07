@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Custom User Model: свой AbstractUser с первого дня — django-guide</title>
+<meta name="description" content="django-guide · Custom User Model: свой AbstractUser с первого дня — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Custom User Model: свой AbstractUser с первого дня, on русском, github pages">
+<meta name="author" content="Big Pickle и Саша">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Custom User Model: свой AbstractUser с первого дня — django-guide">
+<meta property="og:description" content="django-guide · Custom User Model: свой AbstractUser с первого дня — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a> <span class="sep">/</span> <a href="index.html#dokumentaciya">Документация</a> <span class="sep">/</span> <span class="here">Custom User Model: свой AbstractUser с первого дня</span></nav><nav class="chapter-nav" aria-label="Навигация по главам"><span class="nav-spacer"></span><a class="next" href="module_10_ref__common_errors.html">Частые ошибки в Django: топ-10 и их расшифровка →</a></nav><h1>Custom User Model: свой AbstractUser с первого дня</h1>
+<p>Официальная рекомендация Django: <strong>не используйте стандартного <code>User</code>, если знаете,<br>что модель пользователя понадобится менять</strong> (поле «телефон», «nickname», свой UUID-логин<br>и т.д.). Делать это нужно <strong>в самом начале проекта, до первой миграции</strong>: после того как<br><code>auth_user</code> уже создан, сменить модель пользователя — очень болезненно.</p>
+<h2>Почему «до первой миграции»</h2>
+<p>У Django две главные модели: ваши и встроенная <code>auth.User</code>. Переключить встроенную<br>модель (через <code>AUTH_USER_MODEL</code>) можно <strong>только пока БД не создана</strong> — точнее, пока ни одна<br>миграция <code>auth</code> не применена. Если проект уже запущен и в базе есть <code>auth_user</code>, путь<br>назад — ручная миграция данных (неприятно, уязвимо).</p>
+<pre>7 секунд сейчас → 7 часов рефакторинга потом</pre>
+<h2>Как правильно (минимальный вариант)</h2>
+<h3>Шаг 1. Создайте приложение для пользователя сразу</h3>
+<pre>python manage.py startapp users
+python manage.py startapp accounts   # или любое имя</pre>
+<h3>Шаг 2. Напишите модель на базе AbstractUser</h3>
+<pre># users/models.py
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+class User(AbstractUser):
+    """Наша модель пользователя: все поля стандартные + добавляем свои."""
+    phone = models.CharField(max_length=20, blank=True)
+    bio = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.username</pre>
+<p><code>AbstractUser</code> даёт всё, что было во встроенном <code>User</code> (username, password, groups,<br>permissions, email, first_name, last_name, is_staff, is_superuser, is_active, date_joined).<br>Вы просто добавляете свои поля.</p>
+<h3>Шаг 3. Укажите <code>AUTH_USER_MODEL</code> в настройках</h3>
+<pre># settings.py
+AUTH_USER_MODEL = "users.User"</pre>
+<p>До <code>makemigrations</code>! Это самая важная строка в проекте с кастомной моделью.</p>
+<h3>Шаг 4. Формы пользователя</h3>
+<p>Стандартные <code>UserCreationForm</code>/<code>UserChangeForm</code> работают со встроенной моделью. Для<br>своей — наследуйте:</p>
+<pre># users/forms.py
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from .models import User
+
+class UserCreationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ("username", "email")
+
+class UserChangeForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = "__all__"</pre>
+<h3>Шаг 5. Подключите в админке</h3>
+<pre># users/admin.py
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from .models import User
+from .forms import UserCreationForm, UserChangeForm
+
+@admin.register(User)
+class UserAdmin(UserAdmin):
+    add_form = UserCreationForm
+    form = UserChangeForm
+    model = User</pre>
+<h3>Шаг 6. Регистрация пользователей (вьюхи)</h3>
+<p>Типичная view для регистрации:</p>
+<pre># users/views.py
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
+from .forms import UserCreationForm
+
+def signup(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)          # сразу залогинили
+            return redirect("home")
+    else:
+        form = UserCreationForm()
+    return render(request, "users/signup.html", {"form": form})</pre>
+<p>Дальше в любом месте проекта — <code>request.user</code>, и это ваша модель:</p>
+<pre>def profile(request):
+    return render(request, "users/profile.html", {"me": request.user})</pre>
+<h2>AbstractUser vs AbstractBaseUser</h2>
+<table><tr><th></th><th><code>AbstractUser</code></th><th><code>AbstractBaseUser</code></th></tr><tr><td>Что остаётся</td><td>все поля стандартного <code>User</code></td><td>только пароль, логин (<code>USERNAME_FIELD</code>), <code>is_active</code></td></tr><tr><td>Подходит</td><td>90% проектов — «User + пара своих полей»</td><td>кастомный логин (email вместо username), нетривиальные требования</td></tr><tr><td>Кода с нуля</td><td>минимум</td><td>больше: нужны <code>USERNAME_FIELD</code>, менеджер <code>BaseUserManager</code></td></tr><tr><td>Рекомендация для новичка</td><td><strong>брать её</strong></td><td>разбираться, когда нужна настоящая свобода</td></tr></table>
+<p><code>AbstractBaseUser</code> — когда Django Girl «посмотрел все, что я хочу» не хватает:<br>например, логин по email без поля username. Это отдельная мини-статья (см. ссылки в конце).</p>
+<h2>Частые ошибки</h2>
+<ul><li><strong>Забыли <code>AUTH_USER_MODEL</code> до миграций.</strong> Мигрировали <code>auth</code> → ловите проблему. Если</li></ul>
+<p>  ещё недалеко — «удалить миграции auth, создать сначала users, потом migrate».<br>- <strong><code>reverse("...")</code> с <code>settings.AUTH_USER_MODEL</code> вместо <code>User</code>.</strong> В <code>ForeignKey(..., null=True)</code><br>  принято писать <code>settings.AUTH_USER_MODEL</code>, а не класс.<br>- <strong><code>User.objects.all()</code></strong>, когда вы ждёте свою модель. Используйте <code>settings.AUTH_USER_MODEL</code><br>  и <code>get_user_model()</code>:</p>
+<pre>from django.contrib.auth import get_user_model
+User = get_user_model()          # УЖЕ ваша модель</pre>
+<ul><li><strong>Списали пример из туториала</strong> (с прямым <code>User</code>): в моделях замените</li></ul>
+<p>  <code>ForeignKey(User)</code> на <code>ForeignKey(settings.AUTH_USER_MODEL)</code>.</p>
+<h2>Чек-лист</h2>
+<p>1. <code>startapp users</code> создан.<br>2. В <code>users/models.py</code> — <code>class User(AbstractUser)</code> с вашими доп-полями.<br>3. В <code>settings.py</code> — <code>AUTH_USER_MODEL = "users.User"</code> (до migrate).<br>4. Свои <code>UserCreationForm</code>/<code>UserChangeForm</code>/<code>UserAdmin</code>.<br>5. <code>makemigrations users</code> → <code>migrate</code> → всё создалось с нуля.<br>6. <code>request.user</code> — ваша модель.</p>
+<p>Делаете так с первого же проекта — и никогда не попадёте в тупик «модель уже в базе,<br>а телефон прикрутить надо». Подробности и прод-варианты: официальный раздел<br>«Customizing authentication» в документации Django.</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com ·
+ <a href="https://github.com/KilmanR/django-guide/issues">Сообщить об ошибке</a></footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>

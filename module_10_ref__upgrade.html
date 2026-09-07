@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Что изменилось с Django 2.x: шпаргалка обновления — django-guide</title>
+<meta name="description" content="django-guide · Что изменилось с Django 2.x: шпаргалка обновления — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Что изменилось с Django 2.x: шпаргалка обновления, on русском, github pages">
+<meta name="author" content="Big Pickle и Саша">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Что изменилось с Django 2.x: шпаргалка обновления — django-guide">
+<meta property="og:description" content="django-guide · Что изменилось с Django 2.x: шпаргалка обновления — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a> <span class="sep">/</span> <a href="index.html#dokumentaciya">Документация</a> <span class="sep">/</span> <span class="here">Что изменилось с Django 2.x: шпаргалка обновления</span></nav><nav class="chapter-nav" aria-label="Навигация по главам"><a class="prev" href="module_10_ref__common_errors.html">← Частые ошибки в Django: топ-10 и их расшифровка</a><span class="nav-spacer"></span></nav><h1>Что изменилось с Django 2.x: шпаргалка обновления</h1>
+<p>Туториалы MDN и официальный текст написаны на Django 2.x, а актуальный релиз — 6.x.<br>Большинство примеров там работает и сейчас (модели, ORM, формы, админка), но <strong>синтаксис<br>некоторых строк изменился</strong>. Эта страница — быстрая памятка: встретили ошибку в старом<br>примере — нашли строку здесь, переписали, поехали дальше.</p>
+<h2>Самое главное — маршруты</h2>
+<p>В Django 2.x и раньше URL писали через регулярные выражения и <code>url()</code>:</p>
+<pre># Было (Django 1.x–3.x)
+from django.urls import url
+urlpatterns = [
+    url(r'^posts/$', views.post_list, name='post_list'),
+    url(r'^posts/(?P&lt;pk&gt;\d+)/$', views.post_detail, name='post_detail'),
+]</pre>
+<p>С Django 3.1 <code>url()</code> стал устаревшим, с Django 4.0 — удалён. Сейчас — <code>path()</code>:</p>
+<pre># Стало (Django 3.1+)
+from django.urls import path
+urlpatterns = [
+    path('posts/', views.post_list, name='post_list'),
+    path('posts/&lt;int:pk&gt;/', views.post_detail, name='post_detail'),
+]</pre>
+<table><tr><th>Регулярка (<code>url</code>)</th><th>Эквивалент в <code>path()</code></th></tr><tr><td><code>(?P&lt;pk&gt;\d+)</code></td><td><code>&lt;int:pk&gt;</code></td></tr><tr><td><code>(?P&lt;slug&gt;[\w-]+)</code></td><td><code>&lt;slug:slug&gt;</code></td></tr><tr><td><code>(?P&lt;username&gt;\w+)</code></td><td><code>&lt;str:username&gt;</code></td></tr><tr><td><code>\d{4}/</code></td><td><code>&lt;int:year&gt;</code></td></tr></table>
+<p>Регулярные выражения всё ещё возможны через <code>re_path</code> — но они нужны в редких случаях:</p>
+<pre>from django.urls import re_path
+re_path(r'^posts/(?P&lt;pk&gt;\d+)/$', views.post_detail),</pre>
+<p>В шаблонах стало одинаково: <code>{% url 'post_detail' pk=post.pk %}</code> — не изменилось.</p>
+<h2>Короткая таблица отличий 2.x → 5.x/6.x</h2>
+<table><tr><th>Что</th><th>Django 2.x</th><th>Django 5.x / 6.x</th></tr><tr><td>Маршруты</td><td><code>url()</code> + регэкспы</td><td><code>path()</code>, <code>re_path()</code></td></tr><tr><td>Промежуточное ПО</td><td><code>MIDDLEWARE_CLASSES</code></td><td><code>MIDDLEWARE</code> (список, не кортеж)</td></tr><tr><td>Статика в шаблонах</td><td><code>{% load staticfiles %}</code></td><td><code>{% load static %}</code>; <code>staticfiles</code> удалён</td></tr><tr><td>Автополе для id</td><td><code>models.AutoField</code></td><td><code>BigAutoField</code> по умолчанию</td></tr><tr><td>Настройка автополя</td><td>не было</td><td><code>DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"</code></td></tr><tr><td>PostgreSQL-драйвер</td><td><code>psycopg2</code></td><td><code>psycopg</code> (версия 3) — обе поддерживаются</td></tr><tr><td><code>django.contrib.postgres</code></td><td>встроенный модуль Django</td><td>встроенный, отдельной установки не требует</td></tr><tr><td>Асинхронные view</td><td>нет</td><td>есть: <code>async def</code>, <code>async_to_sync</code>, <code>sync_to_async</code></td></tr><tr><td>Разделители времени</td><td><code>pytz</code></td><td><code>zoneinfo</code> (начиная с Django 4.0)</td></tr><tr><td>Локализация</td><td><code>USE_L10N = True</code></td><td>всегда включена, настройка удалена</td></tr><tr><td><code>request.META</code></td><td>есть</td><td>есть (+ <code>request.headers</code> для HTTP-заголовков)</td></tr><tr><td>Переводы</td><td><code>ugettext_lazy</code></td><td><code>gettext_lazy</code> (старые имена удалены)</td></tr></table>
+<h2>Настройки, которые меняются при переносе старого проекта</h2>
+<h3>1. <code>MIDDLEWARE_CLASSES</code> → <code>MIDDLEWARE</code></h3>
+<p>В старых текстах встречается кортеж <code>MIDDLEWARE_CLASSES</code>. Это удалено. Используйте список:</p>
+<pre>MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+]</pre>
+<h3>2. <code>DEFAULT_AUTO_FIELD</code> (warning при старте на 3.2+)</h3>
+<p>Если при <code>makemigrations</code> Django пишет <code>WARNINGS: (models.W042)</code> про<br><code>AutoField</code> — добавьте в <code>settings.py</code>:</p>
+<pre>DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"</pre>
+<p>В новых проектах (<code>django-admin startproject</code> на 3.2+) эта строка уже есть — не удаляйте.</p>
+<h3>3. Статика: <code>{% load staticfiles %}</code> → <code>{% load static %}</code></h3>
+<p>В старых туториалах встречается:</p>
+<pre>{% load staticfiles %}
+&lt;link rel="stylesheet" href="{% static 'css/style.css' %}"&gt;</pre>
+<p>Пишите:</p>
+<pre>{% load static %}
+&lt;link rel="stylesheet" href="{% static 'css/style.css' %}"&gt;</pre>
+<h3>4. PostgreSQL: драйвер <code>psycopg2</code> → <code>psycopg</code></h3>
+<p>Django с 4.2 поддерживает современный драйвер <code>psycopg</code> (версия 3). В новых проектах<br>часто используют уже его. Отличия в коде нет — только в <code>pip</code>:</p>
+<pre>pip install psycopg        # современный (Django 4.2+)
+# или pip install psycopg2-binary  # старый, тоже работает</pre>
+<h2>Асинхронные view (Django 3.1+)</h2>
+<p>Из старого текста вы пришли в мир, где Django умеет <code>async def</code>:</p>
+<pre># app/views.py
+async def home(request):
+    return render(request, "app/home.html")</pre>
+<p>Это работает только на ASGI-сервере (см. раздел «Деплой»). Синхронный стиль<br>(обычные <code>def</code>) по-прежнему валиден и для большинства сайтов — ничего переписывать<br>не нужно.</p>
+<h2>Нюансы, которые ломают код «из 2.x» на практике</h2>
+<ul><li><code>django.core.urlresolvers</code> удалён → <code>django.urls</code> (<code>reverse</code>, <code>reverse_lazy</code>).</li><li><code>django.shortcuts.render_to_response</code> без контекста → лучше <code>render()</code>.</li><li><code>ugettext_lazy</code> → <code>gettext_lazy</code>, <code>ugettext</code> → <code>gettext</code>.</li><li><code>django.utils.encoding.force_text</code> → <code>force_str</code>.</li></ul>
+<p><strong>Правило:</strong> при встрече <code>ImportError</code> с именем вида <code>django.core.urlresolvers</code> — замените<br>на <code>django.urls</code>; суффикс <code>_text</code> в именах (например <code>force_text</code>) теперь называется<br><code>force_str</code>. Старые пути в примерах времен Django 1.x/2.x почти всегда соответствуют<br>новому модулю с тем же именем.</p>
+<h2>Когда писать <code>path()</code> vs <code>re_path()</code> — коротко</h2>
+<table><tr><th>Задача</th><th>Инструмент</th></tr><tr><td>«Обычные» URL: <code>/posts/5/</code>, <code>/blog/some-slug/</code></td><td><code>path()</code> с конвертерами</td></tr><tr><td>Однозначно регулярка (месяц год, UUID-формат)</td><td><code>&lt;uuid:...&gt;</code>, <code>&lt;int:...&gt;</code> и пр.</td></tr><tr><td>Остальное (сложные паттерны)</td><td><code>re_path()</code></td></tr></table>
+<h2>Проверка после обновления</h2>
+<pre>python manage.py check                  # структура и настройки
+python manage.py makemigrations --check # нет незакоммиченных миграций
+python manage.py test                   # упавшие тесты покажут код, требующий правок
+python manage.py runserver              # и открой главную — глазами быстрее всего</pre>
+<p><strong>Порядок действий при переносе старого проекта на новую версию:</strong><br>1. Поставить последнюю версию Django (актуальную, см. «Документация»).<br>2. <code>pip install -U django</code> и устранить ImportError (см. таблицу выше).<br>3. Заменить <code>MIDDLEWARE_CLASSES</code> на <code>MIDDLEWARE</code>, добавить <code>DEFAULT_AUTO_FIELD</code>.<br>4. Заменить <code>{% load staticfiles %}</code> на <code>{% load static %}</code>, <code>url()</code> на <code>path()</code>.<br>5. <code>manage.py makemigrations --check</code> и <code>manage.py test</code> — зелёное = готово к деплою.</p>
+<p>Если после чтения этого списка чувствуете, что «много всего» — на самом деле на небольших<br>учебных проектах правятся 3–5 строк на проект: маршруты, статические теги и настройки.<br>Остальная документация туториалов не менялась.</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com ·
+ <a href="https://github.com/KilmanR/django-guide/issues">Сообщить об ошибке</a></footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>
