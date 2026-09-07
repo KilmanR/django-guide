@@ -105,7 +105,8 @@ python manage.py makemigrations --check # нет незакоммиченных 
 python manage.py test                   # упавшие тесты покажут код, требующий правок
 python manage.py runserver              # и открой главную — глазами быстрее всего</pre>
 <p><strong>Порядок действий при переносе старого проекта на новую версию:</strong><br>1. Поставить последнюю версию Django (актуальную, см. «Документация»).<br>2. <code>pip install -U django</code> и устранить ImportError (см. таблицу выше).<br>3. Заменить <code>MIDDLEWARE_CLASSES</code> на <code>MIDDLEWARE</code>, добавить <code>DEFAULT_AUTO_FIELD</code>.<br>4. Заменить <code>{% load staticfiles %}</code> на <code>{% load static %}</code>, <code>url()</code> на <code>path()</code>.<br>5. <code>manage.py makemigrations --check</code> и <code>manage.py test</code> — зелёное = готово к деплою.</p>
-<p>Если после чтения этого списка чувствуете, что «много всего» — на самом деле на небольших<br>учебных проектах правятся 3–5 строк на проект: маршруты, статические теги и настройки.<br>Остальная документация туториалов не менялась.</p>
+<p>Если после чтения этого списка чувствуете, что «много всего» — на самом деле на небольших<br>учебных проектах правятся 3–5 строк на проект: маршруты, статические теги и настройки.<br>Остальная документация туториалов не менялась.</p><hr>
+<nav class="chapter-nav" aria-label="Навигация по главам"><a class="prev" href="module_10_ref__common_errors.html">← Частые ошибки в Django: топ-10 и их расшифровка</a><span class="nav-spacer"></span></nav>
 <footer>django-guide · содержимое на русском · источник: docs.djangoproject.com ·
  <a href="https://github.com/KilmanR/django-guide/issues">Сообщить об ошибке</a></footer>
 </main>

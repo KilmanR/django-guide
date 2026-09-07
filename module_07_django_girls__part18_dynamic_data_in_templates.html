@@ -82,7 +82,8 @@ def post_list(request):
     posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
     return render(request, 'blog/post_list.html', {'posts': posts})</pre>
 <p>Вот и всё! Теперь пришло время перейти к шаблону и отобразить QuerySet на странице!</p>
-<p>Подробнее о QuerySets в Django можно узнать в официальной документации: https://docs.djangoproject.com/en/1.11/ref/models/querysets/</p>
+<p>Подробнее о QuerySets в Django можно узнать в официальной документации: https://docs.djangoproject.com/en/1.11/ref/models/querysets/</p><hr>
+<nav class="chapter-nav" aria-label="Навигация по главам"><a class="prev" href="module_07_django_girls__part17_django_orm.html">← Часть 17</a><span class="nav-spacer"></span><a class="next" href="module_07_django_girls__part19_django_templates.html">Часть 19 →</a></nav>
 <footer>django-guide · содержимое на русском · источник: docs.djangoproject.com ·
  <a href="https://github.com/KilmanR/django-guide/issues">Сообщить об ошибке</a></footer>
 </main>
