@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Загрузка файлов (File uploads) — django-guide</title>
+<meta name="description" content="django-guide · Загрузка файлов (File uploads) — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Загрузка файлов (File uploads), on русском, github pages">
+<meta name="author" content="Big Pickle и Саша">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Загрузка файлов (File uploads) — django-guide">
+<meta property="og:description" content="django-guide · Загрузка файлов (File uploads) — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a> <span class="sep">/</span> <a href="index.html#dokumentaciya">Документация</a> <span class="sep">/</span> <span class="here">Загрузка файлов (File uploads)</span></nav><h1>Загрузка файлов (File uploads)</h1>
+<h2>Настройки размещения файлов</h2>
+<pre># settings.py
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')   # где ФИЗИЧЕСКИ лежат файлы
+MEDIA_URL = '/media/'                          # URL для отдачи</pre>
+<p>Раздача в dev (main urls.py):</p>
+<pre>from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)</pre>
+<h2>Поле в модели</h2>
+<pre>from django.db import models
+
+class Document(models.Model):
+    title = models.CharField(max_length=120)
+    # upload_to — подпапка (можно функцию от instance)
+    file = models.FileField(upload_to='docs/')
+    image = models.ImageField(upload_to='imgs/', blank=True, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)</pre>
+<ul><li><code>ImageField</code> требует Pillow: <code>pip install Pillow</code>.</li><li>имя файла уникализируется автоматически (добавляется суффикс).</li></ul>
+<p>Функция для upload_to:</p>
+<pre>def user_dir(instance, filename):
+    return f'users/{instance.user.id}/{filename}'
+
+class Avatar(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    img = models.ImageField(upload_to=user_dir)</pre>
+<h2>Форма с файлом</h2>
+<pre>&lt;!-- шаблон --&gt;
+&lt;form method="post" enctype="multipart/form-data"&gt;
+    {% csrf_token %}
+    {{ form.as_p }}
+    &lt;button type="submit"&gt;Загрузить&lt;/button&gt;
+&lt;/form&gt;</pre>
+<pre># forms.py
+from django import forms
+from .models import Document
+
+class DocumentForm(forms.ModelForm):
+    class Meta:
+        model = Document
+        fields = ['title', 'file']
+
+# views.py
+def upload_view(request):
+    if request.method == 'POST':
+        form = DocumentForm(request.POST, request.FILES)   # ОБЯЗАТЕЛЬНО request.FILES
+        if form.is_valid():
+            doc = form.save()          # файл сохранён в MEDIA_ROOT автоматически
+            return redirect('success')
+    else:
+        form = DocumentForm()
+    return render(request, 'upload.html', {'form': form})</pre>
+<p>Забыли <code>request.FILES</code> — файл не сохранится, форма не валидна по этому полю.</p>
+<h2>Обработка файла программно</h2>
+<pre>def raw_upload(request):
+    f = request.FILES['myfile']        # UploadedFile
+    print(f.name, f.size)
+
+    with open(f.name, 'wb+') as dest:  # медленно, для примеров
+        for chunk in f.chunks():       # chunks() — читает по кускам
+            dest.write(chunk)</pre>
+<h2>Проверка размера, типа и расширения</h2>
+<pre>MAX_SIZE = 2 * 1024 * 1024  # 2 МБ
+
+def clean_file(self):
+    f = self.cleaned_data['file']
+    if f.size &gt; MAX_SIZE:
+        raise forms.ValidationError('Файл слишком большой')
+    if not f.content_type.startswith('image/'):
+        raise forms.ValidationError('Нужно изображение')
+    ext = os.path.splitext(f.name)[1].lower()
+    allowed = {'.pdf', '.doc', '.docx'}
+    if ext not in allowed:
+        raise forms.ValidationError('Недопустимое расширение')
+    return f</pre>
+<h2>Доступ к файлу в шаблоне</h2>
+<pre>&lt;p&gt;&lt;a href="{{ doc.file.url }}"&gt;Скачать {{ doc.title }}&lt;/a&gt;&lt;/p&gt;
+&lt;!-- doc.file.url == MEDIA_URL + относительный путь --&gt;</pre>
+<h2>Хранилища</h2>
+<pre>from django.core.files.storage import default_storage
+default_storage.save('x.txt', content)          # в MEDIA_ROOT
+default_storage.exists('x.txt')
+default_storage.delete('x.txt')</pre>
+<p>Для облаков (S3/MinIO) — сторонние <code>django-storages</code> (классы <code>S3Boto3Storage</code> и пр.);<br>в settings меняется <code>DEFAULT_FILE_STORAGE</code> (в Django ≥ 4.2 – <code>STORAGES</code>).</p>
+<h2>Файл при редактировании ворса</h2>
+<ul><li><code>FileField</code> не требует обязательной загрузки при правке — если поле пустое, сохраняется старый файл.</li><li>Для полной замены файла — загрузить новый; старый файл сам не удалится (удаляйте вручную при желании).</li><li>Пиксельные (ImageField) моменты: <code>.width</code>/<code>.height</code> доступны через <code>.image</code> (PIL).</li></ul>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com ·
+ <a href="https://github.com/KilmanR/django-guide/issues">Сообщить об ошибке</a></footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>

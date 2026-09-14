@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Кэширование (Cache framework) — django-guide</title>
+<meta name="description" content="django-guide · Кэширование (Cache framework) — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Кэширование (Cache framework), on русском, github pages">
+<meta name="author" content="Big Pickle и Саша">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Кэширование (Cache framework) — django-guide">
+<meta property="og:description" content="django-guide · Кэширование (Cache framework) — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a> <span class="sep">/</span> <a href="index.html#dokumentaciya">Документация</a> <span class="sep">/</span> <span class="here">Кэширование (Cache framework)</span></nav><h1>Кэширование (Cache framework)</h1>
+<h2>Настройка CACHES в settings.py</h2>
+<pre>CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',   # уникальный id для этого кэша
+        'TIMEOUT': 300,                   # время жизни в секундах
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000,          # макс. записей до очистки
+            'CULL_FREQUENCY': 3,          # после 1000 удаляем каждую 3-ю
+        },
+    }
+}</pre>
+<p>Бэкенды (key = 'default' берутся, если не указан AJIAS):<br>- <code>LocMemCache</code> — в памяти процесса, по умолчанию. Подходит для dev и одного воркера.<br>- <code>memcached.MemcachedCache</code> / <code>PyMemcacheCache</code> — <code>LOCATION: '127.0.0.1:11211'</code>.<br>- <code>db.DatabaseCache</code> — <code>LOCATION: 'cache_table'</code> (нужна <code>python manage.py createcachetable</code>).<br>- <code>filebased.FileBasedCache</code> — <code>LOCATION: '/path/to/dir'</code>.<br>- Redis — через сторонние пакеты (<code>django-redis</code>) либо встроенный бэкенд в Django ≥ 4:<br>  <code>django.core.cache.backends.redis.RedisCache</code>.</p>
+<pre># несколько алиасов, достав по имени:
+CACHES['redis'] = {'BACKEND': '...', 'LOCATION': 'redis://127.0.0.1:6379/1'}
+from django.core.cache import caches
+r = caches['redis']</pre>
+<h2>Низкоуровневый кэш (программный доступ)</h2>
+<pre>from django.core.cache import cache
+
+cache.set('title', 'Привет', timeout=60)   # True/False
+cache.get('title', default=None)           # defaults к времени из CACHES
+cache.add('key', v, 60)                    # пишет ТОЛЬКО если ключа нет
+cache.get_or_set('key', lambda: heavy(), 60)
+cache.delete('key')
+cache.clear()                              # очистить весь кэш
+cache.has_key('key')
+cache.set_many({'a': 1, 'b': 2}, 60)
+cache.get_many(['a', 'b'])
+cache.touch('key', 60)                     # продлить TTL
+cache.incr('counter')                      # инкремент числа
+cache.decr('counter')</pre>
+<h2>Кэширование всей страницы — cache_page</h2>
+<pre>from django.views.decorators.cache import cache_page
+
+urlpatterns = [
+    path('news/', cache_page(60 * 15)(views.news)),   # 15 минут
+]
+
+# либо в самом view:
+@cache_page(60 * 15)
+def news(request):
+    ...</pre>
+<p>Декоратор не кэширует запросы с POST, cookie, сессией и параметрами в URL.</p>
+<h2>Кэш middleware (весь сайт без форсирования)</h2>
+<pre>MIDDLEWARE = [
+    'django.middleware.cache.UpdateCacheMiddleware',    # ПЕРВЫМ
+    ...                                                  # остальные
+    'django.middleware.cache.FetchFromCacheMiddleware', # ПОСЛЕДНИМ
+]
+CACHE_MIDDLEWARE_ALIAS = 'default'
+CACHE_MIDDLEWARE_SECONDS = 600
+CACHE_MIDDLEWARE_KEY_PREFIX = ''   # префикс при общем кэше</pre>
+<p>Порядок обязателен: update-мидлвер наверху, fetch-мидлвер внизу списка.<br>Внимание: кэшируются только GET-страницы без параметров строки запроса.</p>
+<h2>Кэширование фрагментов шаблона</h2>
+<pre>{% load cache %}
+{% cache 600 sidebar request.user.username %}
+    ... дорого генерируемый фрагмент ...
+{% endcache %}</pre>
+<ul><li>первый аргумент — секунды, далее «куски» ключа (можно несколько).</li><li>при использовании с cookie/сессией не забудьте их в аргументах ключа.</li></ul>
+<h2>Учёт заголовков (Vary) и версий</h2>
+<pre>from django.views.decorators.vary import vary_on_headers
+
+@vary_on_headers('User-Agent', 'Accept-Language')
+@cache_page(60 * 60)
+def index(request):
+    ...
+
+# версия ключа — просто инвалидировать логически:
+cache.set('my_key', v, version=3)
+cache.get('my_key', version=3)</pre>
+<h2>Инвалидация после изменения данных</h2>
+<p>Кэш сам не узнает, что модель изменилась — удаляйте ключи вручную:</p>
+<pre>from django.core.cache import cache
+
+def save(self, *args, **kwargs):
+    super().save(*args, **kwargs)
+    cache.delete(f'post:{self.pk}')   # или cache_manager.invalidate</pre>
+<p>Или храните версию в настройке и инкрементьте её при обновлении данных.</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com ·
+ <a href="https://github.com/KilmanR/django-guide/issues">Сообщить об ошибке</a></footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>

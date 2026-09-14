@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Middleware — django-guide</title>
+<meta name="description" content="django-guide · Middleware — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Middleware, on русском, github pages">
+<meta name="author" content="Big Pickle и Саша">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Middleware — django-guide">
+<meta property="og:description" content="django-guide · Middleware — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a> <span class="sep">/</span> <a href="index.html#dokumentaciya">Документация</a> <span class="sep">/</span> <span class="here">Middleware</span></nav><h1>Middleware</h1>
+<p>Middleware — pluggable-слой между сервером и view. Каждый мидлвер<br>обрабатывает запрос ДО view и/или ответ ПОСЛЕ view.</p>
+<h2>Порядок выполнения</h2>
+<ul><li>Запрос идёт по списку <code>MIDDLEWARE</code> СВЕРХУ ВНИЗ (первый видит запрос первым).</li><li>Ответ идёт СНИЗУ ВВЕРХ (обратный порядок).</li></ul>
+<pre>MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',        # 1. запрос
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',            # ...
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware', # последний (первым получает ответ)
+]</pre>
+<h2>Хуки в классе мидлвера (классический стиль)</h2>
+<p>Порядок вызова хуков для одного мидлвера:<br><code>process_request</code> → <code>process_view</code> → (view) → <code>process_template_response</code> /<br><code>process_response</code>; <code>process_exception</code> при ошибке в view.</p>
+<pre>class SimpleMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        # один раз при старте
+
+    def __call__(self, request):
+        # ДО view
+        response = self.get_response(request)
+        # ПОСЛЕ view (и после process_template_response)
+        response['X-My-Header'] = 'добавлено'
+        return response</pre>
+<p>Пример полного набора методов:</p>
+<pre>class LogMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def process_request(self, request):        # до маршрутизации
+        request.started = time.time()
+        return None                            # None = идём дальше
+
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        return None                            # None = вызывается view
+
+    def process_template_response(self, request, response):
+        # у ответа есть render() — TemplateResponse
+        response.context_data['now'] = request.started
+        return response
+
+    def process_exception(self, request, exception):
+        # вернуть None = прокинуть, вернуть Response = перехватить
+        return None
+
+    def process_response(self, request, response):
+        response['X-Log'] = 'ok'
+        return response</pre>
+<p>Важно: если процесс (request/response) возвращает <code>None</code> — обработка идёт дальше;<br>чтобы прервать, нужно вернуть <code>HttpResponse</code>.</p>
+<h2>Современный стиль на middlewares</h2>
+<pre>def my_middleware(get_response):
+    # инициализация один раз
+    def middleware(request):
+        # до view
+        response = get_response(request)
+        # после view
+        return response
+    return middleware</pre>
+<p>Подключение — строка <code>'myapp.middleware.my_middleware'</code> в MIDDLEWARE.</p>
+<h2>MiddlewareMixin (удобно для переноса старых процесс-методов)</h2>
+<pre>from django.utils.deprecation import MiddlewareMixin
+
+class MyMixin(MiddlewareMixin):
+    def process_request(self, request):
+        return None</pre>
+<h2>Что можно делать в мидлвере</h2>
+<ul><li>проверить/ограничить доступ: вернуть <code>HttpResponseForbidden</code> в process_request;</li><li>добавить данные в request (<code>request.user</code>, <code>request.session</code>);</li><li>изменить исходящий <code>response</code> (заголовки, сжатие);</li><li>перехватить исключение и отдать свою страницу (process_exception).</li></ul>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com ·
+ <a href="https://github.com/KilmanR/django-guide/issues">Сообщить об ошибке</a></footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>

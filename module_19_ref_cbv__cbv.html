@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class-Based Views (CBV) — вглубь — django-guide</title>
+<meta name="description" content="django-guide · Class-Based Views (CBV) — вглубь — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Class-Based Views (CBV) — вглубь, on русском, github pages">
+<meta name="author" content="Big Pickle и Саша">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Class-Based Views (CBV) — вглубь — django-guide">
+<meta property="og:description" content="django-guide · Class-Based Views (CBV) — вглубь — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a> <span class="sep">/</span> <a href="index.html#dokumentaciya">Документация</a> <span class="sep">/</span> <span class="here">Class-Based Views (CBV) — вглубь</span></nav><h1>Class-Based Views (CBV) — вглубь</h1>
+<p>FNV — функции, CBV — классы. CBV удобны для типовых сценариев: список, деталь,<br>создание/редактирование/удаление, формы.</p>
+<h2>Базовые атрибуты</h2>
+<pre>from django.views.generic import ListView
+
+class BookListView(ListView):
+    model = Book                    # достаточный минимум
+    template_name = 'app/books.html'      # по умолчанию: 'app/book_list.html'
+    context_object_name = 'books'         # переменная в шаблоне (по умолч. object_list)
+    paginate_by = 10                      # пагинация</pre>
+<h2>ListView — детали</h2>
+<pre>class BookListView(ListView):
+    model = Book
+    template_name = 'app/books.html'
+    context_object_name = 'books'
+
+    def get_queryset(self):          # переопределить выборку
+        qs = super().get_queryset()
+        return qs.filter(author__isnull=False).order_by('title')
+
+    def get_context_data(self, **kwargs):   # добавить в контекст
+        ctx = super().get_context_data(**kwargs)
+        ctx['total'] = Book.objects.count()
+        return ctx</pre>
+<h2>DetailView — детальная страница</h2>
+<pre># urls.py
+path('book/&lt;int:pk&gt;/', views.BookDetailView.as_view(), name='book_detail'),
+# или &lt;slug:slug&gt;
+
+class BookDetailView(generic.DetailView):
+    model = Book
+    template_name = 'app/book_detail.html'
+    context_object_name = 'book'
+    # автоподстановка. Если pk не тот — django возбуждает Http404</pre>
+<h2>FormView — форма (без сохранения, для действий)</h2>
+<pre>class ContactView(generic.FormView):
+    template_name = 'app/contact.html'
+    form_class = ContactForm
+    success_url = '/thanks/'
+
+    def form_valid(self, form):      # вызывает SuccessOnlyMixin
+        form.send_email()            # свои действия с данными
+        return super().form_valid(form)
+        # не возвращайте HttpResponse без super() — потеряете flow</pre>
+<h2>CreateView / UpdateView</h2>
+<pre>class BookCreate(generic.CreateView):
+    model = Book
+    fields = ['title', 'author', 'price']
+    template_name_suffix = '_form'        # app/book_form.html
+    success_url = reverse_lazy('books:list')   # reverse_lazy — на этапе класса
+
+class BookUpdate(generic.UpdateView):
+    model = Book
+    fields = ['title', 'price']
+    template_name_suffix = '_form'
+    success_url = reverse_lazy('books:list')</pre>
+<ul><li><code>fields</code> обязателен (или <code>form_class</code>).</li><li>форма выводится как <code>{{ form }}</code> в шаблоне.</li><li>для CreateView пишете form_valid — получаете instance.</li></ul>
+<h2>DeleteView + подтверждение</h2>
+<pre>class BookDelete(generic.DeleteView):
+    model = Book
+    template_name_suffix = '_confirm_delete'   # app/book_confirm_delete.html
+    success_url = reverse_lazy('books:list')</pre>
+<p>В шаблоне <code>_confirm_delete</code> — объект <code>object</code> и форма <code>{{ form }}</code>.<br>Безопасно: нужен только POST-запрос (кнопка submit внутри формы).</p>
+<h2>Mixins — переиспользование логики</h2>
+<pre>from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
+class StaffRequired(LoginRequiredMixin, UserPassesTestMixin):
+    login_url = '/accounts/login/'
+    raise_exception = True            # вместо редиректа — 403
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+class BookEdit(StaffRequired, generic.UpdateView):
+    model = Book
+    fields = ['title', 'price']
+    success_url = reverse_lazy('books:list')</pre>
+<p>Порядок: защиты сверху, <code>generic.*</code> внизу (не разбиваете Mixin-ы в разные места).</p>
+<h2>Ещё полезные штуки</h2>
+<ul><li><code>TemplateResponseMixin</code> — рендерит шаблон в <code>render_to_response</code>.</li><li><code>ContextMixin</code> — собирает контекст (get_context_data).</li><li><code>MultipleObjectMixin</code>, <code>SingleObjectMixin</code> — логика списка/объекта.</li><li>CBV можно настраивать и без наследования: <code>as_view(template_name='x.html')</code>.</li></ul>
+<h2>Что стоит запомнить</h2>
+<ul><li><code>reverse_lazy</code> (не <code>reverse</code>) — URL нужен только при вызове .as_view().</li><li>template_name_suffix:</li></ul>
+<p>  - Форм-суффиксы: <code>_form</code>, <code>_confirm_delete</code>, <code>_update</code>, <code>_create</code>.<br>- <code>get_object()</code> для DetailView — если нужен объект сразу (в get_context_data).<br>- Не вызывайте <code>super().get()</code> напрямую без причины — flow CBV строгий.</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com ·
+ <a href="https://github.com/KilmanR/django-guide/issues">Сообщить об ошибке</a></footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>

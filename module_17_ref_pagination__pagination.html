@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Пагинация (Pagination) — django-guide</title>
+<meta name="description" content="django-guide · Пагинация (Pagination) — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Пагинация (Pagination), on русском, github pages">
+<meta name="author" content="Big Pickle и Саша">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Пагинация (Pagination) — django-guide">
+<meta property="og:description" content="django-guide · Пагинация (Pagination) — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a> <span class="sep">/</span> <a href="index.html#dokumentaciya">Документация</a> <span class="sep">/</span> <span class="here">Пагинация (Pagination)</span></nav><h1>Пагинация (Pagination)</h1>
+<p>Разбиение большого списка на страницы.</p>
+<h2>Пагинация вручную (функция-вьюха)</h2>
+<pre>from django.core.paginator import Paginator
+from django.shortcuts import render
+from .models import Article
+
+def article_list(request):
+    articles = Article.objects.all().order_by('-created_at')
+    paginator = Paginator(articles, 10)              # по 10 на странице
+    page_number = request.GET.get('page')            # ?page=2
+    page_obj = paginator.get_page(page_number)       # безопасно: лишнее → последняя
+    return render(request, 'app/list.html', {'page_obj': page_obj})</pre>
+<p><code>get_page()</code> сам ловит <code>PageNotAnInteger</code> и <code>EmptyPage</code> (в отличие от <code>page()</code>).</p>
+<h2>Ключевые свойства</h2>
+<pre>page = paginator.get_page(n)
+page.object_list        # объекты текущей страницы
+page.has_next()         # есть ли следующая
+page.has_previous()
+page.next_page_number()
+page.previous_page_number()
+page.paginator.num_pages     # всего страниц
+page.paginator.page_range    # range(1, num_pages+1)
+page.number
+page.paginator.count         # всего объектов
+page.start_index()           # индекс первого элемента на странице (1..count)
+page.end_index()</pre>
+<h2>Шаблон</h2>
+<pre>{% for article in page_obj %}
+    &lt;h3&gt;{{ article.title }}&lt;/h3&gt;
+{% endfor %}
+
+&lt;div class="pagination"&gt;
+    {% if page_obj.has_previous %}
+        &lt;a href="?page={{ page_obj.previous_page_number }}"&gt;&amp;laquo;&lt;/a&gt;
+    {% endif %}
+
+    &lt;span&gt;Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}&lt;/span&gt;
+
+    {% if page_obj.has_next %}
+        &lt;a href="?page={{ page_obj.next_page_number }}"&gt;&amp;raquo;&lt;/a&gt;
+    {% endif %}
+&lt;/div&gt;
+
+&lt;!-- номера страниц --&gt;
+{% for num in page_obj.paginator.page_range %}
+    &lt;a href="?page={{ num }}"
+        {% if num == page_obj.number %} class="active" {% endif %}&gt;{{ num }}&lt;/a&gt;
+{% endfor %}</pre>
+<h2>Пагинация + QuerySet не по-странице (Count)</h2>
+<p>Если нужен только подсчёт и 1 страница — игнорируйте, пагинатор и так считает<br><code>count()</code> только когда нужно (ленивый).</p>
+<h2>CBV ListView с пагинацией</h2>
+<pre>from django.views.generic import ListView
+
+class ArticleListView(ListView):
+    model = Article
+    template_name = 'app/list.html'
+    context_object_name = 'articles'
+    paginate_by = 10                     # включая пагинацию</pre>
+<ul><li>в шаблоне доступны <code>object_list</code>, <code>paginator</code>, <code>page_obj</code>, <code>is_paginated</code>.</li><li>для «умных» ссылок с сохранением фильтров собирайте QueryDict:</li></ul>
+<pre># в шаблоне
+{% if page_obj.has_previous %}
+&lt;a href="?{{ request.GET.urlencode }}&amp;page={{ page_obj.previous_page_number }}"&gt;назад&lt;/a&gt;
+{% endif %}</pre>
+<h2>Кастомная разбивка (по датам, group)</h2>
+<pre>paginator = Paginator(articles, 10, orphans=2)   # 2 «сироты» хвоста - тоже страница
+if n &gt; paginator.num_pages:                      # ручная защита
+    n = paginator.num_pages</pre>
+<h2>Ошибки пагинации</h2>
+<ul><li><code>PageNotAnInteger</code> — «page» не число.</li><li><code>EmptyPage</code> — страницы не существует (get_page вернёт последнюю).</li></ul>
+<p>Используйте <code>get_page()</code> — он обрабатывает все исключения сам.</p>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com ·
+ <a href="https://github.com/KilmanR/django-guide/issues">Сообщить об ошибке</a></footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>

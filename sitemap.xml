@@ -55,4 +55,14 @@
   <url><loc>https://kilmanr.github.io/django-guide/module_10_ref__custom_user.html</loc></url>
   <url><loc>https://kilmanr.github.io/django-guide/module_10_ref__common_errors.html</loc></url>
   <url><loc>https://kilmanr.github.io/django-guide/module_10_ref__upgrade.html</loc></url>
+  <url><loc>https://kilmanr.github.io/django-guide/module_11_ref_caching__caching.html</loc></url>
+  <url><loc>https://kilmanr.github.io/django-guide/module_12_ref_signals__signals.html</loc></url>
+  <url><loc>https://kilmanr.github.io/django-guide/module_13_ref_middleware__middleware.html</loc></url>
+  <url><loc>https://kilmanr.github.io/django-guide/module_14_ref_logging__logging.html</loc></url>
+  <url><loc>https://kilmanr.github.io/django-guide/module_15_ref_i18n__i18n.html</loc></url>
+  <url><loc>https://kilmanr.github.io/django-guide/module_16_ref_uploads__uploads.html</loc></url>
+  <url><loc>https://kilmanr.github.io/django-guide/module_17_ref_pagination__pagination.html</loc></url>
+  <url><loc>https://kilmanr.github.io/django-guide/module_18_ref_commands__commands.html</loc></url>
+  <url><loc>https://kilmanr.github.io/django-guide/module_19_ref_cbv__cbv.html</loc></url>
+  <url><loc>https://kilmanr.github.io/django-guide/module_20_ref_email__email.html</loc></url>
 </urlset>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Management-команды — django-guide</title>
+<meta name="description" content="django-guide · Management-команды — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Management-команды, on русском, github pages">
+<meta name="author" content="Big Pickle и Саша">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Management-команды — django-guide">
+<meta property="og:description" content="django-guide · Management-команды — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a> <span class="sep">/</span> <a href="index.html#dokumentaciya">Документация</a> <span class="sep">/</span> <span class="here">Management-команды</span></nav><h1>Management-команды</h1>
+<p>Свои команды <code>./manage.py ...</code> — для фоновых задач, чистки, импорта и т.п.</p>
+<h2>Структура</h2>
+<pre>app/
+├── management/
+│   ├── __init__.py
+│   └── commands/
+│       ├── __init__.py
+│       └── clean_old.py       ★ имя файла = имя команды
+├── ... (модели, views)</pre>
+<p>Команда регистрируется автоматически при наличии <code>management/commands</code> в приложении.</p>
+<h2>Пример команды</h2>
+<pre>from django.core.management.base import BaseCommand, CommandError
+from .models import Session
+
+class Command(BaseCommand):
+    help = 'Удаляет старые сессии'
+
+    def handle(self, *args, **options):
+        count, _ = Session.objects.filter(expired__lt=...).delete()
+        self.stdout.write(self.style.SUCCESS(f'Удалено сессий: {count}'))</pre>
+<h2>Аргументы командной строки (add_arguments)</h2>
+<pre>class Command(BaseCommand):
+    help = 'Импортирует данные пользователей'
+
+    def add_arguments(self, parser):
+        parser.add_argument('source', type=str)                # позиционный
+        parser.add_argument('--limit', type=int, default=100)  # опциональный
+        parser.add_argument('--dry-run', action='store_true')  # флаг
+
+    def handle(self, *args, **options):
+        src = options['source']
+        limit = options['limit']
+        dry = options['dry_run']
+        if dry:
+            self.stdout.write('Режим проверки (без записи)')</pre>
+<p>Запуск:</p>
+<pre>python manage.py import_users data.csv --limit 50 --dry-run</pre>
+<h2>Вывод в консоль и ошибки</h2>
+<pre>self.stdout.write('обычное сообщение')            # в stdout
+self.stderr.write('в stderr')                     # в stderr
+self.stdout.write(self.style.ERROR('красно'))     # стили
+self.stdout.write(self.style.SUCCESS('зелено'))
+raise CommandError('что-то не так — команда выдаст ошибку')   # abort</pre>
+<h2>Опции по умолчанию (уже есть у BaseCommand)</h2>
+<ul><li><code>--verbosity {0,1,2,3}</code> — уровень детализации.</li><li><code>--settings</code>, <code>--pythonpath</code>, <code>--no-color</code>.</li><li><code>np:</code> чтобы выключить <code>input()</code> не забывайте: <code>options['interactive']</code>.</li></ul>
+<h2>Обращение к БД внутри handle</h2>
+<p><code>handle</code> работает в контексте Django — можно делать ORM-запросы и пользоваться<br><code>get(), filter()</code>. Для транзакций:</p>
+<pre>from django.db import transaction
+
+with transaction.atomic():
+    for item in items:
+        Item.objects.create(**item)</pre>
+<h2>Тестирование команды</h2>
+<pre>from django.core.management import call_command
+from django.test import TestCase
+
+class CleanCommandTest(TestCase):
+    def test_command(self):
+        call_command('clean_old', '--dry-run')   # тип аргументов как в CLI
+        self.assertEqual(Session.objects.count(), 0)</pre>
+<p>Проверка вывода — <code>self.assertIn</code> над <code>out</code>/<code>err</code> через StringIO:</p>
+<pre>import io
+out = io.StringIO()
+call_command('clean_old', stdout=out)
+self.assertIn('Удалено', out.getvalue())</pre>
+<h2>Cron / фоновый запуск</h2>
+<pre># каждую ночь в 2:30 — crontab
+30 2 * * * cd /home/user/proj &amp;&amp; venv/bin/python manage.py clean_old &gt;&gt; /var/log/myapp.log 2&gt;&amp;1</pre>
+<h2>Что нельзя</h2>
+<ul><li>Не писать кириллические имена команд (будут проблемы с менеджером файлов на Windows).</li><li>Не вызывать сеть в <code>__init__</code> команды.</li></ul>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com ·
+ <a href="https://github.com/KilmanR/django-guide/issues">Сообщить об ошибке</a></footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>

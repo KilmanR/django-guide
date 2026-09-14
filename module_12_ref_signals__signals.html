@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сигналы (Signals) — django-guide</title>
+<meta name="description" content="django-guide · Сигналы (Signals) — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Сигналы (Signals), on русском, github pages">
+<meta name="author" content="Big Pickle и Саша">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Сигналы (Signals) — django-guide">
+<meta property="og:description" content="django-guide · Сигналы (Signals) — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a> <span class="sep">/</span> <a href="index.html#dokumentaciya">Документация</a> <span class="sep">/</span> <span class="here">Сигналы (Signals)</span></nav><h1>Сигналы (Signals)</h1>
+<p>Сигналы — «уведомления» о происходящих событиях. Позволяют выполнить свой<br>код при сохранении модели, логине, запуске миграций и т.п., не меняя сам код<br>модели/вьюхи.</p>
+<h2>Подключение обработчика (receiver)</h2>
+<pre>from django.db.models.signals import post_save
+from django.dispatch import receiver
+from .models import Profile, User
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+# то же самое без декоратора:
+def my_handler(sender, **kwargs):
+    ...
+post_save.connect(my_handler, sender=User, dispatch_uid='uniq')</pre>
+<p><code>dispatch_uid</code> — уникальный id, чтобы обработчик не навесился дважды<br>(например, при повторном импорте модуля).</p>
+<h2>Общие сигналы моделей (django.db.models.signals)</h2>
+<ul><li><code>pre_save</code>: sender, instance, raw, using, update_fields</li><li><code>post_save</code>: sender, instance, created, raw, using, update_fields</li><li><code>pre_delete</code> / <code>post_delete</code>: sender, instance, using</li><li><code>m2m_changed</code>: сигнал о изменении ManyToMany (action, pk_set ...)</li><li><code>pre_init</code> / <code>post_init</code>: создание экземпляра модели</li></ul>
+<p>Особые сигналы действия:<br>- <code>post_migrate</code> — после <code>manage.py migrate</code> (полезно для наполнения данными)<br>- <code>request_started</code> / <code>request_finished</code> — на каждый HTTP-запрос<br>- <code>user_logged_in</code> / <code>user_logged_out</code> / <code>user_login_failed</code> (django.contrib.auth)</p>
+<pre>from django.contrib.auth.signals import user_logged_in
+
+@receiver(user_logged_in)
+def on_login(sender, request, user, **kwargs):
+    print("Залогинился:", user)</pre>
+<h2>Малоизвестное, но нужное</h2>
+<ul><li>Обработчик — обычная функция; первым аргументом всегда <code>sender</code>.</li><li>kwargs дополнительно: в общем виде <code>**kwargs</code> обязателен.</li><li><code>sender=None</code> (не указан) — ловить сигналы ВСЕХ моделей (осторожно!).</li></ul>
+<h2>Пишем свой сигнал</h2>
+<pre># app/signals.py
+from django.dispatch import Signal
+
+order_ready = Signal()          # наш сигнал без sender-ограничений
+# или с передачей данных:
+vacancy_updated = Signal()      # отправим instance_close через kwargs
+
+# место отправки (например, в view):
+from .signals import order_ready
+
+order_ready.send(sender=Order, order=order, total=order.total)
+
+# приём:
+from django.dispatch import receiver
+
+@receiver(order_ready, sender=Order)
+def notify_telegram(sender, order, total, **kwargs):
+    ...  # отправить уведомление</pre>
+<h2>Где регистрировать обработчики</h2>
+<p>Модуль приложения <code>app/signals.py</code>, а подключение — в <code>apps.py</code>:</p>
+<pre># app/apps.py
+from django.apps import AppConfig
+
+class AppConfig(AppConfig):
+    name = 'app'
+
+    def ready(self):
+        import app.signals  # noqa: F401  — зарегистрировать обработчики</pre>
+<p>Не создавайте обработчики на уровне модуля верхнего уровня — могут не загрузиться.<br><code>ready()</code> вызывается при старте приложения после загрузки всех моделей.</p>
+<h2>Отключение сигнала</h2>
+<pre>post_save.disconnect(create_user_profile, sender=User)
+# или в тестах: patch.object(...)/ блокировка через dispatch_uid</pre>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com ·
+ <a href="https://github.com/KilmanR/django-guide/issues">Сообщить об ошибке</a></footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>

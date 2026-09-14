@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Логирование (Logging) — django-guide</title>
+<meta name="description" content="django-guide · Логирование (Logging) — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta name="keywords" content="django, учебник, справочник, туториал, python, django girls, mdn, Логирование (Logging), on русском, github pages">
+<meta name="author" content="Big Pickle и Саша">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="django-guide">
+<meta property="og:title" content="Логирование (Logging) — django-guide">
+<meta property="og:description" content="django-guide · Логирование (Logging) — шпаргалка команд, документация и туториалы по Django на русском.">
+<meta property="og:url" content="https://kilmanr.github.io/django-guide/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#fafafa">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121417">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<script>
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+})();
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">django-guide</a>
+    <nav>
+      <a href="index.html">Разделы</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌓</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+<nav class="breadcrumbs" aria-label="Хлебные крошки"><a href="index.html">Главная</a> <span class="sep">/</span> <a href="index.html#dokumentaciya">Документация</a> <span class="sep">/</span> <span class="here">Логирование (Logging)</span></nav><h1>Логирование (Logging)</h1>
+<p>Django использует стандартный модуль <code>logging</code> из Python. Всё настраивается<br>в переменной <code>LOGGING</code> в <code>settings.py</code> (dictConfig).</p>
+<h2>Уровни логирования</h2>
+<p><code>DEBUG</code> < <code>INFO</code> < <code>WARNING</code> < <code>ERROR</code> < <code>CRITICAL</code><br>Запись попадает в лог только если её уровень >= порога хендлера.</p>
+<h2>Быстрый старт: простой LOGGING в settings.py</h2>
+<pre>import os
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '{asctime} {levelname} {name}: {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/app.log'),
+            'formatter': 'simple',
+            'encoding': 'utf-8',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'myapp': {              # логгер вашего приложения
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}</pre>
+<h2>Логирование в коде</h2>
+<pre>import logging
+
+logger = logging.getLogger(__name__)   # имя = 'app.views'
+
+logger.debug('отладочное')
+logger.info('запрос %s обработан', request.path)
+logger.warning('что-то подозрительное')
+logger.error('упало: %s', exc_info=True)   # exc_info — трейсбек
+logger.critical('критично')</pre>
+<p>Параметры в сообщение — через <code>%s</code> (не f-string), чтобы не считать, пока не надо.</p>
+<h2>Кастомный хендлер-фильтр</h2>
+<pre>LOGGING = {
+    ...
+    'filters': {
+        'require_debug_false': {
+            'class': 'django.utils.log.RequireDebugFalse',
+        },
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'filters': ['require_debug_false'],   # только не в DEBUG
+        },
+    },
+}</pre>
+<h2>Встроенные логгеры Django</h2>
+<ul><li><code>django</code> — основа, посылает в него всё логирование.</li><li><code>django.request</code> — каждый HTTP-запрос (уровень 4xx-5xx).</li><li><code>django.db.backends</code> — SQL-запросы (в DEBUG пишет все).</li><li><code>django.security</code> — SecurityDisallowed/другие предупреждения безопасности.</li><li><code>django.server</code> — логи сервера runserver (в dev).</li><li><code>django.template</code>, <code>django.contrib.auth</code>...</li></ul>
+<h2>Шаблон форматирования (style '{')</h2>
+<pre>{asctime}   время записи
+{levelname} уровень
+{name}      имя логгера (модуль)
+{message}   само сообщение
+{lineno}    номер строки
+{funcName}  имя функции</pre>
+<p>Для JSON-логов ловко подойдёт <code>'format': '{"t": "{asctime}", "l": "{levelname}", "m": "{message}"}'</code>.</p>
+<h2>Логирование в tests</h2>
+<pre>python -Wall manage.py test    # показать все warning-и
+# или в тестах assertLogs:
+with self.assertLogs('myapp', level='INFO') as cm:
+    do_action()
+    self.assertIn('запрос обработан', cm.output[0])</pre>
+<footer>django-guide · содержимое на русском · источник: docs.djangoproject.com ·
+ <a href="https://github.com/KilmanR/django-guide/issues">Сообщить об ошибке</a></footer>
+</main>
+
+<script>
+(function () {
+  var b = document.getElementById("themeToggle");
+  if (b) b.addEventListener("click", function () {
+    var d = document.documentElement.getAttribute("data-theme") === "dark";
+    document.documentElement.setAttribute("data-theme", d ? "light" : "dark");
+    try { localStorage.setItem("theme", d ? "light" : "dark"); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>
